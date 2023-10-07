@@ -29,7 +29,7 @@ export async function scrapeMLProduct(url: string) {
     const response = await axios.get(url, options)
     const $ = cheerio.load(response.data)
      
-    const productTitle = $('.ui-pdp-title').text().trim(); 
+    const title = $('.ui-pdp-title').text().trim(); 
     // const currentPrice = extractPrice(
     //     $('.andes-money-amount__fraction'),
     //     $('.andes-visually-hidden'),
@@ -41,7 +41,10 @@ export async function scrapeMLProduct(url: string) {
     
     const isOutOfStock = $('.ui-pdp-color--BLACK.ui-pdp-size--SMALL.ui-pdp-family--SEMIBOLD.ui-pdp-stock-information__title').text().trim().toLowerCase() !== 'stock disponible';  
     
-    const images = $('.ui-pdp-image.ui-pdp-gallery__figure__image, .ui-pdp-image');
+    const images = 
+    $('.ui-pdp-image.ui-pdp-gallery__figure__image') ||
+    $('.ui-pdp-image');
+
 
     const imageUrls: string[] = []
     
@@ -58,7 +61,7 @@ export async function scrapeMLProduct(url: string) {
 
     const originalPrice = currentPrice ? (currentPrice * 100) / (100 - discountRate) : '';
 
-    const desciption = extractDescription($)
+    const description = extractDescription($)
 
   // Construct data object with scraped information
 
@@ -66,7 +69,7 @@ export async function scrapeMLProduct(url: string) {
     url,
     currency: currency || '$',
     image: imageUrls[0],
-    productTitle,
+    title,
     currentPrice: Number(currentPrice) || Number(originalPrice),
     originalPrice: Number(originalPrice) || Number(currentPrice),
     priceHistory: [],
@@ -75,7 +78,7 @@ export async function scrapeMLProduct(url: string) {
     reviewsCount: 0,
     stars: 4.5,
     isOutOfStock,
-    desciption,
+    description,
     lowestPrice: Number(currentPrice) ||  Number(originalPrice),
     highestPrice: Number(originalPrice) || Number(currentPrice),
     average:  Number(currentPrice) ||  Number(originalPrice),

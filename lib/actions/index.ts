@@ -1,10 +1,12 @@
 'use server'
 
+import { User } from "@/types";
 import Product from "../models/product.model";
 import { connectToDb } from "../mongoose";
 import { scrapeMLProduct } from "../scraper";
 import { getAveragePrice, getHighestPrice, getLowestPrice } from "../utils";
 import { revalidatePath } from "next/cache";
+import { generateEmailBody, sendEmail } from "../nodemailer";
 
 export async function scrapeAndStoreProducts(productUrl: string) {
     if (!productUrl) return;
@@ -13,8 +15,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         connectToDb();
 
         const scrapedProduct = await scrapeMLProduct(productUrl);
-
-        console.log('ESTA ENTRANDO ACA??', scrapedProduct);
 
         if(!scrapedProduct) return;
 
@@ -37,10 +37,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
             }
         }
 
-
-        console.log('ESTA ENTRANDO ACA??');
-        
-
         const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url },
             product,
             { upsert: true, new: true }
@@ -54,7 +50,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     }
 }
 
-
 export async function getProductById(productId: string) {
     try {
         connectToDb();
@@ -64,6 +59,63 @@ export async function getProductById(productId: string) {
         if (!product) return;
 
         return product;
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+export async function getAllProducts() {
+    try {
+        connectToDb();
+
+        const products = await Product.find();
+
+        return products;
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+export async function getSimilarProducts(productId: string) {
+    try {
+        connectToDb();
+
+        const currentProduct = await Product.findById(productId);
+
+        if (!currentProduct) return null;
+
+        const similarProducts = await Product.find({
+            _id:{ $ne: productId },
+        }).limit(3);
+
+        return similarProducts;
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+export async function addUserEmailToProduct(productId: string, userEmail: string) {
+    try {
+        const product = await Product.findById(productId)
+
+        if(!product) return;
+
+        const userExists = product.users.some((user: User) => user.email === userEmail);
+
+        if(!userExists) {
+            product.users.push({ email: userEmail });
+
+            await product.save();
+
+            const emailContent = await generateEmailBody(product, 'WELCOME');
+
+            await sendEmail(emailContent, [userEmail]);
+        }
+
+
     } catch (error) {
         console.log(error);
         

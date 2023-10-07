@@ -111,7 +111,9 @@ export function getAveragePrice(priceList: PriceHistoryItem[]) {
 // };
 
 export const formatNumber = (num: number = 0) => {
-  return num.toLocaleString(undefined, {
+  return num.toLocaleString('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   });
