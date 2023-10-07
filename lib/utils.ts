@@ -40,8 +40,8 @@ export function extractCurrency(element: any) {
 export function extractDescription($: any) {
   // these are possible elements holding description of the product
   const selectors = [
-    ".a-unordered-list .a-list-item",
-    ".a-expander-content p",
+    ".ui-pdp-description__content",
+    // ".a-expander-content p",
     // Add more selectors here if needed
   ];
 
@@ -60,17 +60,17 @@ export function extractDescription($: any) {
   return "";
 }
 
-// export function getHighestPrice(priceList: PriceHistoryItem[]) {
-//   let highestPrice = priceList[0];
+export function getHighestPrice(priceList: PriceHistoryItem[]) {
+  let highestPrice = priceList[0];
 
-//   for (let i = 0; i < priceList.length; i++) {
-//     if (priceList[i].price > highestPrice.price) {
-//       highestPrice = priceList[i];
-//     }
-//   }
+  for (let i = 0; i < priceList.length; i++) {
+    if (priceList[i].price > highestPrice.price) {
+      highestPrice = priceList[i];
+    }
+  }
 
-//   return highestPrice.price;
-// }
+  return highestPrice.price;
+}
 
 export function getLowestPrice(priceList: PriceHistoryItem[]) {
   let lowestPrice = priceList[0];

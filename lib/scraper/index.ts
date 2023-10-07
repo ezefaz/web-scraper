@@ -2,13 +2,12 @@
 
 import axios from "axios";
 import * as cheerio from 'cheerio'
-import { extractCurrency, extractPrice } from "../utils";
+import { extractCurrency, extractDescription, extractPrice } from "../utils";
 
 
 export async function scrapeMLProduct(url: string) {
-    if (!url) return;
+    if (!url) return;    
 
-    
     // bright data proxy configuration
     const username = String(process.env.BRIGHT_DATA_USERNAME)
     const password = String(process.env.BRIGHT_DATA_PASSWORD)
@@ -29,10 +28,8 @@ export async function scrapeMLProduct(url: string) {
 
     const response = await axios.get(url, options)
     const $ = cheerio.load(response.data)
-
-    console.log(response.data);
      
-    const producTitle = $('.ui-pdp-title').text().trim(); 
+    const productTitle = $('.ui-pdp-title').text().trim(); 
     // const currentPrice = extractPrice(
     //     $('.andes-money-amount__fraction'),
     //     $('.andes-visually-hidden'),
@@ -61,24 +58,32 @@ export async function scrapeMLProduct(url: string) {
 
     const originalPrice = currentPrice ? (currentPrice * 100) / (100 - discountRate) : '';
 
+    const desciption = extractDescription($)
+
   // Construct data object with scraped information
 
   const data = {
     url,
     currency: currency || '$',
     image: imageUrls[0],
-    producTitle,
-    currentPrice: Number(currentPrice),
-    originalPrice: Number(originalPrice),
+    productTitle,
+    currentPrice: Number(currentPrice) || Number(originalPrice),
+    originalPrice: Number(originalPrice) || Number(currentPrice),
     priceHistory: [],
     discountRate: Number(discountRate),
     category: 'category',
     reviewsCount: 0,
     stars: 4.5,
-    isOutOfStock
+    isOutOfStock,
+    desciption,
+    lowestPrice: Number(currentPrice) ||  Number(originalPrice),
+    highestPrice: Number(originalPrice) || Number(currentPrice),
+    average:  Number(currentPrice) ||  Number(originalPrice),
   }
 
   console.log('DATA', data);
+
+  return data;
   
         
     } catch (error: any) {
