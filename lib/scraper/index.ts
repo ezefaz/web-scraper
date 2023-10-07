@@ -37,7 +37,7 @@ export async function scrapeMLProduct(url: string) {
     //     $('.ui-pdp-price__second-line'),
     //     $('.ui-pdp-price__main-container'),
     // );
-    const currentPrice = $('meta[itemprop="price"]').attr('content');
+    const currentPrice: any = $('meta[itemprop="price"]').attr('content');
     
     const isOutOfStock = $('.ui-pdp-color--BLACK.ui-pdp-size--SMALL.ui-pdp-family--SEMIBOLD.ui-pdp-stock-information__title').text().trim().toLowerCase() !== 'stock disponible';  
     
@@ -57,7 +57,7 @@ export async function scrapeMLProduct(url: string) {
 
     const currency = extractCurrency($('.andes-money-amount__currency-symbol'))
 
-    const discountRate = $('.andes-money-amount__discount').text().replace(/[\s%]*OFF$/, '');
+    const discountRate: any = $('.andes-money-amount__discount').text().replace(/[\s%]*OFF$/, '');
 
     const originalPrice = currentPrice ? (currentPrice * 100) / (100 - discountRate) : '';
 
