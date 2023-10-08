@@ -33,7 +33,7 @@ const Modal = ({ productId }: Props) => {
   return (
     <>
       <button type='button' className='btn' onClick={openModal}>
-        Track
+        Inciar Seguimiento
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>
@@ -64,7 +64,7 @@ const Modal = ({ productId }: Props) => {
                 <div className='flex flex-col'>
                   <div className='flex justify-between'>
                     <div className='p-3 border border-gray-200 rounded-10'>
-                      <Image src='/assets/icons/logo.svg' alt='Logo' width={28} height={28} />
+                      <Image src='/assets/icons/savemelin3.svg' alt='Logo' width={48} height={48} />
                     </div>
                     <Image
                       src='/assets/icons/x-close.svg'
@@ -99,7 +99,7 @@ const Modal = ({ productId }: Props) => {
                     />
                   </div>
                   <button type='submit' className='dialog-btn'>
-                    {isSubmitting ? 'Enviando...' : 'Track'}
+                    {isSubmitting ? 'Enviando...' : 'Iniciar Seguimiento'}
                   </button>
                 </form>
               </div>

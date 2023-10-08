@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema({
     description: { type: String },
     category: { type: String },
     reviewsCount: { type: Number },
-    stockAvailable: { type: Number },
+    stockAvailable: { type: String },
     stars: { type: String },
     isOutOfStock: { type: Boolean, default: false },
     users: [

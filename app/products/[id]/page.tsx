@@ -67,11 +67,11 @@ const ProductDetails = async ({ params: { id } }: Props) => {
                 </div>
                 <div className='product-stock'>
                   {/* <Image src='/assets/icons/comment.svg' alt='comment' width={16} height={16} /> */}
-                  <p className='text-sm text-secondary font-semibold'>{product.stockAvailable || 0}</p>
+                  <p className='text-sm text-secondary font-semibold'>{product.stockAvailable || '0'}</p>
                 </div>
               </div>
               <p className='text-sm text-black opacity-50'>
-                <span className='text-primary-green font-semibold'>93%</span> of buyers have recommended this.
+                <span className='text-primary-green font-semibold'>93%</span> de los compradores recomiendan esto.
               </p>
             </div>
           </div>

@@ -46,11 +46,11 @@ const Searchbar = () => {
         type='text'
         value={searchPrompt}
         onChange={(e) => setSearchPrompt(e.target.value)}
-        placeholder='Enter product link'
+        placeholder='Ingrese link del producto y comience a seguirlo!'
         className='searchbar-input'
       />
       <button type='submit' className='searchbar-btn' disabled={searchPrompt === ''}>
-        {isLoading ? 'Searching...' : 'Search'}
+        {isLoading ? 'Buscando...' : 'Buscar'}
       </button>
     </form>
   );
