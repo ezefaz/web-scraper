@@ -28,14 +28,25 @@ export async function scrapeMLProduct(url: string) {
 		const $ = cheerio.load(response.data);
 
 		const title = $(".ui-pdp-title").text().trim();
-		const originalPrice = extractPrice(
-		    $('.andes-money-amount__fraction'),
-		    $('.andes-visually-hidden'),
-		    $('.andes-money-amount__fraction'),
-		    $('.ui-pdp-price__second-line'),
-		    $('.ui-pdp-price__main-container'),
-		);
+		// const originalPrice = extractPrice(
+		//     $('.andes-money-amount__fraction'),
+		//     $('.andes-visually-hidden'),
+		//     $('.andes-money-amount__fraction'),
+		//     $('.ui-pdp-price__second-line'),
+		//     $('.ui-pdp-price__main-container'),
+		// );
 		const currentPrice: any = $('meta[itemprop="price"]').attr("content");
+
+		const priceElements = $('.andes-money-amount__fraction');
+		const prices = priceElements.map((index, element) => $(element).text().trim()).get();
+		const originalPrice = prices[0]
+		const actualPrice = prices[1]
+
+		console.log('PRECIOS --->', prices);
+		console.log('OLD --->', originalPrice);
+		console.log('ACTUAL --->', currentPrice);
+
+		
 
 		const isOutOfStock =
 			$(
@@ -59,9 +70,16 @@ export async function scrapeMLProduct(url: string) {
 
 		const currency = extractCurrency($(".andes-money-amount__currency-symbol"));
 
-		const discountRate: string = $(".andes-money-amount__discount")
-			.text()
-			.replace(/[\s%]*OFF$/, "");			
+		const discountElements = $('.andes-money-amount__discount');
+		const discounts = discountElements.map((index, element) => $(element).text().trim()).get();
+		const discountRate = discounts[0].replace(/[\s%]*OFF$/, "");		
+
+		// const discountRate: string = $(".andes-money-amount__discount")
+		// 	.text()
+		// 	.replace(/[\s%]*OFF$/, "");		
+			
+		// 	console.log('discuoasdad -->', discountRate);
+			
 
     const reviewsCountText = $('.ui-pdp-review__amount').text();
     const reviewsCount = parseInt(reviewsCountText.replace(/\D+/g, ''), 10);
