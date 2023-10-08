@@ -61,6 +61,8 @@ export function extractDescription($: any) {
 }
 
 export function getHighestPrice(priceList: PriceHistoryItem[]) {
+  console.log('TARARARARAA -->',priceList);
+  
   let highestPrice = priceList[0];
 
   for (let i = 0; i < priceList.length; i++) {
@@ -85,11 +87,16 @@ export function getLowestPrice(priceList: PriceHistoryItem[]) {
 }
 
 export function getAveragePrice(priceList: PriceHistoryItem[]) {
+  if (priceList.length === 0) {
+    return 0; // Handle the case when priceList is empty
+  }
+  
   const sumOfPrices = priceList.reduce((acc, curr) => acc + curr.price, 0);
-  const averagePrice = sumOfPrices / priceList.length || 0;
+  const averagePrice = sumOfPrices / priceList.length;
 
   return averagePrice;
 }
+
 
 export const getEmailNotifType = (
   scrapedProduct: Product,

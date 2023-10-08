@@ -35,18 +35,15 @@ export async function scrapeMLProduct(url: string) {
 		//     $('.ui-pdp-price__second-line'),
 		//     $('.ui-pdp-price__main-container'),
 		// );
-		const currentPrice: any = $('meta[itemprop="price"]').attr("content");
+		// const currentPrice: any = $('meta[itemprop="price"]').attr("content");
 
 		const priceElements = $('.andes-money-amount__fraction');
 		const prices = priceElements.map((index, element) => $(element).text().trim()).get();
-		const originalPrice = prices[0]
-		const actualPrice = prices[1]
-
-		console.log('PRECIOS --->', prices);
-		console.log('OLD --->', originalPrice);
-		console.log('ACTUAL --->', currentPrice);
-
+		const originalPriceText = prices[0];
+		const currentPriceText = prices[1];
 		
+		const originalPrice = parseFloat(originalPriceText);
+		const currentPrice = parseFloat(currentPriceText);	
 
 		const isOutOfStock =
 			$(
@@ -87,14 +84,14 @@ export async function scrapeMLProduct(url: string) {
     const starsText = $('.ui-pdp-review__rating').text();
     const stars = parseFloat(starsText);
 
-    const quantityInput = $('input[name="quantity"]');
-    const stockAvailable = quantityInput.length !== 1 ? quantityInput.val() : $('.ui-pdp-buybox__quantity__available').text();
-    
 	const description = extractDescription($);
 
 	const category = $('.andes-breadcrumb__link[aria-current="page"]').text();	
 
-	console.log('CATEGGGG -->', category);
+	const stockAvailable = $('.ui-pdp-buybox__quantity__available').text().replace(/\(([^)]+)\)/, '$1');
+	
+	// const discounts = discountElements.map((index, element) => $(element).text().trim()).get();
+	// const discountRate = discounts[0].replace(/[\s%]*OFF$/, "");
 	
   // Construct data object with scraped information
 
@@ -110,7 +107,7 @@ export async function scrapeMLProduct(url: string) {
     category,
     reviewsCount: reviewsCount || 0,
     stars: stars || 4.5,
-    stockAvailable,
+    stockAvailable: stockAvailable && !isOutOfStock ? stockAvailable : '1',
     isOutOfStock,
     description,
     lowestPrice: Number(currentPrice) ||  Number(originalPrice),

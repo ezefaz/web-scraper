@@ -18,7 +18,7 @@ const Home = async () => {
               <Image src='/assets/icons/arrow-right.svg' alt='arrow-right' width={16} height={16} />
             </div>
             <h1 className='head-text'>Descubre el potencial de</h1>
-            <tr />
+            {''}
             <div className='head-text'>
               <span>Save</span>
               <span className='text-primary'>Melin</span>
