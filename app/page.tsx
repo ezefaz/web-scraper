@@ -12,17 +12,17 @@ const Home = async () => {
     <>
       <section className='px-6 md:px-20 py-24'>
         <div className='flex max-xl:flex-col gap-16'>
-          <div className='flex flex-col justify-center'>
+          <div className='flex flex-col'>
             <div className='small-text'>
               Tus compras inteligentes comienzan aquí:
               <Image src='/assets/icons/arrow-right.svg' alt='arrow-right' width={16} height={16} />
             </div>
-
-            <h1 className='head-text'>
-              Descubre el potencial de <tr />
+            <h1 className='head-text'>Descubre el potencial de</h1>
+            <tr />
+            <div className='head-text'>
               <span>Save</span>
               <span className='text-primary'>Melin</span>
-            </h1>
+            </div>
             <p className='mt-6'>
               A través de análisis y seguimiento de tus productos favoritos, te vamos a ayudar a ahorrar dinero a largo
               plazo.
