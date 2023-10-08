@@ -23,6 +23,7 @@ export type PriceHistoryItem = {
     category: string;
     reviewsCount: number;
     stars: number;
+    stockAvailable: number;
     isOutOfStock: Boolean;
     users?: User[];
   };

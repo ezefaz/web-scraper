@@ -50,22 +50,24 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold'>
-                {product.currency} {formatNumber(product.currentPrice)}
-              </p>
+              <p className='text-[34px] text-secondary font-bold'>{formatNumber(product.lowestPrice)}</p>
               <p className='text-[21px] text-black opacity-50 line-through'>
-                {`${product.currency} ${formatNumber(product.originalPrice)}`}
+                {`${formatNumber(product.highestPrice)}`}
               </p>
             </div>
             <div className='flex flex-col gap-4'>
               <div className='flex gap-3'>
                 <div className='product-stars'>
                   <Image src='/assets/icons/star.svg' alt='star' width={16} height={16} />
-                  <p className='text-sm text-primary-orange font-semibold'>{product.stars || '25'}</p>
+                  <p className='text-sm text-primary-orange font-semibold'>{product.stars || '4.5'}</p>
                 </div>
                 <div className='product-reviews'>
                   <Image src='/assets/icons/comment.svg' alt='comment' width={16} height={16} />
                   <p className='text-sm text-secondary font-semibold'>{product.reviewsCount} Reviews</p>
+                </div>
+                <div className='product-stock'>
+                  {/* <Image src='/assets/icons/comment.svg' alt='comment' width={16} height={16} /> */}
+                  <p className='text-sm text-secondary font-semibold'>{product.stockAvailable || 0}</p>
                 </div>
               </div>
               <p className='text-sm text-black opacity-50'>
@@ -76,27 +78,27 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           <div className='my-7 flex flex-col gap-5'>
             <div className='flex gap-5 flex-wrap'>
               <PriceInfoCard
-                title='Current Price'
+                title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
                 value={`${product.currency} ${formatNumber(product.currentPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
-                title='Average Price'
+                title='Precio Promedio'
                 iconSrc='/assets/icons/chart.svg'
-                value={`${product.currency} ${formatNumber(product.averagePrice)}`}
+                value={` ${formatNumber(product.averagePrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
-                title='Highest Price'
+                title='Precio Mayor'
                 iconSrc='/assets/icons/arrow-up.svg'
-                value={`${product.currency} ${formatNumber(product.highestPrice)}`}
+                value={` ${formatNumber(product.highestPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
-                title='Lowest Price'
+                title='Precio Menor'
                 iconSrc='/assets/icons/arrow-down.svg'
-                value={`${product.currency} ${formatNumber(product.lowestPrice)}`}
+                value={` ${formatNumber(product.lowestPrice)}`}
                 borderColor='#B3FFC5'
               />
             </div>
@@ -112,7 +114,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         <button className='btn w-fit mx-auto flex items-center justify-center gap-3 min-w-[200px]'>
           <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
           <Link href='/' className='text-base text-white'>
-            Buy Now
+            Comprar Ahora
           </Link>
         </button>
       </div>

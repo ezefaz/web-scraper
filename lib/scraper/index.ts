@@ -63,6 +63,15 @@ export async function scrapeMLProduct(url: string) {
 
     const description = extractDescription($)
 
+    const reviewsCountText = $('.ui-pdp-review__amount').text();
+    const reviewsCount = parseInt(reviewsCountText.replace(/\D+/g, ''), 10);
+    
+    const starsText = $('.ui-pdp-review__rating').text();
+    const stars = parseFloat(starsText);
+
+    const quantityInput = $('input[name="quantity"]');
+    const stockAvailable = quantityInput.length !== 1 ? quantityInput.val() : $('.ui-pdp-buybox__quantity__available').text();
+    
   // Construct data object with scraped information
 
   const data = {
@@ -75,8 +84,9 @@ export async function scrapeMLProduct(url: string) {
     priceHistory: [],
     discountRate: Number(discountRate),
     category: 'category',
-    reviewsCount: 0,
-    stars: 4.5,
+    reviewsCount: reviewsCount || 0,
+    stars: stars || 4.5,
+    stockAvailable,
     isOutOfStock,
     description,
     lowestPrice: Number(currentPrice) ||  Number(originalPrice),

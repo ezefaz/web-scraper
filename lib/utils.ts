@@ -41,8 +41,8 @@ export function extractDescription($: any) {
   // these are possible elements holding description of the product
   const selectors = [
     ".ui-pdp-description__content",
-    // ".a-expander-content p",
-    // Add more selectors here if needed
+    ".ui-pdp-description",
+    ".ui-pdp-description br",
   ];
 
   for (const selector of selectors) {
