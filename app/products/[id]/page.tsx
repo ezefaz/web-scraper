@@ -1,6 +1,7 @@
 import Modal from '@/components/Modal';
 import PriceInfoCard from '@/components/PriceInfoCard';
 import ProductCard from '@/components/ProductCard';
+import BarChart from '@/components/charts/BarChart';
 import { getProductById, getSimilarProducts } from '@/lib/actions';
 import { formatNumber } from '@/lib/utils';
 import { Product } from '@/types';
@@ -107,6 +108,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <Modal productId={id} />
         </div>
+      </div>
+      <div>
+        <BarChart highestPrice={product.highestPrice} lowestPrice={product.lowestPrice} productTitle={product.title} />
       </div>
       <div className='flex flex-col gap-16'>
         <div className='flex flex-col gap-5'>
