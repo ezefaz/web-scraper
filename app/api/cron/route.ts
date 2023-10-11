@@ -27,7 +27,7 @@ export async function GET(request: Request) {
 
         if (!scrapedProduct) return;
 
-        const updatedPrice = scrapedProduct.currentPrice;
+        const updatedPrice = scrapedProduct.currentPrice;        
 
         if (!isNaN(updatedPrice)) {
           const updatedPriceHistory = [
@@ -74,8 +74,8 @@ export async function GET(request: Request) {
 
           return updatedProduct;
         } else {
-          console.error('Scraped price is not a valid number:', updatedPrice);
-          return currentProduct; // Keep the current product in case of an error
+          console.log('Scraped price is not a valid number');
+          return currentProduct; 
         }
       })
     );
