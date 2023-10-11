@@ -75,7 +75,6 @@ export async function GET(request: Request) {
           return updatedProduct;
         } else {
           console.log('Scraped price is not a valid number');
-          return currentProduct; 
         }
       })
     );
