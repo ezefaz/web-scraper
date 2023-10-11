@@ -73,10 +73,7 @@ export async function scrapeMLProduct(url: string) {
 
 		// const discountRate: string = $(".andes-money-amount__discount")
 		// 	.text()
-		// 	.replace(/[\s%]*OFF$/, "");		
-			
-		// 	console.log('discuoasdad -->', discountRate);
-			
+		// 	.replace(/[\s%]*OFF$/, "");			
 
     const reviewsCountText = $('.ui-pdp-review__amount').text();
     const reviewsCount = parseInt(reviewsCountText.replace(/\D+/g, ''), 10);
@@ -84,11 +81,13 @@ export async function scrapeMLProduct(url: string) {
     const starsText = $('.ui-pdp-review__rating').text();
     const stars = parseFloat(starsText);
 
-	const description = extractDescription($);
+	const description = extractDescription($);	
 
-	const category = $('.andes-breadcrumb__link[aria-current="page"]').text();	
+	const stockAvailable = $('.ui-pdp-buybox__quantity__available').text().replace(/\(([^)]+)\)/, '$1');	
 
-	const stockAvailable = $('.ui-pdp-buybox__quantity__available').text().replace(/\(([^)]+)\)/, '$1');
+const category = $('.andes-breadcrumb__link').text()
+	console.log('CARCAGADA', category);
+	
 	
 	// const discounts = discountElements.map((index, element) => $(element).text().trim()).get();
 	// const discountRate = discounts[0].replace(/[\s%]*OFF$/, "");
@@ -104,7 +103,7 @@ export async function scrapeMLProduct(url: string) {
     originalPrice: Number(originalPrice) || Number(currentPrice),
     priceHistory: [],
     discountRate: Number(discountRate),
-    category,
+    category: 'category',
     reviewsCount: reviewsCount || 0,
     stars: stars || 4.5,
     stockAvailable: stockAvailable && !isOutOfStock ? stockAvailable : '1',

@@ -21,8 +21,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         let product = scrapedProduct;
 
         const existingProduct = await Product.findOne({ url: scrapedProduct.url })
-
-        console.log('PRODUCTO EXISTENTE', existingProduct);
         
 
         if (existingProduct) {
@@ -37,10 +35,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
                 lowestPrice: getLowestPrice(updatedPriceHistory),
                 highestPrice: getHighestPrice(updatedPriceHistory),
                 averagePrice: getAveragePrice(updatedPriceHistory),
-            }
-
-            console.log('PAPAPAPA', product);
-            
+            }            
         }
 
         const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url },

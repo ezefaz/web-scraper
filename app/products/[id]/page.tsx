@@ -17,8 +17,6 @@ type Props = {
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
 
-  console.log('ESTE ES EL PRODUCTO', product);
-
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);
@@ -119,7 +117,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </div>
         <button className='btn w-fit mx-auto flex items-center justify-center gap-3 min-w-[200px]'>
           <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
-          <Link href='/' className='text-base text-white'>
+          <Link href='/' className='text-base'>
             Comprar Ahora
           </Link>
         </button>

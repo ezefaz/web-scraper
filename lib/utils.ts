@@ -60,9 +60,8 @@ export function extractDescription($: any) {
 	return "";
 }
 
-export function getHighestPrice(priceList: PriceHistoryItem[]) {
-	console.log("TARARARARAA -->", priceList);
 
+export function getHighestPrice(priceList: PriceHistoryItem[]) {
 	let highestPrice = priceList[0];
 
 	for (let i = 0; i < priceList.length; i++) {
