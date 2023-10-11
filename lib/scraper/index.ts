@@ -65,34 +65,21 @@ export async function scrapeMLProduct(url: string) {
 			}
 		});
 
-		const currency = extractCurrency($(".andes-money-amount__currency-symbol"));
+	const currency = extractCurrency($(".andes-money-amount__currency-symbol"));
 
-		const discountElements = $('.andes-money-amount__discount');
-		const discounts = discountElements.map((index, element) => $(element).text().trim()).get();
-		const discountRate = discounts[0].replace(/[\s%]*OFF$/, "");		
-
-		// const discountRate: string = $(".andes-money-amount__discount")
-		// 	.text()
-		// 	.replace(/[\s%]*OFF$/, "");			
+	const discountElements = $('.andes-money-amount__discount');
+	const discounts = discountElements.map((index, element) => $(element).text().trim()).get();
+	const discountRate = discounts.length > 0 ? discounts[0].replace(/[\s%]*OFF$/, "") : "";
 
     const reviewsCountText = $('.ui-pdp-review__amount').text();
-    const reviewsCount = parseInt(reviewsCountText.replace(/\D+/g, ''), 10);
+	const reviewsCount = reviewsCountText ? parseInt(reviewsCountText.replace(/\D+/g, ''), 10) : 0;
     
     const starsText = $('.ui-pdp-review__rating').text();
     const stars = parseFloat(starsText);
 
 	const description = extractDescription($);	
 
-	const stockAvailable = $('.ui-pdp-buybox__quantity__available').text().replace(/\(([^)]+)\)/, '$1');	
-
-const category = $('.andes-breadcrumb__link').text()
-	console.log('CARCAGADA', category);
-	
-	
-	// const discounts = discountElements.map((index, element) => $(element).text().trim()).get();
-	// const discountRate = discounts[0].replace(/[\s%]*OFF$/, "");
-	
-  // Construct data object with scraped information
+	const stockAvailable = $('.ui-pdp-buybox__quantity__available').text()?.match(/\(([^)]+)\)/)?.[1] || "";
 
   const data = {
     url,
