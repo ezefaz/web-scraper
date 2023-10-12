@@ -3,7 +3,7 @@ import PriceInfoCard from '@/components/PriceInfoCard';
 import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
 import { getProductById, getSimilarProducts } from '@/lib/actions';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber, formatNumberWithCommas } from '@/lib/utils';
 import { Product } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -51,7 +51,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold'>{formatNumber(product.lowestPrice)}</p>
+              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} ${formatNumberWithCommas(
+                product.currentPrice
+              )}`}</p>
               <p className='text-[21px] text-black opacity-50 line-through'>
                 {`${formatNumber(product.highestPrice)}`}
               </p>
@@ -81,7 +83,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <PriceInfoCard
                 title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
-                value={`${product.currency} ${formatNumber(product.currentPrice)}`}
+                value={`${product.currency} ${formatNumberWithCommas(product.currentPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard

@@ -119,7 +119,25 @@ export const formatNumber = (num: number = 0) => {
 	return num.toLocaleString("es-AR", {
 		style: "currency",
 		currency: "ARS",
-		minimumFractionDigits: 0, // Set to the desired number of decimal places
+		minimumFractionDigits: 0, 
 		maximumFractionDigits: 3,
 	});
 };
+
+export function formatNumberWithCommas(num: number = 0) {
+	// Convert the number to a string
+	const numStr = num.toString();
+  
+	// Split the string into integer and decimal parts
+	const [integerPart, decimalPart] = numStr.split('.');
+  
+	// Add commas for thousands separators to the integer part
+	const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  
+	// Combine the formatted integer part with the decimal part, removing trailing zeros
+	const formattedDecimalPart = decimalPart ? `.${decimalPart}` : '';
+	const formattedNumber = `${formattedIntegerPart}${formattedDecimalPart}`;
+  
+	return formattedNumber;
+  }
+  

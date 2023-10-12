@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { extractCurrency, extractDescription, extractPrice } from "../utils";
+import { extractCurrency, extractDescription, extractPrice, formatNumber } from "../utils";
 
 export async function scrapeMLProduct(url: string) {
 	if (!url) return;
@@ -41,10 +41,16 @@ export async function scrapeMLProduct(url: string) {
 		const prices = priceElements.map((index, element) => $(element).text().trim()).get();
 		const originalPriceText = prices[0];
 		const currentPriceText = prices[1];
-		
-		const originalPrice = parseFloat(originalPriceText);
-		const currentPrice = parseFloat(currentPriceText);	
 
+		const originalPrice = originalPriceText.replace(/\./g, "");
+		const currentPrice = currentPriceText.replace(/\./g, "");
+		
+		// const parsedOriginalPrice = Number(sanitizedOriginalPriceText);
+		// const parsedCurrentPrice = Number(sanitizedCurrentPriceText);	
+
+		// const originalPrice = formatNumber(parsedOriginalPrice)
+		// const currentPrice = formatNumber(parsedCurrentPrice)
+		
 		const isOutOfStock =
 			$(
 				".ui-pdp-color--BLACK.ui-pdp-size--SMALL.ui-pdp-family--SEMIBOLD.ui-pdp-stock-information__title"
@@ -101,7 +107,7 @@ export async function scrapeMLProduct(url: string) {
     averagePrice:  Number(currentPrice) ||  Number(originalPrice),
   }
 
-//   console.log('PRODUCTO -->', data);
+  console.log('PRODUCTO -->', data);
 
 		return data;
 	} catch (error: any) {

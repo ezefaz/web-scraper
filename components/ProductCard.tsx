@@ -2,6 +2,7 @@ import React from 'react';
 import { Product } from '@/types';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatNumberWithCommas } from '@/lib/utils';
 
 interface Props {
   product: Product;
@@ -21,7 +22,7 @@ const ProductCard = ({ product }: Props) => {
             <p className='text-black opacity-50 text-lg capitalize'>{product.category}</p>
             <p className='text-black text-lg font-semibold'>
               <span>{product?.currency}</span>
-              <span>{product?.currentPrice}</span>
+              <span>{`${formatNumberWithCommas(product.currentPrice)}`}</span>
             </p>
           </div>
         </div>
