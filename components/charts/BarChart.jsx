@@ -40,15 +40,15 @@ const LineChartComponent = ({ highestPrice, lowestPrice, productTitle }) => {
   }));
 
   return (
-    <Card className='bg-white-200 p-4 shadow-md rounded-md'>
-      <Title className='text-2xl font-semibold mb-4'>Precios Últimos Tres Meses de {productTitle} (1970 to 2021)</Title>
+    <Card className='bg-white-200 p-4 shadow-md rounded-md w-[50%]'>
+      <Title className='text-2xl font-semibold mb-4'>Análisis Últimos Tres Meses de "{productTitle}"</Title>
       <LineChart
         data={chartdata}
         index='mes'
         categories={['Precios Mayores', 'Precios Menores', 'Variación']}
         colors={['emerald', 'red', 'blue']} // Added a color for 'Variación'
         valueFormatter={priceFormatter}
-        yAxisWidth={40}
+        yAxisWidth={80}
       />
     </Card>
   );
