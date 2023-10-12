@@ -5,7 +5,10 @@ import { Card, Title, LineChart } from '@tremor/react';
 
 const priceFormatter = (number) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
-const LineChartComponent = ({ productTitle, priceHistory, dateHistory }) => {
+const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPrice, originalPrice }) => {
+  const numericCurrentPrice = parseFloat(currentPrice);
+  const numericOriginalPrice = parseFloat(originalPrice);
+
   // Get the last three months
   const lastThreeMonths = getLastThreeMonths();
 
@@ -26,19 +29,25 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory }) => {
       );
     });
 
-    console.log('HAYH ALGO ACA?', filteredMonthPrices);
+    // Remove duplicate prices using a Set
+    const uniquePrices = new Set(filteredMonthPrices);
 
-    const numericPrices = filteredMonthPrices.map((price) => parseFloat(price));
+    // Convert the unique prices back to an array
+    const uniquePricesArray = Array.from(uniquePrices);
 
-    let maxPrice = Math.max(...numericPrices);
-    let minPrice = Math.min(...numericPrices);
+    // Format prices to remove commas and dots and convert to integers
+    const formattedPrices = uniquePricesArray.map((price) => {
+      // Use parseFloat to ensure proper interpretation of the number
+      const formattedPrice = parseFloat(String(price).replace(/,|\./g, ''));
+      return formattedPrice || 0; // Default to 0 if the formatting fails
+    });
 
-    const cleanMinPrice = parseFloat(String(minPrice).replace(/,/g, '').replace(/\./g, ''));
-    const cleanMaxPrice = parseFloat(String(maxPrice).replace(/,/g, '').replace(/\./g, ''));
+    const maxPrice = Math.max(...formattedPrices);
+    const minPrice = Math.min(...formattedPrices);
 
-    const variation = cleanMaxPrice - cleanMinPrice;
+    const variation = maxPrice - minPrice;
 
-    if (filteredMonthPrices.length === 0) {
+    if (formattedPrices.length === 0) {
       // If no valid prices for the month, set maxPrice and minPrice to 0
       const maxPrice = 0;
       const minPrice = 0;
@@ -54,8 +63,8 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory }) => {
 
     return {
       mes: month.charAt(0).toUpperCase() + month.slice(1),
-      'Precios Mayores': cleanMaxPrice,
-      'Precios Menores': cleanMinPrice,
+      'Precios Mayores': maxPrice || numericCurrentPrice,
+      'Precios Menores': minPrice || numericOriginalPrice,
       Variación: variation,
     };
   });

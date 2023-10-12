@@ -14,28 +14,35 @@ type Props = {
   params: { id: string };
 };
 
-const MIN_VALID_PRICE = 3000;
+const MIN_VALID_PRICE = 100;
 
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
 
-  const lastPrices: Array<Number> = [];
-  const lastDates: Array<Date> = [];
-
   const productHistory = product.priceHistory;
+
   const updatedPriceHistory = [];
 
   for (const priceEntry of productHistory) {
-    if (priceEntry.price >= MIN_VALID_PRICE) {
-      updatedPriceHistory.push(priceEntry);
+    const formattedPrice = parseFloat(String(priceEntry.price).replace(/,|\./g, ''));
+    if (formattedPrice >= MIN_VALID_PRICE) {
+      // Formatea el precio y verifica si es mayor o igual a MIN_VALID_PRICE
+      updatedPriceHistory.push({
+        price: formattedPrice,
+        date: priceEntry.date,
+      });
     }
   }
 
-  updatedPriceHistory.map((p) => lastPrices.push(p.price));
-  updatedPriceHistory.map((p) => lastDates.push(p.date));
+  // Inicializa los arreglos lastPrices y lastDates
+  const lastPrices: Array<Number> = [];
+  const lastDates: Array<Date> = [];
 
-  console.log('LLEGA ALGO?', product.priceHistory);
-  console.log('LLEGA ALGO?', lastPrices);
+  // Extrae los precios y fechas de updatedPriceHistory
+  updatedPriceHistory.forEach((p) => {
+    lastPrices.push(p.price);
+    lastDates.push(p.date);
+  });
 
   if (!product) redirect('/');
 
@@ -71,11 +78,11 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} ${formatNumberWithCommas(
+              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} ${formatNumber(
                 product.currentPrice
               )}`}</p>
               <p className='text-[21px] text-black opacity-50 line-through'>
-                {`${formatNumber(product.highestPrice)}`}
+                {`${product.currency} ${formatNumber(product.originalPrice)}`}
               </p>
             </div>
             <div className='flex flex-col gap-4'>
@@ -103,7 +110,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <PriceInfoCard
                 title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
-                value={`${product.currency} ${formatNumberWithCommas(product.currentPrice)}`}
+                value={`${product.currency} ${formatNumber(product.currentPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
@@ -130,7 +137,13 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </div>
       </div>
       <div>
-        <BarChart productTitle={product.title} priceHistory={lastPrices} dateHistory={lastDates} />
+        <BarChart
+          productTitle={product.title}
+          priceHistory={lastPrices}
+          dateHistory={lastDates}
+          currentPrice={product.currentPrice}
+          originalPrice={product.originalPrice}
+        />
       </div>
       <div className='flex flex-col gap-16'>
         <div className='flex flex-col gap-5'>

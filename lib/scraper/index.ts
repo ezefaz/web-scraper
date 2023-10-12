@@ -42,19 +42,13 @@ export async function scrapeMLProduct(url: string) {
     const priceElements = $('.andes-money-amount__fraction');
     const prices = priceElements.map((index, element) => $(element).text().trim()).get();
 
-    console.log('ARRAY DE PRICES --> ', prices);
-
     // Create a Set to store unique price entries
     const uniquePrices = new Set();
 
     for (const priceEntry of prices) {
       const numberPriceEntry = parseFloat(String(priceEntry).replace(/,/g, '').replace(/\./g, ''));
 
-      console.log('NUMBERPRICEENTRE', numberPriceEntry);
-
       if (numberPriceEntry && numberPriceEntry >= MIN_VALID_PRICE) {
-        console.log('ENTRA EN VALIDACION DE MIN VALID');
-
         // Add the numberPriceEntry to the Set to ensure uniqueness
         uniquePrices.add(priceEntry);
       }
@@ -125,7 +119,7 @@ export async function scrapeMLProduct(url: string) {
       averagePrice: Number(currentPrice) || Number(originalPrice),
     };
 
-    console.log('PRODUCTO -->', data);
+    // console.log('PRODUCTO -->', data);
 
     return data;
   } catch (error: any) {
