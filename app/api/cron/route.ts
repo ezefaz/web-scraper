@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getLowestPrice, getHighestPrice, getAveragePrice, getEmailNotifType, formatNumber } from "@/lib/utils";
+import { getLowestPrice, getHighestPrice, getAveragePrice, getEmailNotifType, formatNumber, formatNumberWithCommas } from "@/lib/utils";
 import { connectToDb } from "@/lib/mongoose";
 import Product from "@/lib/models/product.model";
 import { scrapeMLProduct } from "@/lib/scraper";
@@ -27,13 +27,15 @@ export async function GET(request: Request) {
 
         if (!scrapedProduct) return;
 
-        const updatedPrice = scrapedProduct.currentPrice; 
+        let updatedPrice = scrapedProduct.currentPrice; 
+        updatedPrice = Number(updatedPrice)
+        
         
         if (!isNaN(updatedPrice)) {
           const updatedPriceHistory = [
             ...currentProduct.priceHistory,
             {
-              price: scrapedProduct.currentPrice,
+              price: formatNumberWithCommas(updatedPrice),
             },
           ];
 
