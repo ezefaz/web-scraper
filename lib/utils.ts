@@ -132,7 +132,7 @@ export function formatNumberWithCommas(num: number = 0) {
 	const [integerPart, decimalPart] = numStr.split('.');
   
 	// Add commas for thousands separators to the integer part
-	const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+	const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   
 	// Combine the formatted integer part with the decimal part, removing trailing zeros
 	const formattedDecimalPart = decimalPart ? `.${decimalPart}` : '';

@@ -24,9 +24,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   productHistory.map((p) => lastPrices.push(p.price));
   productHistory.map((p) => lastDates.push(p.date));
 
-  console.log('LLEGA ALGO?', product.priceHistory);
-  console.log('LLEGA ALGO?', lastPrices);
-
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);
@@ -61,9 +58,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} ${formatNumberWithCommas(
-                product.currentPrice
-              )}`}</p>
+              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} 
+               ${formatNumberWithCommas(product.currentPrice)}
+              `}</p>
               <p className='text-[21px] text-black opacity-50 line-through'>
                 {`${formatNumber(product.highestPrice)}`}
               </p>
