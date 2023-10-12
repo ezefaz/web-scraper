@@ -39,14 +39,14 @@ export async function scrapeMLProduct(url: string) {
 
 		const priceElements = $('.andes-money-amount__fraction');
 		const prices = priceElements.map((index, element) => $(element).text().trim()).get();
+		
 		const originalPriceText = prices[0];
 		const currentPriceText = prices[1];
 
-		const originalPrice = originalPriceText.replace(/\./g, "");
-		const currentPrice = currentPriceText.replace(/\./g, "");
-		
-		// const parsedOriginalPrice = Number(sanitizedOriginalPriceText);
-		// const parsedCurrentPrice = Number(sanitizedCurrentPriceText);	
+		// const originalPrice = originalPriceText.replace(/\./g, "");
+		// const currentPrice = currentPriceText.replace(/\./g, "");
+		const originalPrice = parseFloat(String(originalPriceText).replace(/,/g, '').replace(/\./g, ''));
+		const currentPrice = parseFloat(String(currentPriceText).replace(/,/g, '').replace(/\./g, ''));
 
 		// const originalPrice = formatNumber(parsedOriginalPrice)
 		// const currentPrice = formatNumber(parsedCurrentPrice)

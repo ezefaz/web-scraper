@@ -22,8 +22,6 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory }) => {
   // Filter the priceHistory based on selected months
   const filteredPrices = priceHistory.filter((price, index) => lastThreeMonths.includes(monthsFromDates[index]));
 
-  console.log('LLEGA ALGO?', filteredPrices);
-
   // Create the chart data
   const chartdata = lastThreeMonths.map((month) => {
     const filteredMonthPrices = filteredPrices.filter((price, index) => {
