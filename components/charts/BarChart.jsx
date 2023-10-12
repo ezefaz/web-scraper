@@ -1,14 +1,7 @@
 'use client';
 
-import {
-  extractMonthsFromDate,
-  formatNumber,
-  formatNumberWithCommas,
-  getLastThreeMonths,
-  removeCommas,
-} from '@/lib/utils';
+import { extractMonthsFromDate, formatNumber, formatNumberWithCommas, getLastThreeMonths } from '@/lib/utils';
 import { Card, Title, LineChart } from '@tremor/react';
-import { format, parseISO } from 'date-fns'; // Import date-fns for date formatting
 
 const priceFormatter = (number) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
