@@ -10,6 +10,8 @@ export const maxDuration = 10; // This function can run for a maximum of 300 sec
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const MIN_VALID_PRICE = 4000;
+
 export async function GET(request: Request) {
   
   try {
@@ -29,7 +31,7 @@ export async function GET(request: Request) {
 
         const updatedPrice = scrapedProduct.currentPrice;
 
-        if (!isNaN(updatedPrice) && Number.isInteger(updatedPrice)) {
+        if (!isNaN(updatedPrice) &&  updatedPrice >= MIN_VALID_PRICE) {
           const updatedPriceHistory = [
             ...currentProduct.priceHistory,
             {
