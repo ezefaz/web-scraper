@@ -31,14 +31,21 @@ export async function GET(request: Request) {
 
         const updatedPrice = scrapedProduct.currentPrice;
 
-        if (!isNaN(updatedPrice) &&  updatedPrice >= MIN_VALID_PRICE) {
-          const updatedPriceHistory = [
-            ...currentProduct.priceHistory,
-            {
-              price: updatedPrice,
-            },
-          ];
+        console.log('PRECIO ACTUALIZADO ---> ', updatedPrice);
 
+        if(!isNaN(updatedPrice) && updatedPrice >= MIN_VALID_PRICE) {
+          const updatedPriceHistory = [];
+
+          // Iterate through the price history
+          for (const priceEntry of currentProduct.priceHistory) {
+            if (priceEntry.price >= MIN_VALID_PRICE) {
+              updatedPriceHistory.push(priceEntry);
+            }
+          }
+
+          // Add the new price to the updated history
+          updatedPriceHistory.push({ price: updatedPrice });
+          
           console.log('HISTORIA DE PRECIO ACTUALIZADA', updatedPriceHistory);
 
           const product = {

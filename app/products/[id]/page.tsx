@@ -14,6 +14,8 @@ type Props = {
   params: { id: string };
 };
 
+const MIN_VALID_PRICE = 3000;
+
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
 
@@ -21,8 +23,16 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   const lastDates: Array<Date> = [];
 
   const productHistory = product.priceHistory;
-  productHistory.map((p) => lastPrices.push(p.price));
-  productHistory.map((p) => lastDates.push(p.date));
+  const updatedPriceHistory = [];
+
+  for (const priceEntry of productHistory) {
+    if (priceEntry.price >= MIN_VALID_PRICE) {
+      updatedPriceHistory.push(priceEntry);
+    }
+  }
+
+  updatedPriceHistory.map((p) => lastPrices.push(p.price));
+  updatedPriceHistory.map((p) => lastDates.push(p.date));
 
   console.log('LLEGA ALGO?', product.priceHistory);
   console.log('LLEGA ALGO?', lastPrices);

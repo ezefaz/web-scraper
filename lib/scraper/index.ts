@@ -43,13 +43,8 @@ export async function scrapeMLProduct(url: string) {
 		const originalPriceText = prices[0];
 		const currentPriceText = prices[1];
 
-		// const originalPrice = originalPriceText.replace(/\./g, "");
-		// const currentPrice = currentPriceText.replace(/\./g, "");
 		const originalPrice = parseFloat(String(originalPriceText).replace(/,/g, '').replace(/\./g, ''));
 		const currentPrice = parseFloat(String(currentPriceText).replace(/,/g, '').replace(/\./g, ''));
-
-		// const originalPrice = formatNumber(parsedOriginalPrice)
-		// const currentPrice = formatNumber(parsedCurrentPrice)
 		
 		const isOutOfStock =
 			$(
