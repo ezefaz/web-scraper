@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getLowestPrice, getHighestPrice, getAveragePrice, getEmailNotifType } from "@/lib/utils";
+import { getLowestPrice, getHighestPrice, getAveragePrice, getEmailNotifType, formatNumber } from "@/lib/utils";
 import { connectToDb } from "@/lib/mongoose";
 import Product from "@/lib/models/product.model";
 import { scrapeMLProduct } from "@/lib/scraper";
@@ -33,7 +33,7 @@ export async function GET(request: Request) {
           const updatedPriceHistory = [
             ...currentProduct.priceHistory,
             {
-              price: currentProduct.price,
+              price: formatNumber(currentProduct.price),
             },
           ];
 
