@@ -27,13 +27,13 @@ export async function GET(request: Request) {
 
         if (!scrapedProduct) return;
 
-        const updatedPrice = scrapedProduct.currentPrice;        
-
+        const updatedPrice = scrapedProduct.currentPrice; 
+        
         if (!isNaN(updatedPrice)) {
           const updatedPriceHistory = [
             ...currentProduct.priceHistory,
             {
-              price: formatNumber(currentProduct.price),
+              price: scrapedProduct.currentPrice,
             },
           ];
 
