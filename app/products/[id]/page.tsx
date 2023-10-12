@@ -24,6 +24,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   productHistory.map((p) => lastPrices.push(p.price));
   productHistory.map((p) => lastDates.push(p.date));
 
+  console.log('LLEGA ALGO?', product.priceHistory);
+  console.log('LLEGA ALGO?', lastPrices);
+
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);
@@ -117,13 +120,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </div>
       </div>
       <div>
-        <BarChart
-          currentPrice={product.currentPrice}
-          originalPrice={product.originalPrice}
-          productTitle={product.title}
-          priceHistory={lastPrices}
-          dateHistory={lastDates}
-        />
+        <BarChart productTitle={product.title} priceHistory={lastPrices} dateHistory={lastDates} />
       </div>
       <div className='flex flex-col gap-16'>
         <div className='flex flex-col gap-5'>

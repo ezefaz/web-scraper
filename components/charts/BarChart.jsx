@@ -12,7 +12,7 @@ import { format, parseISO } from 'date-fns'; // Import date-fns for date formatt
 
 const priceFormatter = (number) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
-const LineChartComponent = ({ currentPrice, originalPrice, productTitle, priceHistory, dateHistory }) => {
+const LineChartComponent = ({ productTitle, priceHistory, dateHistory }) => {
   // Get the last three months
   const lastThreeMonths = getLastThreeMonths();
 
@@ -21,6 +21,8 @@ const LineChartComponent = ({ currentPrice, originalPrice, productTitle, priceHi
 
   // Filter the priceHistory based on selected months
   const filteredPrices = priceHistory.filter((price, index) => lastThreeMonths.includes(monthsFromDates[index]));
+
+  console.log('LLEGA ALGO?', filteredPrices);
 
   // Create the chart data
   const chartdata = lastThreeMonths.map((month) => {
@@ -32,6 +34,8 @@ const LineChartComponent = ({ currentPrice, originalPrice, productTitle, priceHi
         !Number.isNaN(price) // Filter out NaN values
       );
     });
+
+    console.log('HAYH ALGO ACA?', filteredMonthPrices);
 
     const numericPrices = filteredMonthPrices.map((price) => parseFloat(price));
 
