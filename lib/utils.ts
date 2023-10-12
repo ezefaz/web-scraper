@@ -140,4 +140,36 @@ export function formatNumberWithCommas(num: number = 0) {
   
 	return formattedNumber;
   }
+
+export const getLastThreeMonths = () => {
+	const months = [
+	  'enero',
+	  'febrero',
+	  'marzo',
+	  'abril',
+	  'mayo',
+	  'junio',
+	  'julio',
+	  'agosto',
+	  'septiembre',
+	  'octubre',
+	  'noviembre',
+	  'diciembre',
+	];
+	const today = new Date();
+	const currentMonth = today.getMonth();
   
+	const lastFourMonths = [];
+	for (let i = 2; i >= 0; i--) {
+	  lastFourMonths.push(months[(currentMonth - i + 12) % 12]);
+	}
+	return lastFourMonths;
+};
+  
+  
+export const extractMonthsFromDate = (dateArray: Array<Date>) =>
+  dateArray.map((date: Date) => {
+    const parsedDate = new Date(date);
+    const monthName = parsedDate.toLocaleString('es-AR', { month: 'long' });
+    return monthName;
+  });

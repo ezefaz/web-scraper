@@ -1,10 +1,12 @@
 export type PriceHistoryItem = {
-    price: number;
-  };
+  price: number;
+  date: Date;
+  _id: string;
+};
   
-  export type User = {
+export type User = {
     email: string;
-  };
+};
   
   export type Product = {
     _id?: string;

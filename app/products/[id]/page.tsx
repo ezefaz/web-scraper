@@ -17,6 +17,13 @@ type Props = {
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
 
+  const lastPrices: Array<Number> = [];
+  const lastDates: Array<Date> = [];
+
+  const productHistory = product.priceHistory;
+  productHistory.map((p) => lastPrices.push(p.price));
+  productHistory.map((p) => lastDates.push(p.date));
+
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);
@@ -110,7 +117,13 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </div>
       </div>
       <div>
-        <BarChart highestPrice={product.highestPrice} lowestPrice={product.lowestPrice} productTitle={product.title} />
+        <BarChart
+          currentPrice={product.currentPrice}
+          originalPrice={product.originalPrice}
+          productTitle={product.title}
+          priceHistory={lastPrices}
+          dateHistory={lastDates}
+        />
       </div>
       <div className='flex flex-col gap-16'>
         <div className='flex flex-col gap-5'>

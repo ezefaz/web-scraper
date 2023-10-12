@@ -1,43 +1,69 @@
 'use client';
 
+import {
+  extractMonthsFromDate,
+  formatNumber,
+  formatNumberWithCommas,
+  getLastThreeMonths,
+  removeCommas,
+} from '@/lib/utils';
 import { Card, Title, LineChart } from '@tremor/react';
+import { format, parseISO } from 'date-fns'; // Import date-fns for date formatting
 
 const priceFormatter = (number) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
-const LineChartComponent = ({ highestPrice, lowestPrice, productTitle }) => {
-  // Function to get the current month and three months before it
-  const getLastThreeMonths = () => {
-    const months = [
-      'Enero',
-      'Febrero',
-      'Marzo',
-      'Abril',
-      'Mayo',
-      'Junio',
-      'Julio',
-      'Agosto',
-      'Septiembre',
-      'Octubre',
-      'Noviembre',
-      'Diciembre',
-    ];
-    const today = new Date();
-    const currentMonth = today.getMonth();
-    const lastFourMonths = [];
-    for (let i = 2; i >= 0; i--) {
-      lastFourMonths.push(months[(currentMonth - i + 12) % 12]);
-    }
-    return lastFourMonths;
-  };
-
+const LineChartComponent = ({ currentPrice, originalPrice, productTitle, priceHistory, dateHistory }) => {
+  // Get the last three months
   const lastThreeMonths = getLastThreeMonths();
 
-  const chartdata = lastThreeMonths.map((month) => ({
-    mes: month,
-    'Precios Mayores': highestPrice,
-    'Precios Menores': lowestPrice,
-    Variación: highestPrice - lowestPrice,
-  }));
+  // Extract months from dateHistory
+  const monthsFromDates = extractMonthsFromDate(dateHistory);
+
+  // Filter the priceHistory based on selected months
+  const filteredPrices = priceHistory.filter((price, index) => lastThreeMonths.includes(monthsFromDates[index]));
+
+  // Create the chart data
+  const chartdata = lastThreeMonths.map((month) => {
+    const filteredMonthPrices = filteredPrices.filter((price, index) => {
+      return (
+        monthsFromDates[index] === month &&
+        typeof price === 'number' &&
+        price >= 2 && // Filter out values less than 0.01
+        !Number.isNaN(price) // Filter out NaN values
+      );
+    });
+
+    const numericPrices = filteredMonthPrices.map((price) => parseFloat(price));
+
+    let maxPrice = Math.max(...numericPrices);
+    let minPrice = Math.min(...numericPrices);
+
+    const cleanMinPrice = parseFloat(String(minPrice).replace(/,/g, '').replace(/\./g, ''));
+    const cleanMaxPrice = parseFloat(String(maxPrice).replace(/,/g, '').replace(/\./g, ''));
+
+    const variation = cleanMaxPrice - cleanMinPrice;
+
+    if (filteredMonthPrices.length === 0) {
+      // If no valid prices for the month, set maxPrice and minPrice to 0
+      const maxPrice = 0;
+      const minPrice = 0;
+      const variation = 0;
+
+      return {
+        mes: month.charAt(0).toUpperCase() + month.slice(1),
+        'Precios Mayores': maxPrice,
+        'Precios Menores': minPrice,
+        Variación: variation,
+      };
+    }
+
+    return {
+      mes: month.charAt(0).toUpperCase() + month.slice(1),
+      'Precios Mayores': cleanMaxPrice,
+      'Precios Menores': cleanMinPrice,
+      Variación: variation,
+    };
+  });
 
   return (
     <Card className='bg-white-200 p-4 shadow-md rounded-md w-[50%]'>
@@ -46,7 +72,7 @@ const LineChartComponent = ({ highestPrice, lowestPrice, productTitle }) => {
         data={chartdata}
         index='mes'
         categories={['Precios Mayores', 'Precios Menores', 'Variación']}
-        colors={['emerald', 'red', 'blue']} // Added a color for 'Variación'
+        colors={['emerald', 'red', 'blue']}
         valueFormatter={priceFormatter}
         yAxisWidth={80}
       />
