@@ -8,7 +8,7 @@ import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { generateEmailBody, sendEmail } from '../nodemailer';
 
-export async function scrapeAndStoreProducts(productUrl: string) {
+export async function scrapeAndStoreProduct(productUrl: string) {
   if (!productUrl) return;
 
   try {
@@ -22,22 +22,23 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
     const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
-    if (existingProduct && existingProduct.priceHistory) {
+    if (existingProduct) {
       const updatedPriceHistory: PriceHistoryItem[] = existingProduct.priceHistory
         .map((priceItem: PriceHistoryItem) => {
-          const priceString = priceItem.price ? priceItem.price.toString() : '';
+          const price = parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10);
           return {
-            price: parseInt(priceString.replace('.', ''), 10),
+            price,
             date: priceItem.date,
+            _id: priceItem._id,
           };
         })
-        .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price) && priceItem.price >= 100000);
+        .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price));
 
-      const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace('.', ''), 10);
+      const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10);
 
-      const product = {
+      product = {
         ...scrapedProduct,
-        priceHistory: [...updatedPriceHistory, { price: currentPrice, date: new Date() }],
+        priceHistory: [...updatedPriceHistory],
         lowestPrice: getLowestPrice(updatedPriceHistory),
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
