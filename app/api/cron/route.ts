@@ -47,7 +47,8 @@ export async function GET(request: Request) {
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
-        // Update Products in DB
+
+        console.log('ACTUALIZACION VIA CRON -->', product);
 
         const updatedProduct = await Product.findOneAndUpdate(
           {

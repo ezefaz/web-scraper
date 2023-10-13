@@ -29,7 +29,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
           return {
             price: parseInt(priceString.replace('.', ''), 10),
             date: priceItem.date,
-            _id: priceItem._id,
           };
         })
         .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price) && priceItem.price >= 100000);
@@ -43,13 +42,14 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
       };
-      const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
-        upsert: true,
-        new: true,
-      });
-
-      revalidatePath(`/products/${newProduct._id}`);
     }
+
+    const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
+      upsert: true,
+      new: true,
+    });
+
+    revalidatePath(`/products/${newProduct._id}`);
   } catch (error: any) {
     throw new Error(`Failed to create/update product: ${error.message}`);
   }
