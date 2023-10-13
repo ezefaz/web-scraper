@@ -27,24 +27,21 @@ export async function GET(request: Request) {
         if (!scrapedProduct) return;
 
         const updatedPriceHistory = currentProduct.priceHistory
-          .map((priceItem: PriceHistoryItem) => ({
-            price: Math.round(priceItem.price),
-            date: priceItem.date,
-            _id: priceItem._id,
-          }))
-          .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price) && priceItem.price >= 100000);
+          .map((priceItem: PriceHistoryItem) => {
+            const price = parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10);
+            return {
+              price,
+              date: priceItem.date,
+              _id: priceItem._id,
+            };
+          })
+          .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price));
 
-        const currentPrice: number = Math.round(Number(scrapedProduct.currentPrice));
+        const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10);
 
         const product = {
           ...scrapedProduct,
-          priceHistory: [
-            ...updatedPriceHistory,
-            {
-              price: currentPrice,
-              date: new Date(),
-            },
-          ],
+          priceHistory: updatedPriceHistory,
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),

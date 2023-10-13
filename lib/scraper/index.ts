@@ -89,7 +89,7 @@ export async function scrapeMLProduct(url: string) {
       $('.ui-vpp-text-alignment--left .highlighted-specs-title')
     );
 
-    const category = categories[4] || categories[1];
+    const category = categories[4].length > 1 ? categories[4] : categories[0];
 
     const data = {
       url,
