@@ -78,11 +78,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} ${formatNumber(
-                product.currentPrice
-              )}`}</p>
+              <p className='text-[34px] text-secondary font-bold'>{`${formatNumber(product.currentPrice)}`}</p>
               <p className='text-[21px] text-black opacity-50 line-through'>
-                {`${product.currency} ${formatNumber(product.originalPrice)}`}
+                {`${formatNumber(product.originalPrice)}`}
               </p>
             </div>
             <div className='flex flex-col gap-4'>
@@ -110,7 +108,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <PriceInfoCard
                 title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
-                value={`${product.currency} ${formatNumber(product.currentPrice)}`}
+                value={`${formatNumber(product.currentPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard

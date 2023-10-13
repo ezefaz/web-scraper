@@ -17,7 +17,7 @@ export const maxDuration = 10; // This function can run for a maximum of 300 sec
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const MIN_VALID_PRICE = 4000;
+const MIN_VALID_PRICE = 100;
 
 export async function GET(request: Request) {
   try {
@@ -27,11 +27,12 @@ export async function GET(request: Request) {
 
     if (!products) throw new Error('No product fetched');
 
-    // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
+    // ======================== 1. SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
-        // Scrape product
         const scrapedProduct = await scrapeMLProduct(currentProduct.url);
+
+        console.log('1. PRODUCTO SCRAPEADO -->', scrapedProduct);
 
         if (!scrapedProduct) return;
 
@@ -50,6 +51,8 @@ export async function GET(request: Request) {
           // Add the new price to the updated history
           updatedPriceHistory.push({ price: updatedPrice });
 
+          console.log('2. HISTORIA DE PRECIO UPDATEADA -->', updatedPriceHistory);
+
           const product = {
             ...scrapedProduct,
             priceHistory: updatedPriceHistory,
@@ -57,6 +60,8 @@ export async function GET(request: Request) {
             highestPrice: getHighestPrice(updatedPriceHistory),
             averagePrice: getAveragePrice(updatedPriceHistory),
           };
+
+          console.log('3. PRODUCTO UPDATEADO -->', product);
 
           // Update Products in DB
           const updatedProduct = await Product.findOneAndUpdate(

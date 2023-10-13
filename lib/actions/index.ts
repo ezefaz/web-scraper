@@ -1,124 +1,125 @@
-'use server'
+'use server';
 
-import { User } from "@/types";
-import Product from "../models/product.model";
-import { connectToDb } from "../mongoose";
-import { scrapeMLProduct } from "../scraper";
-import { getAveragePrice, getHighestPrice, getLowestPrice } from "../utils";
-import { revalidatePath } from "next/cache";
-import { generateEmailBody, sendEmail } from "../nodemailer";
+import { User } from '@/types';
+import Product from '../models/product.model';
+import { connectToDb } from '../mongoose';
+import { scrapeMLProduct } from '../scraper';
+import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils';
+import { revalidatePath } from 'next/cache';
+import { generateEmailBody, sendEmail } from '../nodemailer';
 
 export async function scrapeAndStoreProducts(productUrl: string) {
-    if (!productUrl) return;
+  if (!productUrl) return;
 
-    try {
-        connectToDb();
+  try {
+    connectToDb();
 
-        const scrapedProduct = await scrapeMLProduct(productUrl);
+    const scrapedProduct = await scrapeMLProduct(productUrl);
 
-        if(!scrapedProduct) return;
+    if (!scrapedProduct) return;
 
-        let product = scrapedProduct;
+    let product = scrapedProduct;
 
-        const existingProduct = await Product.findOne({ url: scrapedProduct.url })
-    
-        if (existingProduct) {
-            
-            const updatedPriceHistory: any = [
-                ...existingProduct.priceHistory,
-                { price: scrapedProduct.originalPrice }
-            ]
+    const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
-            product = {
-                ...scrapedProduct,
-                priceHistory: updatedPriceHistory,
-                lowestPrice: getLowestPrice(updatedPriceHistory),
-                highestPrice: getHighestPrice(updatedPriceHistory),
-                averagePrice: getAveragePrice(updatedPriceHistory),
-            }            
-        }
-
-        const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url },
-            product,
-            { upsert: true, new: true }
-        );
-
-        revalidatePath(`/products/${newProduct._id}`);
-
-
-    } catch (error: any) {
-        throw new Error(`Failed to create/update product: ${error.message}`)
+    if (existingProduct && existingProduct.currentPrice) {
+      existingProduct.currentPrice = Number(existingProduct.currentPrice);
+      existingProduct.originalPrice = Number(existingProduct.originalPrice);
     }
+
+    console.log('EXISTEN    -------->', existingProduct);
+
+    if (existingProduct) {
+      const updatedPriceHistory: any = [
+        ...existingProduct.priceHistory,
+        { price: Number(scrapedProduct.currentPrice) },
+      ];
+      console.log('-------->', updatedPriceHistory);
+
+      product = {
+        ...scrapedProduct,
+        priceHistory: updatedPriceHistory,
+        lowestPrice: getLowestPrice(updatedPriceHistory),
+        highestPrice: getHighestPrice(updatedPriceHistory),
+        averagePrice: getAveragePrice(updatedPriceHistory),
+      };
+    }
+
+    const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
+      upsert: true,
+      new: true,
+    });
+
+    console.log('PRODUCTITO NUEVITO', newProduct);
+
+    revalidatePath(`/products/${newProduct._id}`);
+  } catch (error: any) {
+    throw new Error(`Failed to create/update product: ${error.message}`);
+  }
 }
 
 export async function getProductById(productId: string) {
-    try {
-        connectToDb();
+  try {
+    connectToDb();
 
-        const product = await Product.findOne({ _id: productId })
+    const product = await Product.findOne({ _id: productId });
 
-        if (!product) return;
+    if (!product) return;
 
-        return product;
-    } catch (error) {
-        console.log(error);
-        
-    }
+    return product;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getAllProducts() {
-    try {
-        connectToDb();
+  try {
+    connectToDb();
 
-        const products = await Product.find();
+    const products = await Product.find();
 
-        return products;
-    } catch (error) {
-        console.log(error);
-        
-    }
+    return products;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getSimilarProducts(productId: string) {
-    try {
-        connectToDb();
+  try {
+    connectToDb();
 
-        const currentProduct = await Product.findById(productId);
+    const currentProduct = await Product.findById(productId);
 
-        if (!currentProduct) return null;
+    if (!currentProduct) return null;
 
-        const similarProducts = await Product.find({
-            _id:{ $ne: productId },
-        }).limit(3);
+    const similarProducts = await Product.find({
+      _id: { $ne: productId },
+    }).limit(3);
 
-        return similarProducts;
-    } catch (error) {
-        console.log(error);
-        
-    }
+    return similarProducts;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function addUserEmailToProduct(productId: string, userEmail: string) {
-    try {
-        const product = await Product.findById(productId)
+  try {
+    const product = await Product.findById(productId);
 
-        if(!product) return;
+    if (!product) return;
 
-        const userExists = product.users.some((user: User) => user.email === userEmail);
+    const userExists = product.users.some((user: User) => user.email === userEmail);
 
-        if(!userExists) {
-            product.users.push({ email: userEmail });
+    if (!userExists) {
+      product.users.push({ email: userEmail });
 
-            await product.save();
+      await product.save();
 
-            const emailContent = await generateEmailBody(product, 'WELCOME');
+      const emailContent = await generateEmailBody(product, 'WELCOME');
 
-            await sendEmail(emailContent, [userEmail]);
-        }
-
-
-    } catch (error) {
-        console.log(error);
-        
+      await sendEmail(emailContent, [userEmail]);
     }
+  } catch (error) {
+    console.log(error);
+  }
 }

@@ -30,16 +30,9 @@ export async function scrapeMLProduct(url: string) {
     const $ = cheerio.load(response.data);
 
     const title = $('.ui-pdp-title').text().trim();
-    // const originalPrice = extractPrice(
-    //     $('.andes-money-amount__fraction'),
-    //     $('.andes-visually-hidden'),
-    //     $('.andes-money-amount__fraction'),
-    //     $('.ui-pdp-price__second-line'),
-    //     $('.ui-pdp-price__main-container'),
-    // );
-    // const currentPrice: any = $('meta[itemprop="price"]').attr("content");
 
     const priceElements = $('.andes-money-amount__fraction');
+
     const prices = priceElements.map((index, element) => $(element).text().trim()).get();
 
     // Create a Set to store unique price entries
@@ -49,7 +42,6 @@ export async function scrapeMLProduct(url: string) {
       const numberPriceEntry = parseFloat(String(priceEntry).replace(/,/g, '').replace(/\./g, ''));
 
       if (numberPriceEntry && numberPriceEntry >= MIN_VALID_PRICE) {
-        // Add the numberPriceEntry to the Set to ensure uniqueness
         uniquePrices.add(priceEntry);
       }
     }

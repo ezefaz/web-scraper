@@ -78,6 +78,8 @@ export function getLowestPrice(priceList: PriceHistoryItem[]) {
     if (!isNaN(numericPrice) && numericPrice < lowestPrice) {
       lowestPrice = numericPrice;
     }
+
+    console.log('PRECIO MENOR -->', lowestPrice);
   }
 
   return lowestPrice;
