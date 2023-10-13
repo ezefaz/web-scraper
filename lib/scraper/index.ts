@@ -2,7 +2,14 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { extractCurrency, extractDescription, extractPrice, formatNumber, formatNumberWithCommas } from '../utils';
+import {
+  extractCategories,
+  extractCurrency,
+  extractDescription,
+  extractPrice,
+  formatNumber,
+  formatNumberWithCommas,
+} from '../utils';
 
 const MIN_VALID_PRICE = 100;
 
@@ -91,6 +98,15 @@ export async function scrapeMLProduct(url: string) {
         .text()
         ?.match(/\(([^)]+)\)/)?.[1] || '';
 
+    const categories = extractCategories(
+      $('.andes-breadcrumb__link'),
+      $('.andes-breadcrumb__link').attr('title'),
+      $('.andes-breadcrumb__item a'),
+      $('.ui-vpp-text-alignment--left .highlighted-specs-title')
+    );
+
+    const category = categories[4] || categories[1];
+
     const data = {
       url,
       currency: currency || '$',
@@ -100,7 +116,7 @@ export async function scrapeMLProduct(url: string) {
       originalPrice: Number(originalPrice) || Number(currentPrice),
       priceHistory: [],
       discountRate: Number(discountRate),
-      category: 'category',
+      category: category,
       reviewsCount: reviewsCount || 0,
       stars: stars || 4.5,
       stockAvailable: stockAvailable && !isOutOfStock ? stockAvailable : '1',

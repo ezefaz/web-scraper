@@ -30,6 +30,23 @@ export function extractPrice(...elements: any) {
   return '';
 }
 
+export function extractCategories(...elements: any) {
+  for (const element of elements) {
+    const categoryText = element.text().trim();
+
+    if (categoryText) {
+      const splitBySpace = categoryText.split(/\s+/);
+      let category: Array<string> = [];
+      splitBySpace.forEach((word: string) => {
+        category = category.concat(word.split(/(?=[A-Z])/));
+      });
+      return category;
+    }
+  }
+
+  return [];
+}
+
 // Extracts and returns the currency symbol from an element.
 export function extractCurrency(element: any) {
   const currencyText = element.text().trim().slice(0, 1);
@@ -113,11 +130,9 @@ export const getEmailNotifType = (scrapedProduct: Product, currentProduct: Produ
 };
 
 export const formatNumber = (num: number = 0) => {
-  return num.toLocaleString('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
+  return num.toLocaleString(undefined, {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
+    maximumFractionDigits: 0,
   });
 };
 
