@@ -30,11 +30,17 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     lastDates.push(p.date);
   });
 
+  console.log('PRICE HISTORY -->', product.priceHistory);
+  console.log('PRICE CURRENT -->', product.currentPrice);
+  console.log('PRICE ORIGINAL -->', product.originalPrice);
+  console.log('PRICE LOWEST -->', product.lowestPrice);
+
   // Filter the dates that are equal, removing the hours.
   const filteredLastPrices = lastPrices.filter((price) => Number.isInteger(price));
 
   const priceSet = new Set();
   const uniquePrices = [];
+
   for (const price of filteredLastPrices) {
     if (!priceSet.has(price)) {
       priceSet.add(price);

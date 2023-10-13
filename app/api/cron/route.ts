@@ -48,8 +48,6 @@ export async function GET(request: Request) {
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
 
-        console.log('ACTUALIZACION VIA CRON -->', product);
-
         const updatedProduct = await Product.findOneAndUpdate(
           {
             url: product.url,
