@@ -49,7 +49,6 @@ export async function GET(request: Request) {
         };
         // Update Products in DB
 
-        console.log('PRODUCTO ACTUALIZADO CRON -->', product);
         const updatedProduct = await Product.findOneAndUpdate(
           {
             url: product.url,
