@@ -22,19 +22,8 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
     const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
-    if (existingProduct && existingProduct.currentPrice) {
-      existingProduct.currentPrice = Number(existingProduct.currentPrice);
-      existingProduct.originalPrice = Number(existingProduct.originalPrice);
-    }
-
-    console.log('EXISTEN    -------->', existingProduct);
-
     if (existingProduct) {
-      const updatedPriceHistory: any = [
-        ...existingProduct.priceHistory,
-        { price: Number(scrapedProduct.currentPrice) },
-      ];
-      console.log('-------->', updatedPriceHistory);
+      const updatedPriceHistory: any = [...existingProduct.priceHistory, { price: scrapedProduct.currentPrice }];
 
       product = {
         ...scrapedProduct,
@@ -49,8 +38,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
       upsert: true,
       new: true,
     });
-
-    console.log('PRODUCTITO NUEVITO', newProduct);
 
     revalidatePath(`/products/${newProduct._id}`);
   } catch (error: any) {

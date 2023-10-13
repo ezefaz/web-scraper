@@ -38,29 +38,41 @@ export async function scrapeMLProduct(url: string) {
 
     const title = $('.ui-pdp-title').text().trim();
 
-    const priceElements = $('.andes-money-amount__fraction');
+    // const priceElements = $('.andes-money-amount__fraction');
 
-    const prices = priceElements.map((index, element) => $(element).text().trim()).get();
+    // const prices = priceElements.map((index, element) => $(element).text().trim()).get();
 
-    // Create a Set to store unique price entries
-    const uniquePrices = new Set();
+    // const currentPrice = parseFloat(String(currentPriceText).replace(/,/g, '').replace(/\./g, ''));
 
-    for (const priceEntry of prices) {
-      const numberPriceEntry = parseFloat(String(priceEntry).replace(/,/g, '').replace(/\./g, ''));
+    // const currentPrice = extractPrice(
+    //   // $('meta[itemprop="price"]').attr('content')
+    //   $('.ui-pdp-price__second-line .andes-money-amount__fraction')
+    // );
 
-      if (numberPriceEntry && numberPriceEntry >= MIN_VALID_PRICE) {
-        uniquePrices.add(priceEntry);
-      }
-    }
+    const currentPrice = $('meta[itemprop="price"]').attr('content');
 
-    // Convert the Set back to an array (if needed)
-    const updatedPrices = Array.from(uniquePrices);
+    const prices = $($('.andes-money-amount .andes-money-amount__fraction '));
+    const originalPrices = prices.map((index, element) => $(element).text().trim()).get();
+    let firstOriginalPrice = originalPrices[0];
 
-    const originalPriceText = updatedPrices[0];
-    const currentPriceText = updatedPrices[1] || updatedPrices[0];
+    const originalPrice = parseFloat(String(firstOriginalPrice).replace(/,/g, '').replace(/\./g, ''));
 
-    const originalPrice = parseFloat(String(originalPriceText).replace(/,/g, '').replace(/\./g, ''));
-    const currentPrice = parseFloat(String(currentPriceText).replace(/,/g, '').replace(/\./g, ''));
+    // const originalPrice = extractPrice(
+    //   $('.andes-money-amount .andes-money-amount__fraction ')
+    //   // $('.andes-money-amount.andes-money-amount--previous')
+    //   // $('.andes-money-amount.andes-money-amount--previous .andes-money-amount__fraction')
+    // );
+
+    // let firstPrice;
+    // let cleanPrice;
+
+    // if (originalPrice) {
+    //   cleanPrice = originalPrice.replace(/[^\d.]/g, '');
+
+    //   if (cleanPrice) {
+    //     firstPrice = cleanPrice.match(/\d+\.\d{2}/)?.[0];
+    //   }
+    // }
 
     const isOutOfStock =
       $('.ui-pdp-color--BLACK.ui-pdp-size--SMALL.ui-pdp-family--SEMIBOLD.ui-pdp-stock-information__title')
@@ -127,7 +139,7 @@ export async function scrapeMLProduct(url: string) {
       averagePrice: Number(currentPrice) || Number(originalPrice),
     };
 
-    // console.log('PRODUCTO -->', data);
+    console.log('PRODUCTO -->', data);
 
     return data;
   } catch (error: any) {

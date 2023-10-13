@@ -86,29 +86,20 @@ export function getHighestPrice(priceList: PriceHistoryItem[]) {
 }
 
 export function getLowestPrice(priceList: PriceHistoryItem[]) {
-  let lowestPrice = priceList[0].price;
+  let lowestPrice = priceList[0];
 
   for (let i = 0; i < priceList.length; i++) {
-    const currentPrice = priceList[i].price.toString();
-    const numericPrice = parseFloat(currentPrice.replace(/[,\.]/g, ''));
-
-    if (!isNaN(numericPrice) && numericPrice < lowestPrice) {
-      lowestPrice = numericPrice;
+    if (priceList[i].price < lowestPrice.price) {
+      lowestPrice = priceList[i];
     }
-
-    console.log('PRECIO MENOR -->', lowestPrice);
   }
 
-  return lowestPrice;
+  return lowestPrice.price;
 }
 
 export function getAveragePrice(priceList: PriceHistoryItem[]) {
-  if (priceList.length === 0) {
-    return 0;
-  }
-
   const sumOfPrices = priceList.reduce((acc, curr) => acc + curr.price, 0);
-  const averagePrice = sumOfPrices / priceList.length;
+  const averagePrice = sumOfPrices / priceList.length || 0;
 
   return averagePrice;
 }

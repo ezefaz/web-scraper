@@ -23,8 +23,7 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
     const filteredMonthPrices = filteredPrices.filter((price, index) => {
       return (
         monthsFromDates[index] === month &&
-        typeof price === 'number' &&
-        price >= 2 && // Filter out values less than 0.01
+        typeof price === 'number' && // Filter out values less than 0.01
         !Number.isNaN(price) // Filter out NaN values
       );
     });

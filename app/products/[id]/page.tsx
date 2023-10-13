@@ -14,32 +14,17 @@ type Props = {
   params: { id: string };
 };
 
-const MIN_VALID_PRICE = 100;
-
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
 
   const productHistory = product.priceHistory;
-
-  const updatedPriceHistory = [];
-
-  for (const priceEntry of productHistory) {
-    const formattedPrice = parseFloat(String(priceEntry.price).replace(/,|\./g, ''));
-    if (formattedPrice >= MIN_VALID_PRICE) {
-      // Formatea el precio y verifica si es mayor o igual a MIN_VALID_PRICE
-      updatedPriceHistory.push({
-        price: formattedPrice,
-        date: priceEntry.date,
-      });
-    }
-  }
 
   // Inicializa los arreglos lastPrices y lastDates
   const lastPrices: Array<Number> = [];
   const lastDates: Array<Date> = [];
 
   // Extrae los precios y fechas de updatedPriceHistory
-  updatedPriceHistory.forEach((p) => {
+  productHistory.forEach((p) => {
     lastPrices.push(p.price);
     lastDates.push(p.date);
   });
@@ -78,9 +63,11 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold'>{`${formatNumber(product.currentPrice)}`}</p>
+              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} ${formatNumber(
+                product.currentPrice
+              )}`}</p>
               <p className='text-[21px] text-black opacity-50 line-through'>
-                {`${formatNumber(product.originalPrice)}`}
+                {`${product.currency} ${formatNumber(product.originalPrice)}`}
               </p>
             </div>
             <div className='flex flex-col gap-4'>
@@ -108,25 +95,25 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <PriceInfoCard
                 title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
-                value={`${formatNumber(product.currentPrice)}`}
+                value={` ${product.currency} ${formatNumber(product.currentPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
                 title='Precio Promedio'
                 iconSrc='/assets/icons/chart.svg'
-                value={` ${formatNumber(product.averagePrice)}`}
+                value={`${product.currency} ${formatNumber(product.averagePrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
                 title='Precio Mayor'
                 iconSrc='/assets/icons/arrow-up.svg'
-                value={` ${formatNumber(product.highestPrice)}`}
+                value={`${product.currency} ${formatNumber(product.highestPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
                 title='Precio Menor'
                 iconSrc='/assets/icons/arrow-down.svg'
-                value={` ${formatNumber(product.lowestPrice)}`}
+                value={`${product.currency} ${formatNumber(product.lowestPrice)}`}
                 borderColor='#B3FFC5'
               />
             </div>

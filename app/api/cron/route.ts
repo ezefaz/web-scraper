@@ -1,23 +1,14 @@
 import { NextResponse } from 'next/server';
 
-import {
-  getLowestPrice,
-  getHighestPrice,
-  getAveragePrice,
-  getEmailNotifType,
-  formatNumber,
-  formatNumberWithCommas,
-} from '@/lib/utils';
+import { getLowestPrice, getHighestPrice, getAveragePrice, getEmailNotifType } from '@/lib/utils';
 import { connectToDb } from '@/lib/mongoose';
 import Product from '@/lib/models/product.model';
 import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
 
-export const maxDuration = 10; // This function can run for a maximum of 300 seconds
+export const maxDuration = 100; // This function can run for a maximum of 300 seconds
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-const MIN_VALID_PRICE = 100;
 
 export async function GET(request: Request) {
   try {
@@ -27,70 +18,54 @@ export async function GET(request: Request) {
 
     if (!products) throw new Error('No product fetched');
 
-    // ======================== 1. SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
+    // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
+        // Scrape product
         const scrapedProduct = await scrapeMLProduct(currentProduct.url);
-
-        console.log('1. PRODUCTO SCRAPEADO -->', scrapedProduct);
 
         if (!scrapedProduct) return;
 
-        const updatedPrice = scrapedProduct.currentPrice;
+        const updatedPriceHistory = [
+          ...currentProduct.priceHistory,
+          {
+            price: scrapedProduct.currentPrice,
+          },
+        ];
 
-        if (!isNaN(updatedPrice) && updatedPrice >= MIN_VALID_PRICE) {
-          const updatedPriceHistory = [];
+        const product = {
+          ...scrapedProduct,
+          priceHistory: updatedPriceHistory,
+          lowestPrice: getLowestPrice(updatedPriceHistory),
+          highestPrice: getHighestPrice(updatedPriceHistory),
+          averagePrice: getAveragePrice(updatedPriceHistory),
+        };
 
-          // Iterate through the price history
-          for (const priceEntry of currentProduct.priceHistory) {
-            if (priceEntry.price >= MIN_VALID_PRICE) {
-              updatedPriceHistory.push(priceEntry);
-            }
-          }
+        // Update Products in DB
+        const updatedProduct = await Product.findOneAndUpdate(
+          {
+            url: product.url,
+          },
+          product
+        );
 
-          // Add the new price to the updated history
-          updatedPriceHistory.push({ price: updatedPrice });
+        // ======================== 2 CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
+        const emailNotifType = getEmailNotifType(scrapedProduct, currentProduct);
 
-          console.log('2. HISTORIA DE PRECIO UPDATEADA -->', updatedPriceHistory);
-
-          const product = {
-            ...scrapedProduct,
-            priceHistory: updatedPriceHistory,
-            lowestPrice: getLowestPrice(updatedPriceHistory),
-            highestPrice: getHighestPrice(updatedPriceHistory),
-            averagePrice: getAveragePrice(updatedPriceHistory),
+        if (emailNotifType && updatedProduct.users.length > 0) {
+          const productInfo = {
+            title: updatedProduct.title,
+            url: updatedProduct.url,
           };
-
-          console.log('3. PRODUCTO UPDATEADO -->', product);
-
-          // Update Products in DB
-          const updatedProduct = await Product.findOneAndUpdate(
-            {
-              url: product.url,
-            },
-            product
-          );
-
-          // ======================== 2 CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
-          const emailNotifType = getEmailNotifType(scrapedProduct, currentProduct);
-
-          if (emailNotifType && updatedProduct.users.length > 0) {
-            const productInfo = {
-              title: updatedProduct.title,
-              url: updatedProduct.url,
-            };
-            // Construct emailContent
-            const emailContent = await generateEmailBody(productInfo, emailNotifType);
-            // Get array of user emails
-            const userEmails = updatedProduct.users.map((user: any) => user.email);
-            // Send email notification
-            await sendEmail(emailContent, userEmails);
-          }
-
-          return updatedProduct;
-        } else {
-          console.log('Scraped price is not a valid number');
+          // Construct emailContent
+          const emailContent = await generateEmailBody(productInfo, emailNotifType);
+          // Get array of user emails
+          const userEmails = updatedProduct.users.map((user: any) => user.email);
+          // Send email notification
+          await sendEmail(emailContent, userEmails);
         }
+
+        return updatedProduct;
       })
     );
 
