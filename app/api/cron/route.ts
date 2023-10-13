@@ -5,6 +5,7 @@ import { connectToDb } from '@/lib/mongoose';
 import Product from '@/lib/models/product.model';
 import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
+import { PriceHistoryItem } from '@/types';
 
 export const maxDuration = 10; // This function can run for a maximum of 300 seconds
 export const dynamic = 'force-dynamic';
@@ -26,22 +27,29 @@ export async function GET(request: Request) {
 
         if (!scrapedProduct) return;
 
-        const updatedPriceHistory = [
-          ...currentProduct.priceHistory,
-          {
-            price: scrapedProduct.currentPrice,
-          },
-        ];
+        const updatedPriceHistory = currentProduct.priceHistory
+          .map((priceItem: PriceHistoryItem) => {
+            const priceString = priceItem.price ? priceItem.price.toString() : '';
+            return {
+              price: parseInt(priceString.replace('.', ''), 10),
+              date: priceItem.date,
+              _id: priceItem._id,
+            };
+          })
+          .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price) && priceItem.price >= 100000);
+
+        const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace('.', ''), 10);
 
         const product = {
           ...scrapedProduct,
-          priceHistory: updatedPriceHistory,
+          priceHistory: [...updatedPriceHistory, { price: currentPrice, date: new Date() }],
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
-
         // Update Products in DB
+
+        console.log('PRODUCTO ACTUALIZADO CRON -->', product);
         const updatedProduct = await Product.findOneAndUpdate(
           {
             url: product.url,
