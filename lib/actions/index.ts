@@ -1,6 +1,6 @@
 'use server';
 
-import { User } from '@/types';
+import { PriceHistoryItem, User } from '@/types';
 import Product from '../models/product.model';
 import { connectToDb } from '../mongoose';
 import { scrapeMLProduct } from '../scraper';
@@ -22,24 +22,34 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
     const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
-    if (existingProduct) {
-      const updatedPriceHistory: any = [...existingProduct.priceHistory, { price: scrapedProduct.currentPrice }];
+    if (existingProduct && existingProduct.priceHistory) {
+      const updatedPriceHistory: PriceHistoryItem[] = existingProduct.priceHistory
+        .map((priceItem: PriceHistoryItem) => {
+          const priceString = priceItem.price ? priceItem.price.toString() : '';
+          return {
+            price: parseInt(priceString.replace('.', ''), 10),
+            date: priceItem.date,
+            _id: priceItem._id,
+          };
+        })
+        .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price) && priceItem.price >= 100000);
 
-      product = {
+      const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace('.', ''), 10);
+
+      const product = {
         ...scrapedProduct,
-        priceHistory: updatedPriceHistory,
+        priceHistory: [...updatedPriceHistory, { price: currentPrice, date: new Date() }],
         lowestPrice: getLowestPrice(updatedPriceHistory),
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
       };
+      const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
+        upsert: true,
+        new: true,
+      });
+
+      revalidatePath(`/products/${newProduct._id}`);
     }
-
-    const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
-      upsert: true,
-      new: true,
-    });
-
-    revalidatePath(`/products/${newProduct._id}`);
   } catch (error: any) {
     throw new Error(`Failed to create/update product: ${error.message}`);
   }

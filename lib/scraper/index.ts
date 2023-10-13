@@ -7,11 +7,10 @@ import {
   extractCurrency,
   extractDescription,
   extractPrice,
+  extractStarRatings,
   formatNumber,
   formatNumberWithCommas,
 } from '../utils';
-
-const MIN_VALID_PRICE = 100;
 
 export async function scrapeMLProduct(url: string) {
   if (!url) return;
@@ -38,17 +37,6 @@ export async function scrapeMLProduct(url: string) {
 
     const title = $('.ui-pdp-title').text().trim();
 
-    // const priceElements = $('.andes-money-amount__fraction');
-
-    // const prices = priceElements.map((index, element) => $(element).text().trim()).get();
-
-    // const currentPrice = parseFloat(String(currentPriceText).replace(/,/g, '').replace(/\./g, ''));
-
-    // const currentPrice = extractPrice(
-    //   // $('meta[itemprop="price"]').attr('content')
-    //   $('.ui-pdp-price__second-line .andes-money-amount__fraction')
-    // );
-
     const currentPrice = $('meta[itemprop="price"]').attr('content');
 
     const prices = $($('.andes-money-amount .andes-money-amount__fraction '));
@@ -56,23 +44,6 @@ export async function scrapeMLProduct(url: string) {
     let firstOriginalPrice = originalPrices[0];
 
     const originalPrice = parseFloat(String(firstOriginalPrice).replace(/,/g, '').replace(/\./g, ''));
-
-    // const originalPrice = extractPrice(
-    //   $('.andes-money-amount .andes-money-amount__fraction ')
-    //   // $('.andes-money-amount.andes-money-amount--previous')
-    //   // $('.andes-money-amount.andes-money-amount--previous .andes-money-amount__fraction')
-    // );
-
-    // let firstPrice;
-    // let cleanPrice;
-
-    // if (originalPrice) {
-    //   cleanPrice = originalPrice.replace(/[^\d.]/g, '');
-
-    //   if (cleanPrice) {
-    //     firstPrice = cleanPrice.match(/\d+\.\d{2}/)?.[0];
-    //   }
-    // }
 
     const isOutOfStock =
       $('.ui-pdp-color--BLACK.ui-pdp-size--SMALL.ui-pdp-family--SEMIBOLD.ui-pdp-stock-information__title')
@@ -100,7 +71,8 @@ export async function scrapeMLProduct(url: string) {
     const reviewsCountText = $('.ui-pdp-review__amount').text();
     const reviewsCount = reviewsCountText ? parseInt(reviewsCountText.replace(/\D+/g, ''), 10) : 0;
 
-    const starsText = $('.ui-pdp-review__rating').text();
+    // const starsText = $('.ui-pdp-review__rating').text();
+    const starsText = extractStarRatings($);
     const stars = parseFloat(starsText);
 
     const description = extractDescription($);

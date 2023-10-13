@@ -53,7 +53,6 @@ export function extractCurrency(element: any) {
   return currencyText ? currencyText : '';
 }
 
-// Extracts description from two possible elements from amazon
 export function extractDescription($: any) {
   // these are possible elements holding description of the product
   const selectors = ['.ui-pdp-description__content', '.ui-pdp-description', '.ui-pdp-description br'];
@@ -65,6 +64,25 @@ export function extractDescription($: any) {
         .map((_: any, element: any) => $(element).text().trim())
         .get()
         .join('\n');
+      return textContent;
+    }
+  }
+
+  // If no matching elements were found, return an empty string
+  return '';
+}
+
+export function extractStarRatings($: any) {
+  // these are possible elements holding description of the product
+  const selectors = [
+    '.ui-pdp-review__rating',
+    '.ui-review-capability__rating__average.ui-review-capability__rating__average--desktop',
+  ];
+
+  for (const selector of selectors) {
+    const elements = $(selector);
+    if (elements.length > 0) {
+      const textContent = elements.map((_: any, element: any) => $(element).text());
       return textContent;
     }
   }

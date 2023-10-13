@@ -1,14 +1,15 @@
+import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import Modal from '@/components/Modal';
 import PriceInfoCard from '@/components/PriceInfoCard';
 import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
+
 import { getProductById, getSimilarProducts } from '@/lib/actions';
-import { formatNumber, formatNumberWithCommas } from '@/lib/utils';
+import { formatNumber } from '@/lib/utils';
 import { Product } from '@/types';
-import Image from 'next/image';
-import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import React from 'react';
 
 type Props = {
   params: { id: string };
@@ -28,6 +29,23 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     lastPrices.push(p.price);
     lastDates.push(p.date);
   });
+
+  // Filter the dates that are equal, removing the hours.
+  const filteredLastPrices = lastPrices.filter((price) => Number.isInteger(price));
+
+  const priceSet = new Set();
+  const uniquePrices = [];
+  for (const price of filteredLastPrices) {
+    if (!priceSet.has(price)) {
+      priceSet.add(price);
+      uniquePrices.push(price);
+    }
+  }
+
+  const formattedDates = lastDates.map((date) => date.toISOString().slice(0, 10));
+  const uniqueDatesSet = new Set(formattedDates);
+
+  const uniqueDatesArray = Array.from(uniqueDatesSet);
 
   if (!product) redirect('/');
 
@@ -124,8 +142,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div>
         <BarChart
           productTitle={product.title}
-          priceHistory={lastPrices}
-          dateHistory={lastDates}
+          priceHistory={uniquePrices}
+          dateHistory={uniqueDatesArray}
           currentPrice={product.currentPrice}
           originalPrice={product.originalPrice}
         />
