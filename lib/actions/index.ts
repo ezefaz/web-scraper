@@ -8,7 +8,7 @@ import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { generateEmailBody, sendEmail } from '../nodemailer';
 
-export async function scrapeAndStoreProduct(productUrl: string) {
+export async function scrapeAndStoreProducts(productUrl: string) {
   if (!productUrl) return;
 
   try {
