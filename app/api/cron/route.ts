@@ -27,17 +27,29 @@ export async function GET(request: Request) {
         if (!scrapedProduct) return;
 
         const updatedPriceHistory = currentProduct.priceHistory
+          .filter((priceItem: PriceHistoryItem) => priceItem && priceItem.price !== undefined)
           .map((priceItem: PriceHistoryItem) => {
-            const price = parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10);
-            return {
-              price,
-              date: priceItem.date,
-              _id: priceItem._id,
-            };
+            const price = priceItem.price ? parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10) : null;
+            if (price !== null && !isNaN(price)) {
+              return {
+                price,
+                date: priceItem.date,
+                _id: priceItem._id,
+              };
+            }
+            return null;
           })
-          .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price));
+          .filter(
+            (priceItem: PriceHistoryItem | null) =>
+              priceItem !== null && Number.isInteger(priceItem.price) && priceItem.price >= 100000
+          );
 
-        const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10);
+        const currentPrice = scrapedProduct.currentPrice
+          ? parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10)
+          : null;
+        if (currentPrice === null || isNaN(currentPrice)) {
+          throw new Error('Current price is not available or not a valid number.');
+        }
 
         const product = {
           ...scrapedProduct,

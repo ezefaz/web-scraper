@@ -8,7 +8,7 @@ import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { generateEmailBody, sendEmail } from '../nodemailer';
 
-export async function scrapeAndStoreProducts(productUrl: string) {
+export async function scrapeAndStoreProduct(productUrl: string) {
   if (!productUrl) return;
 
   try {
@@ -23,18 +23,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
     if (existingProduct) {
-      const updatedPriceHistory = existingProduct.priceHistory
-        .map((priceItem: PriceHistoryItem) => {
-          const price = parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10);
-          return {
-            price,
-            date: priceItem.date,
-            _id: priceItem._id,
-          };
-        })
-        .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price));
-
-      const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10);
+      const updatedPriceHistory: any = [...existingProduct.priceHistory, { price: scrapedProduct.currentPrice }];
 
       product = {
         ...scrapedProduct,
@@ -44,7 +33,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         averagePrice: getAveragePrice(updatedPriceHistory),
       };
     }
-
     const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
       upsert: true,
       new: true,
