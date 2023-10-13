@@ -7,7 +7,7 @@ import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
 import { PriceHistoryItem } from '@/types';
 
-export const maxDuration = 10; // This function can run for a maximum of 300 seconds
+export const maxDuration = 300; // This function can run for a maximum of 300 seconds
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
@@ -27,18 +27,14 @@ export async function GET(request: Request) {
 
         if (!scrapedProduct) return;
 
-        const updatedPriceHistory = currentProduct.priceHistory
-          .map((priceItem: PriceHistoryItem) => {
-            const priceString = priceItem.price ? priceItem.price.toString() : '';
-            return {
-              price: parseInt(priceString.replace('.', ''), 10),
-              date: priceItem.date,
-              _id: priceItem._id,
-            };
-          })
-          .filter((priceItem: PriceHistoryItem) => Number.isInteger(priceItem.price) && priceItem.price >= 100000);
+        // console.log('PRODUCTITO CURRENT', currentProduct);
 
-        const currentPrice: number = parseInt(scrapedProduct.currentPrice.toString().replace('.', ''), 10);
+        const updatedPriceHistory = currentProduct.priceHistory.filter((priceItem: PriceHistoryItem) => {
+          const price = parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10);
+          return !isNaN(price) && Number.isInteger(price);
+        });
+
+        const currentPrice = parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10);
 
         const product = {
           ...scrapedProduct,
@@ -48,12 +44,17 @@ export async function GET(request: Request) {
           averagePrice: getAveragePrice(updatedPriceHistory),
         };
 
+        console.log('PRODUCTO NORMAL', product);
+
+        // Update Products in DB
         const updatedProduct = await Product.findOneAndUpdate(
           {
             url: product.url,
           },
           product
         );
+
+        console.log('PRODUCTO UPDATEADO', updatedProduct);
 
         // ======================== 2 CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
         const emailNotifType = getEmailNotifType(scrapedProduct, currentProduct);

@@ -104,6 +104,8 @@ export function getHighestPrice(priceList: PriceHistoryItem[]) {
 }
 
 export function getLowestPrice(priceList: PriceHistoryItem[]) {
+  console.log('PINEDA', priceList[0]);
+
   let lowestPrice = priceList[0];
 
   for (let i = 0; i < priceList.length; i++) {
