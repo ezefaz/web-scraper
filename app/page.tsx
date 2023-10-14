@@ -28,9 +28,9 @@ const Home = async () => {
               {/* <Image src='/assets/icons/arrow-right.svg' alt='arrow-right' width={16} height={16} /> */}
             </div>
             <div className='text-center'>
-              <h1 className='head-text'>Descubre el potencial de</h1>
+              <h1 className='head-text'>Optimiza tus Compras</h1>
               <h1 className='head-text'>
-                Save<span className='text-primary'>Melin</span>
+                con Save<span className='text-primary'>Melin</span>
               </h1>
             </div>
             {''}

@@ -1,8 +1,8 @@
 'use client';
-
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 
 const navIcons = [
   { src: '/assets/icons/search.svg', alt: 'Search' },
@@ -11,10 +11,10 @@ const navIcons = [
 ];
 
 const Navbar = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [nav, setNav] = useState(false);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const handleNav = () => {
+    setNav(!nav);
   };
 
   return (
@@ -24,26 +24,49 @@ const Navbar = () => {
           <Link href='/' className='flex items-center gap-1'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
+          {!nav && (
+            <div className={`lg:flex items-center gap-5 text-black ${nav ? 'block' : 'hidden'}`}>
+              <a href='#how-it-works' className='hover:underline'>
+                Funcionamiento
+              </a>
+              <a href='#pricing' className='hover:underline'>
+                Precios
+              </a>
+              <a href='#faqs' className='hover:underline'>
+                FAQs
+              </a>
+            </div>
+          )}
+          <div>
+            <ul
+              className={
+                nav
+                  ? 'fixed left-0 top-0 w-[30%] h-full border-r border-r-white bg-[#000300] transition-all duration-1000 overflow-y-auto bg-[#e5e7eb]'
+                  : 'fixed left-0 top-0 w-[60%] h-full transition-all duration-1000 left-[-100%]'
+              }
+            >
+              <Link href='/' className='flex items-center gap-1 mt-3 ml-2'>
+                <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
+              </Link>
+              <Link href='#funcionalidad' passHref>
+                <li className='mt-3 p-4 border-b border-gray-600 hover:bg-gray-700 m-auto'>Funcionalidad</li>
+              </Link>
+              <Link href='#precios' passHref>
+                <li className='p-4 border-b border-gray-600 hover:bg-gray-700'>Precios</li>
+              </Link>
+              <Link href='#faqs' passHref>
+                <li className='p-4 border-b border-gray-600 hover:bg-gray-700'>FAQs</li>
+              </Link>
+              <div className='flex flex-column p-3 gap-5'>
+                {navIcons.map((icon, index) => (
+                  <Image key={index} src={icon.src} alt={icon.alt} width={28} height={28} className='object-contain' />
+                ))}
+              </div>
+            </ul>
+          </div>
+
           <div className='lg:hidden flex items-center'>
-            <button className='text-2xl text-black hover:text-primary focus:outline-none' onClick={toggleMenu}>
-              ☰
-            </button>
-          </div>
-          <div className={`lg:flex items-center gap-5 text-black ${menuOpen ? 'block' : 'hidden'}`}>
-            <a href='#how-it-works' className='hover:underline'>
-              Funcionamiento
-            </a>
-            <a href='#pricing' className='hover:underline'>
-              Precios
-            </a>
-            <a href='#faqs' className='hover:underline'>
-              FAQs
-            </a>
-          </div>
-          <div className='flex items-center gap-5'>
-            {navIcons.map((icon) => (
-              <Image src={icon.src} alt={icon.alt} width={28} height={28} className='object-contain' />
-            ))}
+            <div onClick={handleNav}>{nav ? <AiOutlineClose size={25} /> : <AiOutlineMenu size={25} />}</div>
           </div>
         </div>
       </nav>
