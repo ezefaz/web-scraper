@@ -6,9 +6,6 @@ import { Card, Title, LineChart } from '@tremor/react';
 const priceFormatter = (number) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
 const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPrice, originalPrice }) => {
-  const numericCurrentPrice = parseFloat(currentPrice);
-  const numericOriginalPrice = parseFloat(originalPrice);
-
   // Get the last three months
   const lastThreeMonths = getLastThreeMonths();
 
@@ -48,9 +45,9 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
 
     if (formattedPrices.length === 0) {
       // If no valid prices for the month, set maxPrice and minPrice to 0
-      const maxPrice = 0;
-      const minPrice = 0;
-      const variation = 0;
+      const maxPrice = originalPrice;
+      const minPrice = currentPrice;
+      const variation = originalPrice - currentPrice;
 
       return {
         mes: month.charAt(0).toUpperCase() + month.slice(1),
@@ -62,14 +59,14 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
 
     return {
       mes: month.charAt(0).toUpperCase() + month.slice(1),
-      'Precios Mayores': maxPrice || numericCurrentPrice,
-      'Precios Menores': minPrice || numericOriginalPrice,
+      'Precios Mayores': maxPrice || currentPrice,
+      'Precios Menores': minPrice || originalPrice,
       Variación: variation,
     };
   });
 
   return (
-    <Card className='bg-white-200 p-4 shadow-md rounded-md w-[50%]'>
+    <Card className='bg-white-200 p-4 shadow-md rounded-md w-full lg:w-[50%]'>
       <Title className='text-2xl font-semibold mb-4'>Análisis Últimos Tres Meses de "{productTitle}"</Title>
       <LineChart
         data={chartdata}
@@ -78,6 +75,8 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
         colors={['emerald', 'red', 'blue']}
         valueFormatter={priceFormatter}
         yAxisWidth={80}
+        maxValue={currentPrice}
+        minValue={originalPrice}
       />
     </Card>
   );

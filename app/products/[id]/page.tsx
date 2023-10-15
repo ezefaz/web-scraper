@@ -30,13 +30,15 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     lastDates.push(p.date);
   });
 
+  console.log('lastPrices -->', lastPrices);
+  console.log('lastDates -->', lastDates);
+
   // Filter the dates that are equal, removing the hours.
-  const filteredLastPrices = lastPrices.filter((price) => Number.isInteger(price));
 
   const priceSet = new Set();
   const uniquePrices = [];
 
-  for (const price of filteredLastPrices) {
+  for (const price of lastPrices) {
     if (!priceSet.has(price)) {
       priceSet.add(price);
       uniquePrices.push(price);
@@ -66,16 +68,15 @@ const ProductDetails = async ({ params: { id } }: Props) => {
                 Visitar Producto
               </Link>
             </div>
-            <div className='flex items-center gap-3'>
-              <div className='product-hearts'>
+            <div className='flex items-center gap-3 py-3'>
+              <div className='flex items-center gap-1 text-[#D46F77]'>
                 <Image src='/assets/icons/red-heart.svg' alt='heart' width={20} height={20} />
-
-                <p className='text-base font-semibold text-[#D46F77]'>{product.reviewsCount}</p>
+                <p className='text-base font-semibold'>{product.reviewsCount}</p>
               </div>
-              <div className='p-2 bg-white-200 rounded-10'>
+              <div className='p-2 bg-white-200 rounded-full'>
                 <Image src='/assets/icons/bookmark.svg' alt='bookmark' height={20} width={20} />
               </div>
-              <div className='p-2 bg-white-200 rounded-10'>
+              <div className='p-2 bg-white-200 rounded-full'>
                 <Image src='/assets/icons/share.svg' alt='share' height={20} width={20} />
               </div>
             </div>

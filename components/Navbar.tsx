@@ -25,23 +25,30 @@ const Navbar = () => {
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
           {!nav && (
-            <div className={`lg:flex items-center gap-5 text-black ${nav ? 'block' : 'hidden'}`}>
-              <a href='#how-it-works' className='hover:underline'>
-                Funcionamiento
-              </a>
-              <a href='#pricing' className='hover:underline'>
-                Precios
-              </a>
-              <a href='#faqs' className='hover:underline'>
-                FAQs
-              </a>
-            </div>
+            <>
+              <div className={`lg:flex items-center m-auto gap-5 text-black ${nav ? 'block' : 'hidden'}`}>
+                <a href='#how-it-works' className='hover:underline'>
+                  Funcionamiento
+                </a>
+                <a href='#pricing' className='hover:underline'>
+                  Precios
+                </a>
+                <a href='#faqs' className='hover:underline'>
+                  FAQs
+                </a>
+              </div>
+              <div className={`flex flex-column p-3 gap-5  ${nav ? 'hidden' : 'block'}`}>
+                {navIcons.map((icon, index) => (
+                  <Image key={index} src={icon.src} alt={icon.alt} width={28} height={28} className='object-contain' />
+                ))}
+              </div>
+            </>
           )}
           <div>
             <ul
               className={
                 nav
-                  ? 'fixed left-0 top-0 w-[30%] h-full border-r border-r-white bg-[#000300] transition-all duration-1000 overflow-y-auto bg-[#e5e7eb]'
+                  ? 'fixed left-0 top-0 w-[60%] h-full border-r border-r-white bg-[#000300] transition-all duration-1000 overflow-y-auto bg-[#e5e7eb]'
                   : 'fixed left-0 top-0 w-[60%] h-full transition-all duration-1000 left-[-100%]'
               }
             >
@@ -57,11 +64,11 @@ const Navbar = () => {
               <Link href='#faqs' passHref>
                 <li className='p-4 border-b border-gray-600 hover:bg-gray-700'>FAQs</li>
               </Link>
-              <div className='flex flex-column p-3 gap-5'>
+              {/* <div className='flex flex-column p-3 gap-5'>
                 {navIcons.map((icon, index) => (
                   <Image key={index} src={icon.src} alt={icon.alt} width={28} height={28} className='object-contain' />
                 ))}
-              </div>
+              </div> */}
             </ul>
           </div>
 

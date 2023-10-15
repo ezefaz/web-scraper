@@ -34,10 +34,10 @@ const Home = async () => {
               </h1>
             </div>
             {''}
-            <p className='mt-6 text-gray-900'>
+            {/* <p className='mt-6 text-gray-900'>
               A través de análisis y seguimiento de tus productos favoritos, te vamos a ayudar a ahorrar dinero a largo
               plazo.
-            </p>
+            </p> */}
             <Searchbar />
           </div>
           {/* <HeroCarousel /> */}

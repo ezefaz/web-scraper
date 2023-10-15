@@ -5,6 +5,7 @@ import Product from '@/lib/models/product.model';
 import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
 import { PriceHistoryItem } from '@/types';
+import { scrapeDolarValue } from '@/lib/scraper/dolar';
 
 export const maxDuration = 10; // This function can run for a maximum of 300 seconds
 export const dynamic = 'force-dynamic';
@@ -23,6 +24,7 @@ export async function GET(request: Request) {
       products.map(async (currentProduct) => {
         // Scrape product
         const scrapedProduct = await scrapeMLProduct(currentProduct.url);
+        const scrapedDolarValue = await scrapeDolarValue();
 
         if (!scrapedProduct) return;
 

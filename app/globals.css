@@ -29,7 +29,7 @@
 	}
 
 	.small-text {
-		@apply flex gap-2 text-sm font-medium text-secondary;
+		@apply flex gap-2 text-sm justify-center font-medium text-secondary;
 	}
 
 	.paragraph-text {

@@ -7,6 +7,7 @@ import { scrapeMLProduct } from '../scraper';
 import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { generateEmailBody, sendEmail } from '../nodemailer';
+import { scrapeDolarValue } from '../scraper/dolar';
 
 export async function scrapeAndStoreProducts(productUrl: string) {
   if (!productUrl) return;
@@ -15,6 +16,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     connectToDb();
 
     const scrapedProduct = await scrapeMLProduct(productUrl);
+    const scrapedDolarValue = await scrapeDolarValue();
 
     if (!scrapedProduct) return;
 
