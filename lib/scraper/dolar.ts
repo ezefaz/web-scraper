@@ -26,12 +26,9 @@ export async function scrapeDolarValue() {
 
     const dolarValues = $($('.values strong'));
     const dolarBlueValue = dolarValues.map((index, element) => $(element).text().trim()).get(1);
+    const currentDolarBlue = Number(dolarBlueValue);
 
-    console.log('RESPONSE ---->', dolarBlueValue);
-
-    // console.log('PRODUCTO -->', data);
-
-    return dolarBlueValue;
+    return currentDolarBlue;
   } catch (error: any) {
     throw new Error(`Failed to scrape usd dolar value; ${error.message}`);
   }

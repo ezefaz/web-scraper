@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       products.map(async (currentProduct) => {
         // Scrape product
         const scrapedProduct = await scrapeMLProduct(currentProduct.url);
-        const scrapedDolarValue = await scrapeDolarValue();
+        const currentDolarValue = await scrapeDolarValue();
 
         if (!scrapedProduct) return;
 
@@ -59,7 +59,10 @@ export async function GET(request: Request) {
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
+          currentDolarValue,
         };
+
+        console.log('PRODUCTO OBTENIDO CON CRON -->', currentDolarValue);
 
         // Update Products in DB
         const updatedProduct = await Product.findOneAndUpdate(

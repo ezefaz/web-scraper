@@ -16,7 +16,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     connectToDb();
 
     const scrapedProduct = await scrapeMLProduct(productUrl);
-    const scrapedDolarValue = await scrapeDolarValue();
+    const currentDolarValue = await scrapeDolarValue();
 
     if (!scrapedProduct) return;
 
@@ -33,6 +33,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         lowestPrice: getLowestPrice(updatedPriceHistory),
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
+        currentDolarValue: Number(currentDolarValue),
       };
     }
     const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {

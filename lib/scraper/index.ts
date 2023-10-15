@@ -11,6 +11,7 @@ import {
   formatNumber,
   formatNumberWithCommas,
 } from '../utils';
+import { scrapeDolarValue } from './dolar';
 
 export async function scrapeMLProduct(url: string) {
   if (!url) return;
@@ -34,6 +35,8 @@ export async function scrapeMLProduct(url: string) {
   try {
     const response = await axios.get(url, options);
     const $ = cheerio.load(response.data);
+
+    const currentDolarValue = await scrapeDolarValue();
 
     const title = $('.ui-pdp-title').text().trim();
 
@@ -98,6 +101,7 @@ export async function scrapeMLProduct(url: string) {
       title,
       currentPrice: Number(currentPrice) || Number(originalPrice),
       originalPrice: Number(originalPrice) || Number(currentPrice),
+      currentDolarValue,
       priceHistory: [],
       discountRate: Number(discountRate),
       category: category,
@@ -110,8 +114,6 @@ export async function scrapeMLProduct(url: string) {
       highestPrice: Number(originalPrice) || Number(currentPrice),
       averagePrice: Number(currentPrice) || Number(originalPrice),
     };
-
-    // console.log('PRODUCTO -->', data);
 
     return data;
   } catch (error: any) {
