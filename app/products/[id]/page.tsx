@@ -8,8 +8,9 @@ import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
 
 import { getProductById, getSimilarProducts } from '@/lib/actions';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber, formatUSD } from '@/lib/utils';
 import { Product } from '@/types';
+import DolarBasedChart from '@/components/charts/LineChart';
 
 type Props = {
   params: { id: string };
@@ -17,6 +18,10 @@ type Props = {
 
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
+
+  const dolarBlueValue = product.currentDolarValue || product.currentDolar.value;
+
+  const priceBasedOnDolar = product.currentPrice / dolarBlueValue || product.originalPrice / dolarBlueValue;
 
   const productHistory = product.priceHistory;
 
@@ -29,9 +34,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     lastPrices.push(p.price);
     lastDates.push(p.date);
   });
-
-  console.log('lastPrices -->', lastPrices);
-  console.log('lastDates -->', lastDates);
 
   // Filter the dates that are equal, removing the hours.
 
@@ -136,18 +138,31 @@ const ProductDetails = async ({ params: { id } }: Props) => {
                 value={`${product.currency} ${formatNumber(product.lowestPrice)}`}
                 borderColor='#B3FFC5'
               />
+              <PriceInfoCard
+                title='Valor Actual en Dolar'
+                iconSrc='/assets/icons/arrow-down.svg'
+                value={`${formatUSD(product.currentPrice)}`}
+                borderColor='#B3FFC5'
+              />
             </div>
           </div>
           <Modal productId={id} />
         </div>
       </div>
-      <div>
-        <BarChart
-          productTitle={product.title}
-          priceHistory={uniquePrices}
+      <div className='flex flex-col-2 gap-3'>
+        <div className='w-[100%]'>
+          <BarChart
+            productTitle={product.title}
+            priceHistory={uniquePrices}
+            dateHistory={uniqueDatesArray}
+            currentPrice={product.currentPrice}
+            originalPrice={product.originalPrice}
+          />
+        </div>
+        <DolarBasedChart
           dateHistory={uniqueDatesArray}
-          currentPrice={product.currentPrice}
-          originalPrice={product.originalPrice}
+          priceBasedOnDolar={priceBasedOnDolar}
+          dolarValue={product.originalPrice}
         />
       </div>
       <div className='flex flex-col gap-16'>

@@ -4,7 +4,7 @@ import { connectToDb } from '@/lib/mongoose';
 import Product from '@/lib/models/product.model';
 import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
-import { PriceHistoryItem } from '@/types';
+import { CurrentDolar, PriceHistoryItem } from '@/types';
 import { scrapeDolarValue } from '@/lib/scraper/dolar';
 
 export const maxDuration = 10; // This function can run for a maximum of 300 seconds
@@ -53,16 +53,21 @@ export async function GET(request: Request) {
           throw new Error('Current price is not available or not a valid number.');
         }
 
+        const today = new Date();
+
+        const updatedCurrentDolar: CurrentDolar = {
+          value: currentDolarValue,
+          date: today,
+        };
+
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
           lowestPrice: getLowestPrice(updatedPriceHistory),
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
-          currentDolarValue,
+          currentDolar: updatedCurrentDolar,
         };
-
-        console.log('PRODUCTO OBTENIDO CON CRON -->', currentDolarValue);
 
         // Update Products in DB
         const updatedProduct = await Product.findOneAndUpdate(

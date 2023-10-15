@@ -66,7 +66,7 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
   });
 
   return (
-    <Card className='bg-white-200 p-4 shadow-md rounded-md w-full lg:w-[50%]'>
+    <Card className='bg-white-200 p-4 shadow-md rounded-md w-full'>
       <Title className='text-2xl font-semibold mb-4'>Análisis Últimos Tres Meses de "{productTitle}"</Title>
       <LineChart
         data={chartdata}

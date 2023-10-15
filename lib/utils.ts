@@ -199,6 +199,14 @@ export const getLastThreeMonths = () => {
   return lastFourMonths;
 };
 
+export function formatUSD(price: number) {
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+  return formatter.format(price);
+}
+
 export const extractMonthsFromDate = (dateArray: Array<Date>) =>
   dateArray.map((date: Date) => {
     const parsedDate = new Date(date);

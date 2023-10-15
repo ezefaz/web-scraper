@@ -1,6 +1,6 @@
 'use server';
 
-import { PriceHistoryItem, User } from '@/types';
+import { CurrentDolar, PriceHistoryItem, User } from '@/types';
 import Product from '../models/product.model';
 import { connectToDb } from '../mongoose';
 import { scrapeMLProduct } from '../scraper';
@@ -16,6 +16,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     connectToDb();
 
     const scrapedProduct = await scrapeMLProduct(productUrl);
+
     const currentDolarValue = await scrapeDolarValue();
 
     if (!scrapedProduct) return;
@@ -27,21 +28,29 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     if (existingProduct) {
       const updatedPriceHistory: any = [...existingProduct.priceHistory, { price: scrapedProduct.currentPrice }];
 
+      const today = new Date();
+
+      const updatedCurrentDolar: CurrentDolar = {
+        value: currentDolarValue,
+        date: today,
+      };
+
       product = {
         ...scrapedProduct,
         priceHistory: updatedPriceHistory,
         lowestPrice: getLowestPrice(updatedPriceHistory),
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
-        currentDolarValue: Number(currentDolarValue),
+        currentDolar: updatedCurrentDolar,
       };
-    }
-    const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
-      upsert: true,
-      new: true,
-    });
 
-    revalidatePath(`/products/${newProduct._id}`);
+      const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
+        upsert: true,
+        new: true,
+      });
+
+      revalidatePath(`/products/${newProduct._id}`);
+    }
   } catch (error: any) {
     throw new Error(`Failed to create/update product: ${error.message}`);
   }

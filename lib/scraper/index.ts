@@ -94,6 +94,8 @@ export async function scrapeMLProduct(url: string) {
 
     const category = categories[4].length > 1 ? categories[4] : categories[0];
 
+    const today = new Date();
+
     const data = {
       url,
       currency: currency || '$',
@@ -101,7 +103,7 @@ export async function scrapeMLProduct(url: string) {
       title,
       currentPrice: Number(currentPrice) || Number(originalPrice),
       originalPrice: Number(originalPrice) || Number(currentPrice),
-      currentDolarValue,
+      currentDolar: { value: currentDolarValue, date: today },
       priceHistory: [],
       discountRate: Number(discountRate),
       category: category,
@@ -114,6 +116,8 @@ export async function scrapeMLProduct(url: string) {
       highestPrice: Number(originalPrice) || Number(currentPrice),
       averagePrice: Number(currentPrice) || Number(originalPrice),
     };
+
+    // console.log('PRODUCTO -->', data);
 
     return data;
   } catch (error: any) {
