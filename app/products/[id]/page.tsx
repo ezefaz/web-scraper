@@ -19,9 +19,11 @@ type Props = {
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
 
-  const dolarBlueValue = product.currentDolarValue || product.currentDolar.value;
+  const { currentDolar } = product;
 
-  const priceBasedOnDolar = product.currentPrice / dolarBlueValue || product.originalPrice / dolarBlueValue;
+  const dolarBlueValue = product.currentDolarValue || currentDolar.value;
+
+  const priceBasedOnDolar = product.currentPrice / currentDolar.value;
 
   const productHistory = product.priceHistory;
 
@@ -141,7 +143,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <PriceInfoCard
                 title='Valor Actual en Dolar'
                 iconSrc='/assets/icons/arrow-down.svg'
-                value={`${formatUSD(product.currentPrice)}`}
+                value={`${formatUSD(priceBasedOnDolar)}`}
                 borderColor='#B3FFC5'
               />
             </div>
@@ -162,7 +164,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         <DolarBasedChart
           dateHistory={uniqueDatesArray}
           priceBasedOnDolar={priceBasedOnDolar}
-          dolarValue={product.originalPrice}
+          dolarValue={dolarBlueValue}
         />
       </div>
       <div className='flex flex-col gap-16'>
