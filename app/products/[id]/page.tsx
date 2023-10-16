@@ -22,6 +22,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   const { currentDolar } = product;
 
   const dolarBlueValue = product.currentDolarValue || currentDolar.value;
+  const scrapedDolarDate = product.currentDolar.date;
 
   const priceBasedOnDolar = product.currentPrice / currentDolar.value;
 
@@ -62,16 +63,21 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     <div className='product-container'>
       <div className='flex gap-28 xl:flex-row flex-col'>
         <div className='product-image'>
-          <Image src={product.image} alt={product.title} width={500} height={400} className='mx-auto' />
+          <Image src={product.image} alt={product.title} width={500} height={400} />
         </div>
         <div className='flex-1 flex flex-col'>
           <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
             <div className='flex flex-col gap-3'>
-              <p className='text-[28px]'>{product.title}</p>
-              <Link href={product.url} target='_blank' className='text-base text-black opacity-50'>
+              <p className='text-[28px] hover:text-primary transition-colors duration-300'>{product.title}</p>
+              <Link
+                href={product.url}
+                target='_blank'
+                className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300'
+              >
                 Visitar Producto
               </Link>
             </div>
+
             <div className='flex items-center gap-3 py-3'>
               <div className='flex items-center gap-1 text-[#D46F77]'>
                 <Image src='/assets/icons/red-heart.svg' alt='heart' width={20} height={20} />
@@ -87,10 +93,10 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold'>{`${product.currency} ${formatNumber(
-                product.currentPrice
-              )}`}</p>
-              <p className='text-[21px] text-black opacity-50 line-through'>
+              <p className='text-[34px] text-secondary font-bold hover:text-primary'>{`${
+                product.currency
+              } ${formatNumber(product.currentPrice)}`}</p>
+              <p className='text-[21px] text-black opacity-50 line-through '>
                 {`${product.currency} ${formatNumber(product.originalPrice)}`}
               </p>
             </div>
@@ -151,8 +157,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           <Modal productId={id} />
         </div>
       </div>
-      <div className='flex flex-col-2 gap-3'>
-        <div className='w-[100%]'>
+      <div className='flex flex-col lg:flex-row gap-5'>
+        <div className='w-full lg:w-[50%]'>
           <BarChart
             productTitle={product.title}
             priceHistory={uniquePrices}
@@ -161,12 +167,16 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             originalPrice={product.originalPrice}
           />
         </div>
-        <DolarBasedChart
-          dateHistory={uniqueDatesArray}
-          priceBasedOnDolar={priceBasedOnDolar}
-          dolarValue={dolarBlueValue}
-        />
+        <div className='w-full lg:w-[50%]'>
+          <DolarBasedChart
+            dateHistory={uniqueDatesArray}
+            priceBasedOnDolar={priceBasedOnDolar}
+            dolarValue={dolarBlueValue}
+            dolarDate={scrapedDolarDate}
+          />
+        </div>
       </div>
+
       <div className='flex flex-col gap-16'>
         <div className='flex flex-col gap-5'>
           <h3 className='text-2xl text-secondary font-semibold'>Descripción</h3>
