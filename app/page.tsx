@@ -4,6 +4,8 @@ import Image from 'next/image';
 
 import { getAllProducts } from '@/lib/actions';
 import ProductCard from '@/components/ProductCard';
+import Services from '@/components/Services';
+import StepsComponent from '@/components/Steps';
 
 const Home = async () => {
   const allProducts = await getAllProducts();
@@ -43,6 +45,8 @@ const Home = async () => {
           {/* <HeroCarousel /> */}
         </div>
       </section>
+      <Services />
+      <StepsComponent />
       <section className='trending-section'>
         <h2 className='section-text'>Trending</h2>
         <div className='flex flex-wrap gap-x-8 gap-y-16'>
