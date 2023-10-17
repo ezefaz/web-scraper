@@ -25,11 +25,14 @@ export async function scrapeDolarValue() {
     const $ = cheerio.load(response.data);
 
     const dolarValues = $($('.values strong'));
+
+    if (!dolarValues) return;
+
     const dolarBlueValue = dolarValues.map((index, element) => $(element).text().trim()).get(1);
     const currentDolarBlue = Number(dolarBlueValue);
 
     return currentDolarBlue;
   } catch (error: any) {
-    throw new Error(`Failed to scrape usd dolar value; ${error.message}`);
+    throw new Error(`Failed to scrape usd dolar value: ${error.message}`);
   }
 }

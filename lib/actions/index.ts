@@ -17,7 +17,9 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
     const scrapedProduct = await scrapeMLProduct(productUrl);
 
-    const currentDolarValue = await scrapeDolarValue();
+    console.log('PRODUCTO SCRAPEADO -->', scrapedProduct);
+
+    let scrapedDolarValue = scrapedProduct?.currentDolar.value;
 
     if (!scrapedProduct) return;
 
@@ -31,7 +33,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
       const today = new Date();
 
       const updatedCurrentDolar: CurrentDolar = {
-        value: currentDolarValue,
+        value: scrapedDolarValue,
         date: today,
       };
 
@@ -61,6 +63,8 @@ export async function getProductById(productId: string) {
     connectToDb();
 
     const product = await Product.findOne({ _id: productId });
+
+    console.log('PANA', product);
 
     if (!product) return;
 

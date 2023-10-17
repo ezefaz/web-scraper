@@ -9,7 +9,7 @@ const productSchema = new mongoose.Schema(
     currentPrice: { type: Number, required: true },
     originalPrice: { type: Number, required: true },
     currentDolar: {
-      value: { type: Number, required: true },
+      value: { type: Number },
       date: { type: Date, default: Date.now },
     },
 

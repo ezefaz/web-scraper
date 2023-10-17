@@ -55,6 +55,8 @@ export async function GET(request: Request) {
 
         const today = new Date();
 
+        if (!currentDolarValue) return;
+
         const updatedCurrentDolar: CurrentDolar = {
           value: currentDolarValue,
           date: today,
