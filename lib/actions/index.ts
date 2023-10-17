@@ -17,10 +17,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
     const scrapedProduct = await scrapeMLProduct(productUrl);
 
-    console.log('PRODUCTO SCRAPEADO -->', scrapedProduct);
-
-    let scrapedDolarValue = scrapedProduct?.currentDolar;
-
     if (!scrapedProduct) return;
 
     let product = scrapedProduct;
@@ -30,12 +26,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     if (existingProduct) {
       const updatedPriceHistory: any = [...existingProduct.priceHistory, { price: scrapedProduct.currentPrice }];
 
-      const today = new Date();
-
-      const updatedCurrentDolar: CurrentDolar = {
-        value: scrapedDolarValue,
-        date: today,
-      };
+      const updatedDolarValue = scrapedProduct.currentDolar;
 
       product = {
         ...scrapedProduct,
@@ -43,16 +34,16 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         lowestPrice: getLowestPrice(updatedPriceHistory),
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
-        currentDolar: updatedCurrentDolar,
+        currentDolar: updatedDolarValue,
       };
-
-      const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
-        upsert: true,
-        new: true,
-      });
-
-      revalidatePath(`/products/${newProduct._id}`);
     }
+
+    const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
+      upsert: true,
+      new: true,
+    });
+
+    revalidatePath(`/products/${newProduct._id}`);
   } catch (error: any) {
     throw new Error(`Failed to create/update product: ${error.message}`);
   }
@@ -63,8 +54,6 @@ export async function getProductById(productId: string) {
     connectToDb();
 
     const product = await Product.findOne({ _id: productId });
-
-    console.log('PANA', product);
 
     if (!product) return;
 

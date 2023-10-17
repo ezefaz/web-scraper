@@ -53,14 +53,7 @@ export async function GET(request: Request) {
           throw new Error('Current price is not available or not a valid number.');
         }
 
-        const today = new Date();
-
-        if (!currentDolarValue) return;
-
-        const updatedCurrentDolar: CurrentDolar = {
-          value: Number(currentDolarValue),
-          date: today,
-        };
+        const updatedCurrentDolar = scrapedProduct.currentDolar;
 
         const product = {
           ...scrapedProduct,

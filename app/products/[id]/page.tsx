@@ -21,10 +21,10 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const { currentDolar } = product;
 
-  const dolarBlueValue = Number(currentDolar.value);
+  const dolarValue = Number(currentDolar.value);
   const scrapedDolarDate = currentDolar.date;
 
-  const priceBasedOnDolar = product.currentPrice / currentDolar.value;
+  const priceBasedOnDolar = product.currentPrice / dolarValue;
 
   const productHistory = product.priceHistory;
 
@@ -171,7 +171,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           <DolarBasedChart
             dateHistory={uniqueDatesArray}
             priceBasedOnDolar={priceBasedOnDolar}
-            dolarValue={dolarBlueValue}
+            dolarValue={dolarValue}
             dolarDate={scrapedDolarDate}
           />
         </div>
