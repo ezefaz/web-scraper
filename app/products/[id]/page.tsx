@@ -21,8 +21,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const { currentDolar } = product;
 
-  const dolarBlueValue = product.currentDolarValue || currentDolar.value;
-  const scrapedDolarDate = product.currentDolar.date;
+  const dolarBlueValue = Number(currentDolar.value);
+  const scrapedDolarDate = currentDolar.date;
 
   const priceBasedOnDolar = product.currentPrice / currentDolar.value;
 

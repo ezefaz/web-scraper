@@ -12,7 +12,6 @@ const productSchema = new mongoose.Schema(
       value: { type: Number },
       date: { type: Date, default: Date.now },
     },
-
     priceHistory: [
       {
         price: { type: Number, required: true },

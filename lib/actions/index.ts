@@ -19,7 +19,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
     console.log('PRODUCTO SCRAPEADO -->', scrapedProduct);
 
-    let scrapedDolarValue = scrapedProduct?.currentDolar.value;
+    let scrapedDolarValue = scrapedProduct?.currentDolar;
 
     if (!scrapedProduct) return;
 
