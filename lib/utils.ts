@@ -32,15 +32,16 @@ export function extractPrice(...elements: any) {
 
 export function extractCategories(...elements: any) {
   for (const element of elements) {
-    const categoryText = element.text().trim();
-
-    if (categoryText) {
-      const splitBySpace = categoryText.split(/\s+/);
-      let category: Array<string> = [];
-      splitBySpace.forEach((word: string) => {
-        category = category.concat(word.split(/(?=[A-Z])/));
-      });
-      return category;
+    if (element && element.text) {
+      const categoryText = element.text().trim();
+      if (categoryText) {
+        const splitBySpace = categoryText.split(/\s+/);
+        let category: Array<string> = [];
+        splitBySpace.forEach((word: string) => {
+          category = category.concat(word.split(/(?=[A-Z])/));
+        });
+        return category;
+      }
     }
   }
 
@@ -51,6 +52,27 @@ export function extractCategories(...elements: any) {
 export function extractCurrency(element: any) {
   const currencyText = element.text().trim().slice(0, 1);
   return currencyText ? currencyText : '';
+}
+
+export function extractCategory($: any) {
+  const elements = [
+    $('.andes-breadcrumb .andes-breadcrumb__link'),
+    // $('.andes-breadcrumb__link').attr('title'),
+    // $('.andes-breadcrumb__item a'),
+    // $('.ui-vpp-text-alignment--left .highlighted-specs-title'),
+  ];
+  const categories = elements.map((element) => {
+    if (element && element.text) {
+      const categoryText = element.text().trim();
+      if (categoryText) {
+        const words = categoryText.split(/(?=[A-Z])/);
+        const lastWord = words[words.length - 1];
+        return lastWord;
+      }
+    }
+    return null;
+  });
+  return categories.filter(Boolean);
 }
 
 export function extractDescription($: any) {

@@ -24,7 +24,6 @@ export async function GET(request: Request) {
       products.map(async (currentProduct) => {
         // Scrape product
         const scrapedProduct = await scrapeMLProduct(currentProduct.url);
-        const currentDolarValue = await scrapeDolarValue();
 
         if (!scrapedProduct) return;
 
@@ -53,7 +52,7 @@ export async function GET(request: Request) {
           throw new Error('Current price is not available or not a valid number.');
         }
 
-        const updatedCurrentDolar = scrapedProduct.currentDolar;
+        const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
 
         const product = {
           ...scrapedProduct,
