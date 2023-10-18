@@ -43,7 +43,8 @@ export async function scrapeMLProduct(url: string) {
 
     const currentPrice = $('meta[itemprop="price"]').attr('content');
 
-    const prices = $($('.andes-money-amount .andes-money-amount__fraction '));
+    const prices = $('.andes-money-amount.ui-pdp-price__part .andes-money-amount__fraction');
+
     const originalPrices = prices.map((index, element) => $(element).text().trim()).get();
     let firstOriginalPrice = originalPrices[0];
 
