@@ -27,6 +27,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   const priceBasedOnDolar = product.currentPrice / dolarValue;
 
   const productHistory = product.priceHistory;
+  const dolarHistory = product.dolarHistory;
+
+  console.log('ASD--->', dolarHistory);
 
   // Inicializa los arreglos lastPrices y lastDates
   const lastPrices: Array<Number> = [];

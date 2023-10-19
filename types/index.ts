@@ -24,6 +24,7 @@ export type Product = {
   currentDolar: CurrentDolar;
   // currentDolarValue?: number;
   priceHistory: PriceHistoryItem[] | [];
+  dolarHistory: PriceHistoryItem[] | [];
   highestPrice: number;
   lowestPrice: number;
   averagePrice: number;

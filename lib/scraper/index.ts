@@ -9,8 +9,6 @@ import {
   extractDescription,
   extractPrice,
   extractStarRatings,
-  formatNumber,
-  formatNumberWithCommas,
 } from '../utils';
 import { scrapeDolarValue } from './dolar';
 
@@ -109,6 +107,7 @@ export async function scrapeMLProduct(url: string) {
       originalPrice: Number(originalPrice) || Number(currentPrice),
       currentDolar: { value: Number(currentDolarValue), date: today },
       priceHistory: [],
+      dolarHistory: [],
       discountRate: Number(discountRate),
       category: category || '',
       reviewsCount: reviewsCount || 0,

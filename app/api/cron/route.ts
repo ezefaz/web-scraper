@@ -54,6 +54,8 @@ export async function GET(request: Request) {
 
         const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
 
+        const updatedDolarHistory = [...currentProduct.dolarHistory, { price: updatedCurrentDolar.value }];
+
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
@@ -61,6 +63,7 @@ export async function GET(request: Request) {
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
           currentDolar: updatedCurrentDolar,
+          dolarHistory: updatedDolarHistory,
         };
 
         // Update Products in DB
