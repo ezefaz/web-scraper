@@ -24,14 +24,18 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
     if (existingProduct) {
-      const updatedDolarValue: CurrentDolar = scrapedProduct.currentDolar;
+      const updatedDolar: CurrentDolar = scrapedProduct.currentDolar;
+
+      const updatedDolarValue = scrapedProduct.currentDolar.value;
+      const currentDate = new Date();
+
+      const previousDolarHistory = existingProduct.dolarHistory || [];
 
       const updatedPriceHistory: any = [...existingProduct.priceHistory, { price: scrapedProduct.currentPrice }];
 
-      const updatedDolarHistory: any = [
-        ...existingProduct.dolarHistory,
-        { price: updatedDolarValue.value, date: new Date() },
-      ];
+      const updatedDolarHistory = [...previousDolarHistory, { price: updatedDolarValue, date: currentDate }];
+
+      const sanitizedDolarHistory: any = updatedDolarHistory.filter((dolarItem) => dolarItem.price && dolarItem.date);
 
       product = {
         ...scrapedProduct,
@@ -39,8 +43,8 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         lowestPrice: getLowestPrice(updatedPriceHistory),
         highestPrice: getHighestPrice(updatedPriceHistory),
         averagePrice: getAveragePrice(updatedPriceHistory),
-        currentDolar: updatedDolarValue,
-        dolarHistory: updatedDolarHistory,
+        currentDolar: updatedDolar,
+        dolarHistory: sanitizedDolarHistory,
       };
     }
 

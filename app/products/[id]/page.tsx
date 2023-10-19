@@ -28,8 +28,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const productHistory = product.priceHistory;
   const dolarHistory = product.dolarHistory;
-
-  console.log('ASD--->', dolarHistory);
+  console.log('TANO', dolarHistory);
 
   // Inicializa los arreglos lastPrices y lastDates
   const lastPrices: Array<Number> = [];
@@ -61,9 +60,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);
-  useEffect(() => {
-    console.log('DATA', dolarHistory);
-  });
+
   return (
     <div className='product-container'>
       <div className='flex gap-28 xl:flex-row flex-col'>
