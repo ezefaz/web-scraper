@@ -9,7 +9,7 @@ import BarChart from '@/components/charts/BarChart';
 
 import { getProductById, getSimilarProducts } from '@/lib/actions';
 import { formatNumber, formatUSD } from '@/lib/utils';
-import { Product } from '@/types';
+import { DolarHistoryItem, Product } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
 
 type Props = {
@@ -28,7 +28,35 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const productHistory = product.priceHistory;
   const dolarHistory = product.dolarHistory;
-  console.log('TANO', dolarHistory);
+
+  const lastDolarValue: Array<Number> = [];
+  const lastDolarDates: Array<Date> = [];
+
+  dolarHistory.forEach((p) => {
+    if (p.value) {
+      lastDolarValue.push(p.value);
+      lastDolarDates.push(p.date);
+    }
+  });
+
+  const dolarSet = new Set();
+  const uniqueDolarValue = [];
+
+  for (const price of lastDolarValue) {
+    if (!dolarSet.has(price)) {
+      dolarSet.add(price);
+      uniqueDolarValue.push(price);
+    }
+  }
+
+  const formattedDolarDates = lastDolarDates.map((date) => date.toISOString().slice(0, 10));
+  const uniqueDolarDatesSet = new Set(formattedDolarDates);
+
+  const uniqueDolarDatesArray = Array.from(uniqueDolarDatesSet);
+
+  console.log('ASDSA');
+  console.log(uniqueDolarDatesArray);
+  console.log(uniqueDolarValue);
 
   // Inicializa los arreglos lastPrices y lastDates
   const lastPrices: Array<Number> = [];
@@ -175,6 +203,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             priceBasedOnDolar={priceBasedOnDolar}
             dolarValue={dolarValue}
             dolarDate={scrapedDolarDate}
+            dolarDates={uniqueDolarDatesArray}
+            dolarValues={uniqueDolarValue}
           />
         </div>
       </div>

@@ -4,6 +4,12 @@ export type PriceHistoryItem = {
   _id: string;
 };
 
+export type DolarHistoryItem = {
+  value: number;
+  date: Date;
+  _id: string;
+};
+
 export type CurrentDolar = {
   value: number | any;
   date: Date;
@@ -24,7 +30,7 @@ export type Product = {
   currentDolar: CurrentDolar;
   // currentDolarValue?: number;
   priceHistory: PriceHistoryItem[] | [];
-  dolarHistory: PriceHistoryItem[] | [];
+  dolarHistory: DolarHistoryItem[] | [];
   highestPrice: number;
   lowestPrice: number;
   averagePrice: number;

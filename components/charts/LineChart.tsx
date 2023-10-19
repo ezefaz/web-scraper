@@ -8,15 +8,21 @@ interface Props {
   dateHistory: Array<String>;
   dolarValue: number;
   dolarDate: Date;
+  dolarDates: Array<String>;
+  dolarValues: Array<Number>;
 }
 
 const valueFormatter = (number: number) => `$ ${new Intl.NumberFormat('us').format(number).toString()}`;
 
-const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate }: Props) => {
+const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate, dolarValues, dolarDates }: Props) => {
+  console.log('VALORES -->', dolarDates, dolarValues);
+
   const chartdata = dateHistory.map((date, index) => ({
     date,
     'Valor Real del Producto': priceBasedOnDolar,
     'Valor del Dólar': dolarValue,
+    'Historial de Dólar': dolarValues[index], // Asumiendo que dolarValues y dolarDates tienen la misma longitud y que se corresponden por índice
+    'Fecha de Dólar': dolarDates[index],
   }));
 
   return (

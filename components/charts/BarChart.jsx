@@ -6,6 +6,7 @@ import { Card, Title, LineChart } from '@tremor/react';
 const priceFormatter = (number) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
 const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPrice, originalPrice }) => {
+  console.log('HISTORIA DEL -->', currentPrice);
   // Get the last three months
   const lastThreeMonths = getLastThreeMonths();
 

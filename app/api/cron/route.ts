@@ -39,11 +39,11 @@ export async function GET(request: Request) {
               };
             }
             return null;
-          })
-          .filter(
-            (priceItem: PriceHistoryItem | null) =>
-              priceItem !== null && Number.isInteger(priceItem.price) && priceItem.price >= 100000
-          );
+          });
+        // .filter(
+        //   (priceItem: PriceHistoryItem | null) =>
+        //     priceItem !== null && Number.isInteger(priceItem.price) && priceItem.price >= 100000
+        // );
 
         const currentPrice = scrapedProduct.currentPrice
           ? parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10)
@@ -52,9 +52,14 @@ export async function GET(request: Request) {
           throw new Error('Current price is not available or not a valid number.');
         }
 
-        const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
+        const previousDolarHistory = currentProduct.dolarHistory;
 
-        const updatedDolarHistory = [...currentProduct.dolarHistory, { price: updatedCurrentDolar.value }];
+        const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
+        const updatedDolarValue = scrapedProduct.currentDolar.value;
+
+        const updatedDolarHistory: any = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
+
+        console.log(updatedDolarHistory);
 
         const product = {
           ...scrapedProduct,
