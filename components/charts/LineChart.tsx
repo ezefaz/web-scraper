@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { Card, Title, LineChart } from '@tremor/react';
+import { Badge, BadgeDelta } from '@tremor/react';
+import { HiOutlineStatusOnline } from 'react-icons/hi';
 
 interface Props {
   priceBasedOnDolar: number;
@@ -15,8 +17,6 @@ interface Props {
 const valueFormatter = (number: number) => `$ ${new Intl.NumberFormat('us').format(number).toString()}`;
 
 const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate, dolarValues, dolarDates }: Props) => {
-  console.log('VALORES -->', dolarDates, dolarValues);
-
   let chartdata: any = [];
 
   if (dolarValues.length === 1) {
@@ -27,8 +27,6 @@ const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate
       'Historial de Dólar': dolarValues[0],
     }));
   } else if (dolarValues.length > 1) {
-    console.log('entra aqui', dolarValues[1]);
-
     chartdata = dolarDates.map((date, index) => ({
       date,
       'Valor Real del Producto': priceBasedOnDolar,
@@ -39,6 +37,9 @@ const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate
 
   return (
     <Card className='p-4 shadow-md rounded-md w-full h-full'>
+      <div className='flex justify-end'>
+        <Badge icon={HiOutlineStatusOnline}>live</Badge>
+      </div>
       <Title>Valor Real del Producto en el Tiempo (USD)</Title>
       <LineChart
         data={chartdata}

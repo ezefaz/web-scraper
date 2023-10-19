@@ -207,8 +207,12 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
       <div className='flex flex-col gap-16'>
         <div className='flex flex-col gap-5'>
-          <h3 className='text-2xl text-secondary font-semibold'>Descripción</h3>
-          <div className='flex flex-col gap-4'>{product?.description?.split('/n')}</div>
+          {product.description.length > 2 && (
+            <>
+              <h3 className='text-2xl text-secondary font-semibold'>Descripción</h3>
+              <div className='flex flex-col gap-4'>{product?.description?.split('/n')}</div>
+            </>
+          )}
         </div>
         <button className='btn w-fit mx-auto flex items-center justify-center gap-3 min-w-[200px]'>
           <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
@@ -218,7 +222,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </button>
       </div>
       {similarProducts && similarProducts?.length > 0 && (
-        <div className='py-14 flex flex-col gap-2 w-full'>
+        <div className='py-14 flex flex-col gap-2 w-full' id='trending'>
           <p className='section-text'>Trending</p>
           <div className='flex flex-wrap gap-10 mt-7 w-full'>
             {similarProducts.map((product) => (

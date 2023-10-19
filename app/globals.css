@@ -25,7 +25,7 @@
 	}
 
 	.section-text {
-		@apply text-secondary text-[32px] font-semibold;
+		@apply text-secondary text-[32px] m-auto font-semibold;
 	}
 
 	.small-text {

@@ -2,11 +2,12 @@
 
 import { extractMonthsFromDate, formatNumber, formatNumberWithCommas, getLastThreeMonths } from '@/lib/utils';
 import { Card, Title, LineChart } from '@tremor/react';
+import { Badge, BadgeDelta } from '@tremor/react';
+import { HiOutlineStatusOnline } from 'react-icons/hi';
 
 const priceFormatter = (number) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
 const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPrice, originalPrice }) => {
-  console.log('HISTORIA DEL -->', currentPrice);
   // Get the last three months
   const lastThreeMonths = getLastThreeMonths();
 
@@ -67,6 +68,9 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
 
   return (
     <Card className='p-4 shadow-md rounded-md w-full'>
+      <div className='flex justify-end'>
+        <Badge icon={HiOutlineStatusOnline}>live</Badge>
+      </div>
       <Title className='text-2xl font-semibold mb-4'>Análisis Últimos Tres Meses de "{productTitle}"</Title>
       <LineChart
         data={chartdata}

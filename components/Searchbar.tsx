@@ -2,22 +2,19 @@
 
 import { scrapeAndStoreProducts } from '@/lib/actions';
 import { FormEvent, useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 const Searchbar = () => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const mercadolibreDomains = [
-    'mercadolibre.com',
-    'mercadolibre.com.ar', // Add other MercadoLibre country domains if needed
-  ];
+  const mercadolibreDomains = ['mercadolibre.com', 'mercadolibre.com.ar'];
 
   const isValidMLProductUrl = (url: string) => {
     try {
       const parsedUrl = new URL(url);
       const hostname = parsedUrl.hostname;
 
-      // Check if hostname is in the list of MercadoLibre domains
       return mercadolibreDomains.some((domain) => hostname.includes(domain));
     } catch (error) {
       return false;
@@ -29,10 +26,11 @@ const Searchbar = () => {
 
     const isValidLink = isValidMLProductUrl(searchPrompt);
 
-    if (!isValidLink) return alert('Please provide a valid link');
+    if (!isValidLink) return toast.error('Porfavor inserte un link de mercadolibre válido.');
     setIsLoading(true);
 
     const product = await scrapeAndStoreProducts(searchPrompt);
+
     try {
     } catch (error) {
     } finally {
