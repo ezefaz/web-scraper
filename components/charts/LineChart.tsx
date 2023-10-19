@@ -17,13 +17,25 @@ const valueFormatter = (number: number) => `$ ${new Intl.NumberFormat('us').form
 const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate, dolarValues, dolarDates }: Props) => {
   console.log('VALORES -->', dolarDates, dolarValues);
 
-  const chartdata = dateHistory.map((date, index) => ({
-    date,
-    'Valor Real del Producto': priceBasedOnDolar,
-    'Valor del Dólar': dolarValue,
-    'Historial de Dólar': dolarValues[index], // Asumiendo que dolarValues y dolarDates tienen la misma longitud y que se corresponden por índice
-    'Fecha de Dólar': dolarDates[index],
-  }));
+  let chartdata: any = [];
+
+  if (dolarValues.length === 1) {
+    chartdata = dolarDates.map((date, index) => ({
+      date,
+      'Valor Real del Producto': priceBasedOnDolar,
+      'Valor del Dólar': dolarValue,
+      'Historial de Dólar': dolarValues[0],
+    }));
+  } else if (dolarValues.length > 1) {
+    console.log('entra aqui', dolarValues[1]);
+
+    chartdata = dolarDates.map((date, index) => ({
+      date,
+      'Valor Real del Producto': priceBasedOnDolar,
+      'Valor del Dólar': dolarValues[0],
+      'Historial del Dolar': dolarValues[1],
+    }));
+  }
 
   return (
     <Card className='p-4 shadow-md rounded-md w-full h-full'>
@@ -31,8 +43,8 @@ const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate
       <LineChart
         data={chartdata}
         index='date'
-        categories={['Valor Real del Producto', 'Valor del Dólar']}
-        colors={['indigo', 'cyan']}
+        categories={['Valor Real del Producto', 'Valor del Dólar', 'Historial de Dólar']}
+        colors={['indigo', 'cyan', 'purple']}
         valueFormatter={valueFormatter}
         yAxisWidth={80}
       />

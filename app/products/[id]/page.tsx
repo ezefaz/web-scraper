@@ -54,10 +54,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const uniqueDolarDatesArray = Array.from(uniqueDolarDatesSet);
 
-  console.log('ASDSA');
-  console.log(uniqueDolarDatesArray);
-  console.log(uniqueDolarValue);
-
   // Inicializa los arreglos lastPrices y lastDates
   const lastPrices: Array<Number> = [];
   const lastDates: Array<Date> = [];

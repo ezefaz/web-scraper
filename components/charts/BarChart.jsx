@@ -33,19 +33,18 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
     const uniquePricesArray = Array.from(uniquePrices);
 
     // Format prices to remove commas and dots and convert to integers
-    const formattedPrices = uniquePricesArray.map((price) => {
-      // Use parseFloat to ensure proper interpretation of the number
-      const formattedPrice = parseFloat(String(price).replace(/,|\./g, ''));
-      return formattedPrice || 0; // Default to 0 if the formatting fails
-    });
+    // const formattedPrices = uniquePricesArray.map((price) => {
+    //   // Use parseFloat to ensure proper interpretation of the number
+    //   const formattedPrice = parseFloat(String(price).replace(/,|\./g, ''));
+    //   return formattedPrice || 0; // Default to 0 if the formatting fails
+    // });
 
-    const maxPrice = Math.max(...formattedPrices);
-    const minPrice = Math.min(...formattedPrices);
+    const maxPrice = Math.max(...uniquePricesArray);
+    const minPrice = Math.min(...uniquePricesArray);
 
     const variation = maxPrice - minPrice;
 
-    if (formattedPrices.length === 0) {
-      // If no valid prices for the month, set maxPrice and minPrice to 0
+    if (uniquePricesArray.length === 0) {
       const maxPrice = originalPrice;
       const minPrice = currentPrice;
       const variation = originalPrice - currentPrice;
@@ -76,8 +75,8 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
         colors={['emerald', 'red', 'blue']}
         valueFormatter={priceFormatter}
         yAxisWidth={80}
-        maxValue={currentPrice}
-        minValue={originalPrice}
+        // maxValue={currentPrice}
+        // minValue={originalPrice}
       />
     </Card>
   );
