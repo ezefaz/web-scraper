@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -61,7 +61,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);
-
+  useEffect(() => {
+    console.log('DATA', dolarHistory);
+  });
   return (
     <div className='product-container'>
       <div className='flex gap-28 xl:flex-row flex-col'>
