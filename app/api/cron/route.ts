@@ -57,7 +57,26 @@ export async function GET(request: Request) {
         const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
         const updatedDolarValue = scrapedProduct.currentDolar.value;
 
+        // ... (previous code remains unchanged)
+
         const updatedDolarHistory: any = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
+
+        // Filter the entries to remove those without a value
+        // const filteredDolarHistory: any = updatedDolarHistory.filter((item: any) => item.value);
+
+        const filteredDolarHistory: any[] = [];
+
+        // Filtering out entries with the same date and value
+        updatedDolarHistory.forEach((item: any) => {
+          const existingItem = filteredDolarHistory.find(
+            (filteredItem) =>
+              new Date(filteredItem.date).toISOString().split('T')[0] ===
+                new Date(item.date).toISOString().split('T')[0] && filteredItem.value === item.value
+          );
+          if (!existingItem) {
+            filteredDolarHistory.push(item);
+          }
+        });
 
         const product = {
           ...scrapedProduct,
@@ -66,7 +85,7 @@ export async function GET(request: Request) {
           highestPrice: getHighestPrice(updatedPriceHistory),
           averagePrice: getAveragePrice(updatedPriceHistory),
           currentDolar: updatedCurrentDolar,
-          dolarHistory: updatedDolarHistory,
+          dolarHistory: filteredDolarHistory,
         };
 
         // Update Products in DB
