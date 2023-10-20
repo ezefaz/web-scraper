@@ -59,8 +59,6 @@ export async function GET(request: Request) {
 
         const updatedDolarHistory: any = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
 
-        console.log(updatedDolarHistory);
-
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
