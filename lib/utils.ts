@@ -323,11 +323,7 @@ export const getCurrentWeekData = (
   return weeklyData;
 };
 
-export const getMonthlyRealData = (
-  dolarDates: Array<Date | string>,
-  dolarValues: Array<Number>,
-  currentPrice: number
-) => {
+export const getMonthlyRealData = (dolarDates: Array<Date | string>, dolarValues: any[], currentPrice: number) => {
   const monthlyData: any = [];
   const monthlyMonths = extractMonthsFromDate(dolarDates);
 
