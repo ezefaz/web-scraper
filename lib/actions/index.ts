@@ -35,8 +35,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
       const updatedDolarHistory: any = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
 
-      console.log(updatedDolarHistory);
-
       product = {
         ...scrapedProduct,
         priceHistory: updatedPriceHistory,
@@ -47,7 +45,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
         dolarHistory: updatedDolarHistory,
       };
     }
-    console.log(product);
 
     const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
       upsert: true,
