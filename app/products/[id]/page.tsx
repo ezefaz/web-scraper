@@ -79,7 +79,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   const formattedDates = lastDates.map((date) => date.toISOString().slice(0, 10));
   const uniqueDatesSet = new Set(formattedDates);
 
-  const uniqueDatesArray = Array.from(uniqueDatesSet);
+  const uniqueDatesArray: Array<string | Date> = Array.from(uniqueDatesSet);
 
   if (!product) redirect('/');
 

@@ -229,9 +229,43 @@ export function formatUSD(price: number) {
   return formatter.format(price);
 }
 
-export const extractMonthsFromDate = (dateArray: Array<Date>) =>
-  dateArray.map((date: Date) => {
-    const parsedDate = new Date(date);
+export const extractMonthsFromDate = (dateArray: Array<Date | string>): string[] => {
+  return dateArray.map((date) => {
+    const parsedDate = typeof date === 'string' ? new Date(date) : date;
     const monthName = parsedDate.toLocaleString('es-AR', { month: 'long' });
     return monthName;
   });
+};
+
+export const getMonthName = (dateString: any) => {
+  const date = new Date(dateString);
+  const monthNames = [
+    'Enero',
+    'Febrero',
+    'Marzo',
+    'Abril',
+    'Mayo',
+    'Junio',
+    'Julio',
+    'Agosto',
+    'Septiembre',
+    'Octubre',
+    'Noviembre',
+    'Diciembre',
+  ];
+  return monthNames[date.getMonth()];
+};
+
+export const isSameWeek = (date1: Date, date2: Date) => {
+  const oneDay = 24 * 60 * 60 * 1000;
+  const firstDay = new Date(date1.getFullYear(), date1.getMonth(), date1.getDate() - date1.getDay());
+  const secondDay = new Date(date2.getFullYear(), date2.getMonth(), date2.getDate() - date2.getDay());
+  return Math.round(Math.abs((firstDay.getTime() - secondDay.getTime()) / oneDay)) < 7;
+};
+
+export function getWeekFromDate(dateString: string) {
+  const date: any = new Date(dateString);
+  const firstDayOfYear: any = new Date(date.getFullYear(), 0, 1);
+  const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
+  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+}
