@@ -286,9 +286,6 @@ export const getDistinctDailyDolarValues = (
 
     if (dateString === today) {
       realProductValue = currentPrice / currentDolarValue;
-      if (!distinctDolarValues.includes(currentDolarValue)) {
-        distinctDolarValues.push(currentDolarValue);
-      }
     }
   }
 
