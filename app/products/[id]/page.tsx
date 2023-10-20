@@ -195,7 +195,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </div>
         <div className='w-full lg:w-[50%]'>
           <DolarBasedChart
-            dateHistory={uniqueDatesArray}
+            currentPrice={product.currentPrice}
             priceBasedOnDolar={priceBasedOnDolar}
             dolarValue={dolarValue}
             dolarDate={scrapedDolarDate}

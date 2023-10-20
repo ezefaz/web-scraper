@@ -11,6 +11,7 @@ import {
 import { Card, Title, LineChart, Text, Flex, Metric, ProgressBar, TabGroup, TabList, Tab } from '@tremor/react';
 import { Badge, BadgeDelta } from '@tremor/react';
 import { HiOutlineStatusOnline } from 'react-icons/hi';
+import { generateDolarHistory } from '@/lib/faker';
 
 const priceFormatter = (number: any) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
@@ -21,6 +22,9 @@ interface Props {
   currentPrice: Number;
   originalPrice: Number;
 }
+
+const fakedDolarHistory = generateDolarHistory(5);
+console.log(fakedDolarHistory);
 
 const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPrice, originalPrice }: Props) => {
   const [selectedTab, setSelectedTab] = useState('mensual');

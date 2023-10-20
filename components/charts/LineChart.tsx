@@ -5,11 +5,19 @@ import { Card, Title, LineChart, Text, Flex, Metric, ProgressBar } from '@tremor
 import { Badge, BadgeDelta } from '@tremor/react';
 import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
-import { getMonthName, isSameWeek } from '@/lib/utils';
+import {
+  extractMonthsFromDate,
+  getCurrentWeekData,
+  getDistinctDailyDolarValues,
+  getMonthName,
+  getMonthlyRealData,
+  isSameWeek,
+} from '@/lib/utils';
+import { generateDailyDolarData, generateWeeklyDolarData, generateDolarHistory } from '@/lib/faker';
 
 interface Props {
   priceBasedOnDolar: number;
-  dateHistory: Array<String | Date>;
+  currentPrice: number;
   dolarValue: number;
   dolarDate: Date;
   dolarDates: Array<string | Date>;
@@ -18,92 +26,89 @@ interface Props {
 
 const valueFormatter = (number: number) => `$ ${new Intl.NumberFormat('us').format(number).toString()}`;
 
-const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate, dolarValues, dolarDates }: Props) => {
-  const [selectedTab, setSelectedTab] = useState('mensual');
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const DolarBasedChart = ({
+  priceBasedOnDolar,
+  currentPrice,
+  dolarValue,
+  dolarDate,
+  dolarValues,
+  dolarDates,
+}: Props) => {
+  const [selectedTab, setSelectedTab] = useState('diario');
 
   let chartdata: any = [];
 
-  if (selectedTab === 'diario') {
-    let realProductValue = 0;
-    let distinctDolarValues: Array<number> = [];
+  if (isDevelopment) {
+    // Use the generated fake data in development mode
+    if (selectedTab === 'diario') {
+      const fakerDailyData = generateDailyDolarData(5);
 
-    for (let i = 0; i < dolarDates.length; i++) {
-      const dateString = dolarDates[i].toString().slice(0, 10);
-      const currentDolarValue = Number(dolarValues[i]);
-      const today = new Date().toISOString().slice(0, 10);
+      chartdata = fakerDailyData.map((dataItem: any, index: number) => {
+        return {
+          date: new Date().toISOString().slice(0, 10),
+          'Valor Real del Producto': currentPrice / dataItem.value,
+          'Valor del Dólar': dataItem.value,
+        };
+      });
+    } else if (selectedTab === 'semanal') {
+      const weeklyData = [];
+      const thisSunday = new Date();
+      thisSunday.setDate(thisSunday.getDate() - thisSunday.getDay());
+      const nextSunday = new Date(thisSunday);
+      nextSunday.setDate(thisSunday.getDate() + 7);
 
-      if (dateString === today) {
-        realProductValue = currentDolarValue * priceBasedOnDolar;
-        if (!distinctDolarValues.includes(currentDolarValue)) {
-          distinctDolarValues.push(currentDolarValue);
-        }
-      }
-    }
+      const fakerWeeklyData = generateWeeklyDolarData();
 
-    chartdata = [
-      {
-        date: new Date().toISOString().slice(0, 10),
-        'Valor Real del Producto': realProductValue,
-        'Valor del Dólar': distinctDolarValues,
-      },
-    ];
-  } else if (selectedTab === 'semanal') {
-    let weeklyData: any = [];
+      for (let i = 0; i < fakerWeeklyData.length; i++) {
+        const currentDolarDate = new Date(fakerWeeklyData[i].date);
+        const currentDolarValue = fakerWeeklyData[i].value;
 
-    for (let i = 0; i < dolarDates.length; i++) {
-      const currentDolarDate = new Date(dolarDates[i]);
-      const currentDolarValue = dolarValues[i];
-      const currentDay = currentDolarDate.getDay();
-      let currentWeekDates: any = [];
-      let currentWeekValues: any = [];
-
-      for (let j = 0; j < dolarDates.length; j++) {
-        const comparedDolarDate = new Date(dolarDates[j]);
-        if (isSameWeek(currentDolarDate, comparedDolarDate)) {
-          currentWeekDates.push(comparedDolarDate);
-          currentWeekValues.push(dolarValues[j]);
+        if (currentDolarDate >= thisSunday && currentDolarDate <= nextSunday) {
+          weeklyData.push({
+            date: currentDolarDate.toISOString().slice(0, 10),
+            'Valor Real del Producto': priceBasedOnDolar,
+            'Valor del Dólar': currentDolarValue,
+          });
         }
       }
 
-      if (currentWeekDates.length > 0) {
-        const weekMax = Math.max(...currentWeekValues);
-        const weekMin = Math.min(...currentWeekValues);
+      chartdata = weeklyData;
+    } else if (selectedTab === 'mensual') {
+      // Logic for monthly data using fake data
+      const fakerMonthlyData = generateDolarHistory(5);
+      const monthlyMonths = extractMonthsFromDate(fakerMonthlyData.map((dataItem: any) => dataItem.date));
 
-        const startDate = currentWeekDates[0].toISOString().slice(0, 10);
-        const endDate = currentWeekDates[currentWeekDates.length - 1].toISOString().slice(0, 10);
-
-        weeklyData.push({
-          startDate,
-          endDate,
-          max: weekMax,
-          min: weekMin,
-        });
-      }
+      chartdata = fakerMonthlyData.map((dataItem: any, index: number) => {
+        return {
+          date: monthlyMonths[index],
+          'Valor Real del Producto': currentPrice / dataItem.value,
+          'Valor del Dólar': dataItem.value,
+        };
+      });
     }
-
-    chartdata = weeklyData.map(({ startDate, endDate, max, min }: any) => ({
-      date: startDate,
-      endDate,
-      'Valor Real del Producto': priceBasedOnDolar,
-      'Valor del Dólar': min,
-      // 'Valor Real del Producto': min,
-    }));
   } else {
-    // Lógica para datos mensuales (por defecto)
-    if (dolarValues.length === 1) {
-      chartdata = dolarDates.map((date, index) => ({
-        date: getMonthName(date),
-        'Valor Real del Producto': priceBasedOnDolar,
-        'Valor del Dólar': dolarValue,
-        'Historial de Dólar': dolarValues[0],
-      }));
-    } else if (dolarValues.length > 1) {
-      chartdata = dolarDates.map((date, index) => ({
-        date: getMonthName(date),
-        'Valor Real del Producto': priceBasedOnDolar,
-        'Valor del Dólar': dolarValues[0],
-        'Historial del Dolar': dolarValues[1],
-      }));
+    if (selectedTab === 'diario') {
+      const { realProductValue, distinctDolarValues } = getDistinctDailyDolarValues(
+        dolarDates,
+        dolarValues,
+        priceBasedOnDolar
+      );
+
+      chartdata = [
+        {
+          date: new Date().toISOString().slice(0, 10),
+          'Valor Real del Producto': realProductValue,
+          'Valor del Dólar': distinctDolarValues,
+        },
+      ];
+    } else if (selectedTab === 'semanal') {
+      const weeklyData = getCurrentWeekData(dolarDates, dolarValues, currentPrice);
+      chartdata = weeklyData;
+    } else {
+      // Lógica para datos mensuales (por defecto)
+      chartdata = getMonthlyRealData(dolarDates, dolarValues, currentPrice);
     }
   }
 
@@ -124,7 +129,7 @@ const DolarBasedChart = ({ priceBasedOnDolar, dateHistory, dolarValue, dolarDate
         <LineChart
           data={chartdata}
           index='date'
-          categories={['Valor Real del Producto', 'Valor del Dólar', 'Historial de Dólar']}
+          categories={['Valor Real del Producto', 'Valor del Dólar']}
           colors={['indigo', 'cyan', 'purple']}
           valueFormatter={valueFormatter}
           yAxisWidth={80}

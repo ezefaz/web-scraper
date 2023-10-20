@@ -269,3 +269,84 @@ export function getWeekFromDate(dateString: string) {
   const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
   return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
+
+export const getDistinctDailyDolarValues = (
+  dolarDates: Array<Date | string>,
+  dolarValues: Array<Number>,
+  currentPrice: number
+) => {
+  let realProductValue = 0;
+  let distinctDolarValues: Array<Number> = [];
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  for (let i = 0; i < dolarDates.length; i++) {
+    const dateString = dolarDates[i].toString().slice(0, 10);
+    const currentDolarValue = Number(dolarValues[i]);
+
+    if (dateString === today) {
+      realProductValue = currentPrice / currentDolarValue;
+      if (!distinctDolarValues.includes(currentDolarValue)) {
+        distinctDolarValues.push(currentDolarValue);
+      }
+    }
+  }
+
+  return { realProductValue, distinctDolarValues };
+};
+
+export const getCurrentWeekData = (
+  dolarDates: Array<Date | string>,
+  dolarValues: Array<Number>,
+  currentPrice: number
+) => {
+  const weeklyData = [];
+  const thisSunday = new Date();
+  thisSunday.setDate(thisSunday.getDate() - thisSunday.getDay());
+  const nextSunday = new Date();
+  nextSunday.setDate(thisSunday.getDate() + 6);
+
+  for (let i = 0; i < dolarDates.length; i++) {
+    const currentDolarDate = new Date(dolarDates[i]);
+    const currentDolarValue: any = dolarValues[i];
+    const realProductValue = currentPrice / currentDolarValue;
+
+    if (currentDolarDate >= thisSunday && currentDolarDate <= nextSunday) {
+      weeklyData.push({
+        date: currentDolarDate.toISOString().slice(0, 10),
+        'Valor Real del Producto': realProductValue,
+        'Valor del Dólar': currentDolarValue,
+      });
+    }
+  }
+
+  return weeklyData;
+};
+
+export const getMonthlyRealData = (
+  dolarDates: Array<Date | string>,
+  dolarValues: Array<Number>,
+  currentPrice: number
+) => {
+  const monthlyData: any = [];
+  const monthlyMonths = extractMonthsFromDate(dolarDates);
+
+  // Create a map of months to their corresponding values
+  const monthlyMap = new Map<string, number>();
+  dolarDates.forEach((date, index) => {
+    const currentMonth = extractMonthsFromDate([date])[0];
+    if (!monthlyMap.has(currentMonth) || dolarValues[index] < monthlyMap.get(currentMonth)!) {
+      monthlyMap.set(currentMonth, dolarValues[index]);
+    }
+  });
+
+  monthlyMap.forEach((value, key) => {
+    monthlyData.push({
+      date: key,
+      'Valor Real del Producto': currentPrice / value,
+      'Valor del Dólar': value,
+    });
+  });
+
+  return monthlyData;
+};

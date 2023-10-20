@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@faker-js/faker": "^8.2.0",
     "@headlessui/react": "^1.7.17",
     "@tremor/react": "^3.8.2",
     "@vercel/analytics": "^1.1.1",
