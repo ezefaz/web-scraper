@@ -8,7 +8,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
 import {
   extractMonthsFromDate,
   getCurrentWeekData,
-  getDistinctDailyDolarValues,
+  getDailyDolarData,
   getMonthName,
   getMonthlyRealData,
   isSameWeek,
@@ -16,26 +16,18 @@ import {
 import { generateDailyDolarData, generateWeeklyDolarData, generateDolarHistory } from '@/lib/faker';
 
 interface Props {
-  priceBasedOnDolar: number;
   currentPrice: number;
   dolarValue: number;
   dolarDate: Date;
-  dolarDates: Array<string | Date>;
-  dolarValues: Array<Number>;
+  dolarDates: Array<Date>;
+  dolarValues: Array<Number | number>;
 }
 
 const valueFormatter = (number: number) => `$ ${new Intl.NumberFormat('us').format(number).toString()}`;
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-const DolarBasedChart = ({
-  priceBasedOnDolar,
-  currentPrice,
-  dolarValue,
-  dolarDate,
-  dolarValues,
-  dolarDates,
-}: Props) => {
+const DolarBasedChart = ({ currentPrice, dolarValue, dolarDate, dolarValues, dolarDates }: Props) => {
   const [selectedTab, setSelectedTab] = useState('diario');
 
   let chartdata: any = [];
@@ -68,7 +60,7 @@ const DolarBasedChart = ({
         if (currentDolarDate >= thisSunday && currentDolarDate <= nextSunday) {
           weeklyData.push({
             date: currentDolarDate.toISOString().slice(0, 10),
-            'Valor Real del Producto': priceBasedOnDolar,
+            'Valor Real del Producto': currentPrice / currentDolarValue,
             'Valor del Dólar': currentDolarValue,
           });
         }
@@ -90,25 +82,16 @@ const DolarBasedChart = ({
     }
   } else {
     if (selectedTab === 'diario') {
-      const { realProductValue, distinctDolarValues } = getDistinctDailyDolarValues(
-        dolarDates,
-        dolarValues,
-        priceBasedOnDolar
-      );
-
-      chartdata = [
-        {
-          date: new Date().toISOString().slice(0, 10),
-          'Valor Real del Producto': realProductValue,
-          'Valor del Dólar': distinctDolarValues,
-        },
-      ];
+      const dailyData = getDailyDolarData(currentPrice, dolarValue, dolarDate, dolarValues, dolarDates);
+      chartdata = dailyData;
     } else if (selectedTab === 'semanal') {
-      const weeklyData = getCurrentWeekData(dolarDates, dolarValues, currentPrice);
+      const weeklyData = getCurrentWeekData(currentPrice, dolarValue, dolarDate, dolarValues, dolarDates);
+
       chartdata = weeklyData;
     } else {
-      // Lógica para datos mensuales (por defecto)
-      chartdata = getMonthlyRealData(dolarDates, dolarValues, currentPrice);
+      const monthlyData = getMonthlyRealData(dolarDates, dolarValues, currentPrice);
+
+      chartdata = monthlyData;
     }
   }
 
@@ -130,7 +113,7 @@ const DolarBasedChart = ({
           data={chartdata}
           index='date'
           categories={['Valor Real del Producto', 'Valor del Dólar']}
-          colors={['indigo', 'cyan', 'purple']}
+          colors={['green', 'red']}
           valueFormatter={valueFormatter}
           yAxisWidth={80}
         />

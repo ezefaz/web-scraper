@@ -40,7 +40,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   });
 
   const dolarSet = new Set();
-  const uniqueDolarValue = [];
+  const uniqueDolarValue: Array<number | Number> = [];
 
   for (const price of lastDolarValue) {
     if (!dolarSet.has(price)) {
@@ -49,8 +49,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     }
   }
 
-  const formattedDolarDates = lastDolarDates.map((date) => date.toISOString().slice(0, 10));
-  const uniqueDolarDatesSet = new Set(formattedDolarDates);
+  const uniqueDolarDatesSet = new Set(lastDolarDates);
 
   const uniqueDolarDatesArray = Array.from(uniqueDolarDatesSet);
 
@@ -196,7 +195,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         <div className='w-full lg:w-[50%]'>
           <DolarBasedChart
             currentPrice={product.currentPrice}
-            priceBasedOnDolar={priceBasedOnDolar}
             dolarValue={dolarValue}
             dolarDate={scrapedDolarDate}
             dolarDates={uniqueDolarDatesArray}

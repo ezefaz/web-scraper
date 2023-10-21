@@ -270,42 +270,69 @@ export function getWeekFromDate(dateString: string) {
   return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
 
-export const getDistinctDailyDolarValues = (
-  dolarDates: Array<Date | string>,
-  dolarValues: Array<Number>,
-  currentPrice: number
+export const getDailyDolarData = (
+  currentPrice: number,
+  dolarValue: number,
+  dolarDate: Date,
+  dolarValues: any[],
+  dolarDates: Array<Date>
 ) => {
-  let realProductValue = 0;
-  let distinctDolarValues: Array<Number> = [];
-
-  const today = new Date().toISOString().slice(0, 10);
+  let maxDolarValue = -Infinity;
+  let minDolarValue = Infinity;
+  let productValue = 0;
+  let dailyData: any = [];
 
   for (let i = 0; i < dolarDates.length; i++) {
-    const dateString = dolarDates[i].toString().slice(0, 10);
-    const currentDolarValue = Number(dolarValues[i]);
+    const currentDate = dolarDates[i];
+    const currentDolarValue = dolarValues[i] ? dolarValues[i] : dolarValue;
 
-    if (dateString === today) {
-      realProductValue = currentPrice / currentDolarValue;
+    if (currentDate.toISOString().slice(0, 10) === dolarDate.toISOString().slice(0, 10)) {
+      if (currentDolarValue > maxDolarValue) {
+        maxDolarValue = currentDolarValue;
+      }
+      if (currentDolarValue < minDolarValue) {
+        minDolarValue = currentDolarValue;
+      }
     }
   }
 
-  return { realProductValue, distinctDolarValues };
+  productValue = currentPrice / dolarValue;
+
+  const formattedDate = dolarDate.toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  dailyData.push({
+    date: formattedDate,
+    'Valor Real del Producto': productValue,
+    'Valor del Dólar': dolarValue,
+    // 'Máximo Valor del Dólar': maxDolarValue,
+    // 'Mínimo Valor del Dólar': minDolarValue,
+  });
+
+  return dailyData;
 };
 
 export const getCurrentWeekData = (
-  dolarDates: Array<Date | string>,
-  dolarValues: Array<Number>,
-  currentPrice: number
+  currentPrice: number,
+  dolarValue: number,
+  dolarDate: Date,
+  dolarValues: Array<any>,
+  dolarDates: Array<Date>
 ) => {
   const weeklyData = [];
   const thisSunday = new Date();
+
   thisSunday.setDate(thisSunday.getDate() - thisSunday.getDay());
   const nextSunday = new Date();
   nextSunday.setDate(thisSunday.getDate() + 6);
 
   for (let i = 0; i < dolarDates.length; i++) {
     const currentDolarDate = new Date(dolarDates[i]);
-    const currentDolarValue: any = dolarValues[i];
+    const currentDolarValue = dolarValues[i] ? dolarValues[i] : dolarValue;
+
     const realProductValue = currentPrice / currentDolarValue;
 
     if (currentDolarDate >= thisSunday && currentDolarDate <= nextSunday) {

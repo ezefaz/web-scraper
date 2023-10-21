@@ -1,17 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  extractMonthsFromDate,
-  formatNumber,
-  formatNumberWithCommas,
-  getLastThreeMonths,
-  getWeekFromDate,
-} from '@/lib/utils';
+import { extractMonthsFromDate, getLastThreeMonths } from '@/lib/utils';
 import { Card, Title, LineChart, Text, Flex, Metric, ProgressBar, TabGroup, TabList, Tab } from '@tremor/react';
 import { Badge, BadgeDelta } from '@tremor/react';
 import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { generateDolarHistory } from '@/lib/faker';
+import { DolarHistoryItem } from '@/types';
 
 const priceFormatter = (number: any) => `$${Intl.NumberFormat('us').format(number).toString()}`;
 
@@ -24,7 +19,6 @@ interface Props {
 }
 
 const fakedDolarHistory = generateDolarHistory(5);
-console.log(fakedDolarHistory);
 
 const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPrice, originalPrice }: Props) => {
   const [selectedTab, setSelectedTab] = useState('mensual');
@@ -41,11 +35,7 @@ const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPr
   } else {
     chartData = lastThreeMonths.map((month) => {
       const filteredMonthPrices = filteredPrices.filter((price, index) => {
-        return (
-          monthsFromDates[index] === month &&
-          typeof price === 'number' && // Filter out values less than 0.01
-          !Number.isNaN(price) // Filter out NaN values
-        );
+        return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
       });
 
       // Remove duplicate prices using a Set
