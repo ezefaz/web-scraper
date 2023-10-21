@@ -370,3 +370,114 @@ export const getMonthlyRealData = (dolarDates: Array<Date | string>, dolarValues
 
   return monthlyData;
 };
+
+export const comparePrices = (price1: number, price2: number) => {
+  let mayores, menores;
+  if (price1 > price2) {
+    mayores = Number(price1);
+    menores = Number(price2);
+  } else {
+    mayores = Number(price2);
+    menores = Number(price1);
+  }
+  return {
+    mayores: mayores,
+    menores: menores,
+  };
+};
+
+export const getDailyData = (currentPrice: Number, originalPrice: Number) => {
+  let dailyData = [];
+
+  const formattedDate = new Date().toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+
+  dailyData.push({
+    mes: formattedDate,
+    'Precios Mayores': originalPrice > currentPrice ? originalPrice : currentPrice,
+    'Precios Menores': currentPrice > originalPrice ? currentPrice : originalPrice,
+    Variación:
+      originalPrice > currentPrice
+        ? Number(originalPrice) - Number(currentPrice)
+        : Number(currentPrice) - Number(originalPrice),
+    // 'Máximo Precio Original': maxOriginalPrice,
+    // 'Mínimo Precio Original': minOriginalPrice,
+  });
+
+  return dailyData;
+};
+
+export const getWeeklyData = (priceAndDateHistory: Array<any>, currentPrice: Number, originalPrice: Number) => {
+  const today = new Date();
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const weeklyData: Array<any> = [];
+
+  for (let i = 0; i < priceAndDateHistory.length; i++) {
+    const currentDate = new Date(priceAndDateHistory[i].date);
+    if (currentDate > sevenDaysAgo && currentDate <= today) {
+      const maxPrice = originalPrice > priceAndDateHistory[i].price ? originalPrice : priceAndDateHistory[i].price;
+      const minPrice = currentPrice < priceAndDateHistory[i].price ? currentPrice : priceAndDateHistory[i].price;
+
+      weeklyData.push({
+        mes: currentDate.toLocaleDateString('es-AR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+        }),
+        'Precios Mayores': maxPrice,
+        'Precios Menores': minPrice,
+        Variación: maxPrice - minPrice,
+      });
+    }
+  }
+
+  return weeklyData;
+};
+
+export const getMonthlyData = (
+  filteredPrices: Array<any>,
+  monthsFromDates: Array<string>,
+  originalPrice: Number,
+  currentPrice: Number
+) => {
+  const lastThreeMonths = getLastThreeMonths();
+  return lastThreeMonths.map((month) => {
+    const filteredMonthPrices = filteredPrices.filter((price, index) => {
+      return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
+    });
+
+    // Remove duplicate prices using a Set
+    const uniquePrices = new Set(filteredMonthPrices);
+
+    // Convert the unique prices back to an array
+    const uniquePricesArray: Array<any> = Array.from(uniquePrices);
+
+    let maxPrice = 0;
+    let minPrice = 0;
+
+    if (uniquePricesArray.length > 0) {
+      maxPrice = Math.max(...uniquePricesArray);
+      minPrice = Math.min(...uniquePricesArray);
+    }
+
+    const variation = Number(maxPrice) - Number(minPrice);
+
+    if (uniquePricesArray.length === 0) {
+      maxPrice = Number(originalPrice);
+      minPrice = Number(currentPrice);
+    } else {
+      maxPrice = maxPrice > Number(currentPrice) ? Number(currentPrice) : maxPrice;
+      minPrice = minPrice > Number(originalPrice) ? Number(originalPrice) : minPrice;
+    }
+
+    return {
+      mes: month.charAt(0).toUpperCase() + month.slice(1),
+      'Precios Mayores': maxPrice > Number(currentPrice) ? currentPrice : maxPrice,
+      'Precios Menores': minPrice > Number(originalPrice) ? originalPrice : minPrice,
+      Variación: variation,
+    };
+  });
+};

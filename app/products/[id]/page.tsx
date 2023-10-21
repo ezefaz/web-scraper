@@ -8,7 +8,7 @@ import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
 
 import { getProductById, getSimilarProducts } from '@/lib/actions';
-import { formatNumber, formatUSD } from '@/lib/utils';
+import { formatNumber, formatUSD, getWeeklyData } from '@/lib/utils';
 import { DolarHistoryItem, Product } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
 
@@ -19,15 +19,14 @@ type Props = {
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: Product = await getProductById(id);
 
-  const { currentDolar } = product;
+  const { currentDolar, priceHistory, currentPrice, dolarHistory } = product;
 
   const dolarValue = Number(currentDolar.value);
   const scrapedDolarDate = currentDolar.date;
 
-  const priceBasedOnDolar = product.currentPrice / dolarValue;
+  const priceBasedOnDolar = currentPrice / dolarValue;
 
-  const productHistory = product.priceHistory;
-  const dolarHistory = product.dolarHistory;
+  const productHistory = priceHistory;
 
   const lastDolarValue: Array<Number> = [];
   const lastDolarDates: Array<Date> = [];
@@ -80,6 +79,10 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const uniqueDatesArray: Array<string | Date> = Array.from(uniqueDatesSet);
 
+  console.log(priceHistory);
+
+  const weeklyData = getWeeklyData(priceHistory, currentPrice, product.originalPrice);
+
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);
@@ -120,7 +123,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             <div className='flex flex-col gap-2'>
               <p className='text-[34px] text-secondary font-bold hover:text-primary'>{`${
                 product.currency
-              } ${formatNumber(product.currentPrice)}`}</p>
+              } ${formatNumber(currentPrice)}`}</p>
               <p className='text-[21px] text-black opacity-50 line-through '>
                 {`${product.currency} ${formatNumber(product.originalPrice)}`}
               </p>
@@ -150,7 +153,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <PriceInfoCard
                 title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
-                value={` ${product.currency} ${formatNumber(product.currentPrice)}`}
+                value={` ${product.currency} ${formatNumber(currentPrice)}`}
                 borderColor='#b6dbff'
               />
               <PriceInfoCard
@@ -188,13 +191,14 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             productTitle={product.title}
             priceHistory={uniquePrices}
             dateHistory={uniqueDatesArray}
-            currentPrice={product.currentPrice}
+            currentPrice={currentPrice}
             originalPrice={product.originalPrice}
+            weeklyData={weeklyData}
           />
         </div>
         <div className='w-full lg:w-[50%]'>
           <DolarBasedChart
-            currentPrice={product.currentPrice}
+            currentPrice={currentPrice}
             dolarValue={dolarValue}
             dolarDate={scrapedDolarDate}
             dolarDates={uniqueDolarDatesArray}

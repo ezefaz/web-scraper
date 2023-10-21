@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { extractMonthsFromDate, getLastThreeMonths } from '@/lib/utils';
+import { comparePrices, extractMonthsFromDate, getDailyData, getLastThreeMonths, getMonthlyData } from '@/lib/utils';
 import { Card, Title, LineChart, Text, Flex, Metric, ProgressBar, TabGroup, TabList, Tab } from '@tremor/react';
 import { Badge, BadgeDelta } from '@tremor/react';
 import { HiOutlineStatusOnline } from 'react-icons/hi';
@@ -16,59 +16,71 @@ interface Props {
   priceHistory: Array<string | Number>;
   currentPrice: Number;
   originalPrice: Number;
+  weeklyData: Array<any>;
 }
 
-const fakedDolarHistory = generateDolarHistory(5);
-
-const LineChartComponent = ({ productTitle, priceHistory, dateHistory, currentPrice, originalPrice }: Props) => {
+const LineChartComponent = ({
+  productTitle,
+  priceHistory,
+  dateHistory,
+  currentPrice,
+  originalPrice,
+  weeklyData,
+}: Props) => {
   const [selectedTab, setSelectedTab] = useState('mensual');
   const lastThreeMonths = getLastThreeMonths();
   const monthsFromDates = extractMonthsFromDate(dateHistory);
+
   const filteredPrices = priceHistory.filter((price, index) => lastThreeMonths.includes(monthsFromDates[index]));
 
   let chartData: any = [];
 
   if (selectedTab === 'diario') {
-    // Lógica para datos diarios
+    // Logic for daily data
+
+    chartData = getDailyData(currentPrice, originalPrice);
   } else if (selectedTab === 'semanal') {
     // Lógica para datos semanales
+    chartData = weeklyData;
   } else {
-    chartData = lastThreeMonths.map((month) => {
-      const filteredMonthPrices = filteredPrices.filter((price, index) => {
-        return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
-      });
+    // chartData = lastThreeMonths.map((month) => {
+    //   const filteredMonthPrices = filteredPrices.filter((price, index) => {
+    //     return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
+    //   });
 
-      // Remove duplicate prices using a Set
-      const uniquePrices: any = new Set(filteredMonthPrices);
+    //   // Remove duplicate prices using a Set
+    //   const uniquePrices: any = new Set(filteredMonthPrices);
 
-      // Convert the unique prices back to an array
-      const uniquePricesArray: any = Array.from(uniquePrices);
+    //   // Convert the unique prices back to an array
+    //   const uniquePricesArray: any = Array.from(uniquePrices);
 
-      const maxPrice = Math.max(...uniquePricesArray);
-      const minPrice = Math.min(...uniquePricesArray);
+    //   const maxPrice: Number = Math.max(...uniquePricesArray);
+    //   const minPrice: Number = Math.min(...uniquePricesArray);
 
-      const variation = maxPrice - minPrice;
+    //   const variation = Number(maxPrice) - Number(minPrice);
 
-      if (uniquePricesArray.length === 0) {
-        const maxPrice = originalPrice;
-        const minPrice = currentPrice;
-        const variation = Number(originalPrice) - Number(currentPrice);
+    //   if (uniquePricesArray.length === 0) {
+    //     const maxPrice = originalPrice;
+    //     const minPrice = currentPrice;
+    //     const variation = Number(originalPrice) - Number(currentPrice);
 
-        return {
-          mes: month.charAt(0).toUpperCase() + month.slice(1),
-          'Precios Mayores': maxPrice,
-          'Precios Menores': minPrice,
-          Variación: variation,
-        };
-      }
+    //     return {
+    //       mes: month.charAt(0).toUpperCase() + month.slice(1),
+    //       'Precios Mayores': maxPrice,
+    //       'Precios Menores': minPrice,
+    //       Variación: variation,
+    //     };
+    //   }
 
-      return {
-        mes: month.charAt(0).toUpperCase() + month.slice(1),
-        'Precios Mayores': maxPrice || currentPrice,
-        'Precios Menores': minPrice || originalPrice,
-        Variación: variation,
-      };
-    });
+    //   return {
+    //     mes: month.charAt(0).toUpperCase() + month.slice(1),
+    //     'Precios Mayores': maxPrice > currentPrice ? currentPrice : maxPrice,
+    //     'Precios Menores': minPrice > originalPrice ? originalPrice : minPrice,
+    //     Variación: variation,
+    //   };
+    // });
+
+    chartData = getMonthlyData(filteredPrices, monthsFromDates, originalPrice, currentPrice);
   }
   return (
     <Card className='p-4 shadow-md rounded-md w-full'>

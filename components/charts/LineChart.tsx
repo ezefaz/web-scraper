@@ -5,14 +5,7 @@ import { Card, Title, LineChart, Text, Flex, Metric, ProgressBar } from '@tremor
 import { Badge, BadgeDelta } from '@tremor/react';
 import { HiOutlineStatusOnline } from 'react-icons/hi';
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@tremor/react';
-import {
-  extractMonthsFromDate,
-  getCurrentWeekData,
-  getDailyDolarData,
-  getMonthName,
-  getMonthlyRealData,
-  isSameWeek,
-} from '@/lib/utils';
+import { extractMonthsFromDate, getCurrentWeekData, getDailyDolarData, getMonthlyRealData } from '@/lib/utils';
 import { generateDailyDolarData, generateWeeklyDolarData, generateDolarHistory } from '@/lib/faker';
 
 interface Props {
