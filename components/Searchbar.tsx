@@ -47,7 +47,7 @@ const Searchbar = () => {
         placeholder='Ingrese link del producto y comience a seguirlo!'
         className='searchbar-input'
       />
-      <button type='submit' className='searchbar-btn' disabled={searchPrompt === ''}>
+      <button type='submit' className='searchbar-btn md:w-auto px-4 py-2' disabled={searchPrompt === ''}>
         {isLoading ? 'Buscando...' : 'Buscar'}
       </button>
     </form>

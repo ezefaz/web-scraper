@@ -108,6 +108,7 @@ const DolarBasedChart = ({ currentPrice, dolarValue, dolarDate, dolarValues, dol
           categories={['Valor Real del Producto', 'Valor del Dólar']}
           colors={['green', 'red']}
           valueFormatter={valueFormatter}
+          className='h-72 mt-4 m-auto'
           yAxisWidth={80}
         />
       </Card>

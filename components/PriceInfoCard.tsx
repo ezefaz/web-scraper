@@ -1,22 +1,26 @@
 import Image from 'next/image';
 import React from 'react';
 
+import { Card, Text } from '@tremor/react';
+
 interface Props {
   title: string;
   iconSrc: string;
   value: string;
-  borderColor: string;
+  borderColor: any;
 }
 
 const PriceInfoCard = ({ title, iconSrc, value, borderColor }: Props) => {
   return (
-    <div className={`price-info_card border-l-[${borderColor}]`}>
-      <p className='text-base text-black-100'>{title}</p>
-      <div className='flex gap-1'>
-        <Image src={iconSrc} alt={title} width={24} height={24} />
-        <p className='text-2xl font-bold text-secondary'>{value}</p>
-      </div>
-    </div>
+    <>
+      <Card className='max-w-xs mx-2 m-auto' decoration='top' decorationColor={borderColor}>
+        <Text>{title}</Text>
+        <div className='flex gap-1'>
+          <Image src={iconSrc} alt={title} width={24} height={24} />
+          <p className='text-2xl ml-1 font-bold text-secondary'>{value}</p>{' '}
+        </div>
+      </Card>
+    </>
   );
 };
 

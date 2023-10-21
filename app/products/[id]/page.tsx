@@ -11,6 +11,7 @@ import { getProductById, getSimilarProducts } from '@/lib/actions';
 import { formatNumber, formatUSD, getWeeklyData } from '@/lib/utils';
 import { DolarHistoryItem, Product } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
+import { Card } from '@tremor/react';
 
 type Props = {
   params: { id: string };
@@ -88,10 +89,13 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   const similarProducts = await getSimilarProducts(id);
 
   return (
-    <div className='product-container'>
+    <div className='product-container mt-16'>
+      {' '}
       <div className='flex gap-28 xl:flex-row flex-col'>
-        <div className='product-image'>
-          <Image src={product.image} alt={product.title} width={500} height={400} />
+        <div className='flex gap-28 xl:flex-row flex-col h-[max-content]'>
+          <Card decoration='bottom' decorationColor='orange'>
+            <Image src={product.image} alt={product.title} width={450} height={450} className='m-4' />
+          </Card>
         </div>
         <div className='flex-1 flex flex-col'>
           <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
@@ -148,45 +152,46 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               </p>
             </div>
           </div>
-          <div className='my-7 flex flex-col gap-5'>
-            <div className='flex gap-5 flex-wrap'>
+          <div className='my-7 w-full flex flex-col-2 gap-5'>
+            <div className='flex m-auto gap-6 flex-wrap'>
               <PriceInfoCard
                 title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
                 value={` ${product.currency} ${formatNumber(currentPrice)}`}
-                borderColor='#b6dbff'
+                borderColor='neutral'
               />
               <PriceInfoCard
                 title='Precio Promedio'
                 iconSrc='/assets/icons/chart.svg'
                 value={`${product.currency} ${formatNumber(product.averagePrice)}`}
-                borderColor='#b6dbff'
+                borderColor='blue'
               />
               <PriceInfoCard
                 title='Precio Mayor'
                 iconSrc='/assets/icons/arrow-up.svg'
                 value={`${product.currency} ${formatNumber(product.highestPrice)}`}
-                borderColor='#b6dbff'
+                borderColor='red'
               />
               <PriceInfoCard
                 title='Precio Menor'
                 iconSrc='/assets/icons/arrow-down.svg'
                 value={`${product.currency} ${formatNumber(product.lowestPrice)}`}
-                borderColor='#B3FFC5'
+                borderColor='green'
               />
               <PriceInfoCard
                 title='Valor Actual en Dolar'
                 iconSrc='/assets/icons/arrow-down.svg'
                 value={`${formatUSD(priceBasedOnDolar)}`}
-                borderColor='#B3FFC5'
+                borderColor='red'
               />
             </div>
           </div>
+
           <Modal productId={id} />
         </div>
       </div>
-      <div className='flex flex-col lg:flex-row gap-5'>
-        <div className='w-full lg:w-[50%]'>
+      <div className='flex flex-col lg:flex-row gap-5 m-auto'>
+        <div className='w-full m-auto lg:w-[50%]'>
           <BarChart
             productTitle={product.title}
             priceHistory={uniquePrices}
@@ -206,7 +211,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           />
         </div>
       </div>
-
       <div className='flex flex-col gap-16'>
         <div className='flex flex-col gap-5'>
           {product.description.length > 2 && (

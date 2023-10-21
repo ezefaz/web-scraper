@@ -103,7 +103,8 @@ const LineChartComponent = ({
         categories={['Precios Mayores', 'Precios Menores', 'Variación']}
         colors={['emerald', 'red', 'blue']}
         valueFormatter={priceFormatter}
-        yAxisWidth={80}
+        yAxisWidth={70}
+        className='h-72 mt-4 m-auto'
         // maxValue={currentPrice}
         // minValue={originalPrice}
       />

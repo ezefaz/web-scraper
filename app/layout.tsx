@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <main className='max-w-10xl mx-auto'>
+        <main className='max-w-10xl m-auto overflow-x-hidden'>
           <Toaster position='top-center' reverseOrder={false} />
           <Navbar />
           {children}

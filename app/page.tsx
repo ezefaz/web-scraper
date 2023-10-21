@@ -13,17 +13,17 @@ const Home = async () => {
   return (
     <>
       <section
-        className='px-6 md:px-20 py-24'
+        className='px-6 md:px-20 py-24 mt-16'
         style={{
           backgroundImage: "url('/assets/images/hero2.png')",
           backgroundSize: 'cover',
           height: '100vh',
           backgroundPosition: 'center',
           opacity: '70%',
-          backgroundColor: 'rgba(255, 255, 255, 0.8)', // Adjust the alpha value (0.8) as needed
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
         }}
       >
-        <div className='flex justify-center max-xl:flex-col gap-16'>
+        <div className='flex justify-center p-5 max-xl:flex-col gap-16'>
           <div>
             <div className='small-text'>
               Empieza a ahorrar de manera gratuita y eficaz.
@@ -48,9 +48,9 @@ const Home = async () => {
       <Services />
       <StepsComponent />
       <section className='trending-section'>
-        <h2 className='section-text'>Trending</h2>
+        <h2 className='section-text'>Trending 🔥</h2>
         <div className='flex flex-wrap gap-x-8 gap-y-16'>
-          {allProducts?.map((product) => (
+          {allProducts?.slice(0, 8).map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

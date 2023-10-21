@@ -18,31 +18,24 @@ const Navbar = () => {
   };
 
   return (
-    <header className='w-full'>
+    <header className='w-full fixed top-0 z-50'>
       <nav className='bg-gray-200 p-4'>
         <div className='container mx-auto flex justify-between items-center'>
           <Link href='/' className='flex items-center gap-1'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
           {!nav && (
-            <>
-              <div className={`lg:flex items-center m-auto gap-5 text-black ${nav ? 'block' : 'hidden'}`}>
-                <a href='#how-it-works' className='hover:underline'>
-                  Funcionamiento
-                </a>
-                <a href='#pricing' className='hover:underline'>
-                  Precios
-                </a>
-                <a href='#faqs' className='hover:underline'>
-                  FAQs
-                </a>
-              </div>
-              <div className={`flex flex-column p-3 gap-5  ${nav ? 'hidden' : 'block'}`}>
-                {navIcons.map((icon, index) => (
-                  <Image key={index} src={icon.src} alt={icon.alt} width={28} height={28} className='object-contain' />
-                ))}
-              </div>
-            </>
+            <div className='lg:flex items-center gap-5 text-black hidden lg:block'>
+              <a href='#how-it-works' className='hover:underline'>
+                Funcionamiento
+              </a>
+              <a href='#pricing' className='hover:underline'>
+                Precios
+              </a>
+              <a href='#faqs' className='hover:underline'>
+                FAQs
+              </a>
+            </div>
           )}
           <div>
             <ul
@@ -64,14 +57,8 @@ const Navbar = () => {
               <Link href='#faqs' passHref>
                 <li className='p-4 border-b border-gray-600 hover:bg-gray-700'>FAQs</li>
               </Link>
-              {/* <div className='flex flex-column p-3 gap-5'>
-                {navIcons.map((icon, index) => (
-                  <Image key={index} src={icon.src} alt={icon.alt} width={28} height={28} className='object-contain' />
-                ))}
-              </div> */}
             </ul>
           </div>
-
           <div className='lg:hidden flex items-center'>
             <div onClick={handleNav}>{nav ? <AiOutlineClose size={25} /> : <AiOutlineMenu size={25} />}</div>
           </div>

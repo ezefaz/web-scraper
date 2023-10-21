@@ -135,7 +135,7 @@
 
 	/* PRODUCT CARD */
 	.product-card {
-		@apply sm:w-[292px] sm:max-w-[292px] w-full flex-1 flex flex-col gap-4 rounded-md;
+		@apply  sm:w-[292px] sm:max-w-[292px] w-full flex-1 flex flex-col gap-4 rounded-md;
 	}
 
 	.product-card_img-container {
@@ -156,6 +156,6 @@
 	}
 
 	.searchbar-btn {
-		@apply bg-gray-900 border border-gray-900 rounded-lg  px-5 py-3 text-white text-base font-semibold hover:opacity-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40;
+		@apply w-full bg-gray-900 border border-gray-900 rounded-lg  px-5 py-3 text-white text-base font-semibold hover:opacity-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40;
 	}
 }
