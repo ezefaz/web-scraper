@@ -27,7 +27,7 @@ const LineChartComponent = ({
   originalPrice,
   weeklyData,
 }: Props) => {
-  const [selectedTab, setSelectedTab] = useState('mensual');
+  const [selectedTab, setSelectedTab] = useState('diario');
   const lastThreeMonths = getLastThreeMonths();
   const monthsFromDates = extractMonthsFromDate(dateHistory);
 
@@ -43,44 +43,37 @@ const LineChartComponent = ({
     // Lógica para datos semanales
     chartData = weeklyData;
   } else {
-    // chartData = lastThreeMonths.map((month) => {
-    //   const filteredMonthPrices = filteredPrices.filter((price, index) => {
-    //     return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
-    //   });
+    chartData = lastThreeMonths.map((month) => {
+      const filteredMonthPrices = filteredPrices.filter((price, index) => {
+        return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
+      });
+      // Remove duplicate prices using a Set
+      const uniquePrices: any = new Set(filteredMonthPrices);
+      // Convert the unique prices back to an array
+      const uniquePricesArray: any = Array.from(uniquePrices);
+      const maxPrice: Number = Math.max(...uniquePricesArray);
+      const minPrice: Number = Math.min(...uniquePricesArray);
+      const variation = Number(maxPrice) - Number(minPrice);
 
-    //   // Remove duplicate prices using a Set
-    //   const uniquePrices: any = new Set(filteredMonthPrices);
+      if (uniquePricesArray.length === 0) {
+        const maxPrice = originalPrice;
+        const minPrice = currentPrice;
 
-    //   // Convert the unique prices back to an array
-    //   const uniquePricesArray: any = Array.from(uniquePrices);
-
-    //   const maxPrice: Number = Math.max(...uniquePricesArray);
-    //   const minPrice: Number = Math.min(...uniquePricesArray);
-
-    //   const variation = Number(maxPrice) - Number(minPrice);
-
-    //   if (uniquePricesArray.length === 0) {
-    //     const maxPrice = originalPrice;
-    //     const minPrice = currentPrice;
-    //     const variation = Number(originalPrice) - Number(currentPrice);
-
-    //     return {
-    //       mes: month.charAt(0).toUpperCase() + month.slice(1),
-    //       'Precios Mayores': maxPrice,
-    //       'Precios Menores': minPrice,
-    //       Variación: variation,
-    //     };
-    //   }
-
-    //   return {
-    //     mes: month.charAt(0).toUpperCase() + month.slice(1),
-    //     'Precios Mayores': maxPrice > currentPrice ? currentPrice : maxPrice,
-    //     'Precios Menores': minPrice > originalPrice ? originalPrice : minPrice,
-    //     Variación: variation,
-    //   };
-    // });
-
-    chartData = getMonthlyData(filteredPrices, monthsFromDates, originalPrice, currentPrice);
+        return {
+          mes: month.charAt(0).toUpperCase() + month.slice(1),
+          'Precios Mayores': maxPrice,
+          'Precios Menores': minPrice,
+          Variación: Number(originalPrice) - Number(currentPrice),
+        };
+      }
+      return {
+        mes: month.charAt(0).toUpperCase() + month.slice(1),
+        'Precios Mayores': maxPrice > currentPrice ? currentPrice : maxPrice,
+        'Precios Menores': minPrice > originalPrice ? originalPrice : minPrice,
+        Variación: Number(originalPrice) - Number(currentPrice),
+      };
+    });
+    // chartData = getMonthlyData(filteredPrices, monthsFromDates, originalPrice, currentPrice);
   }
   return (
     <Card className='p-4 shadow-md rounded-md w-full'>

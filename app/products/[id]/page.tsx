@@ -8,7 +8,7 @@ import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
 
 import { getProductById, getSimilarProducts } from '@/lib/actions';
-import { formatNumber, formatUSD, getWeeklyData } from '@/lib/utils';
+import { formatNumber, formatUSD, getMonthlyData, getWeeklyData } from '@/lib/utils';
 import { DolarHistoryItem, Product } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
 import { Card } from '@tremor/react';
@@ -80,9 +80,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const uniqueDatesArray: Array<string | Date> = Array.from(uniqueDatesSet);
 
-  console.log(priceHistory);
-
   const weeklyData = getWeeklyData(priceHistory, currentPrice, product.originalPrice);
+  const monthlyData = getMonthlyData(priceHistory, currentPrice, product.originalPrice);
 
   if (!product) redirect('/');
 

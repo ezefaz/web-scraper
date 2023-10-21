@@ -397,8 +397,8 @@ export const getDailyData = (currentPrice: Number, originalPrice: Number) => {
 
   dailyData.push({
     mes: formattedDate,
-    'Precios Mayores': originalPrice > currentPrice ? originalPrice : currentPrice,
-    'Precios Menores': currentPrice > originalPrice ? currentPrice : originalPrice,
+    'Precios Mayores': originalPrice,
+    'Precios Menores': currentPrice,
     Variación:
       originalPrice > currentPrice
         ? Number(originalPrice) - Number(currentPrice)
@@ -437,47 +437,98 @@ export const getWeeklyData = (priceAndDateHistory: Array<any>, currentPrice: Num
   return weeklyData;
 };
 
-export const getMonthlyData = (
-  filteredPrices: Array<any>,
-  monthsFromDates: Array<string>,
-  originalPrice: Number,
-  currentPrice: Number
-) => {
-  const lastThreeMonths = getLastThreeMonths();
-  return lastThreeMonths.map((month) => {
-    const filteredMonthPrices = filteredPrices.filter((price, index) => {
-      return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
-    });
+// export const getMonthlyData = (
+//   filteredPrices: Array<any>,
+//   monthsFromDates: Array<string>,
+//   originalPrice: Number,
+//   currentPrice: Number
+// ) => {
+//   const lastThreeMonths = getLastThreeMonths();
+//   return lastThreeMonths.map((month) => {
+//     const filteredMonthPrices = filteredPrices.filter((price, index) => {
+//       return monthsFromDates[index] === month && typeof price === 'number' && !Number.isNaN(price);
+//     });
 
-    // Remove duplicate prices using a Set
-    const uniquePrices = new Set(filteredMonthPrices);
+//     // Remove duplicate prices using a Set
+//     const uniquePrices = new Set(filteredMonthPrices);
 
-    // Convert the unique prices back to an array
-    const uniquePricesArray: Array<any> = Array.from(uniquePrices);
+//     // Convert the unique prices back to an array
+//     const uniquePricesArray: Array<any> = Array.from(uniquePrices);
 
-    let maxPrice = 0;
-    let minPrice = 0;
+//     let maxPrice = 0;
+//     let minPrice = 0;
 
-    if (uniquePricesArray.length > 0) {
-      maxPrice = Math.max(...uniquePricesArray);
-      minPrice = Math.min(...uniquePricesArray);
+//     if (uniquePricesArray.length > 0) {
+//       maxPrice = Math.max(...uniquePricesArray);
+//       minPrice = Math.min(...uniquePricesArray);
+//     }
+
+//     const variation = Number(maxPrice) - Number(minPrice);
+
+//     if (uniquePricesArray.length === 0) {
+//       maxPrice = Number(originalPrice);
+//       minPrice = Number(currentPrice);
+//     } else {
+//       maxPrice = maxPrice > Number(currentPrice) ? Number(currentPrice) : maxPrice;
+//       minPrice = minPrice > Number(originalPrice) ? Number(originalPrice) : minPrice;
+//     }
+
+//     return {
+//       mes: month.charAt(0).toUpperCase() + month.slice(1),
+//       'Precios Mayores': maxPrice > Number(currentPrice) ? currentPrice : maxPrice,
+//       'Precios Menores': minPrice > Number(originalPrice) ? originalPrice : minPrice,
+//       Variación: variation,
+//     };
+//   });
+// };
+
+export const getMonthlyData = (priceAndDateHistory: Array<any>, currentPrice: Number, originalPrice: Number) => {
+  const today = new Date();
+  const currentMonth = today.getMonth();
+  const monthlyData: any = {};
+
+  for (let i = 0; i < priceAndDateHistory.length; i++) {
+    const currentDate = new Date(priceAndDateHistory[i].date);
+    const currentMonthIndex = currentDate.getMonth();
+    const currentPriceItem = priceAndDateHistory[i].price;
+
+    if (currentMonthIndex === currentMonth) {
+      monthlyData[currentMonth] = {
+        maxPrice: originalPrice,
+        minPrice: currentPrice,
+      };
+    } else if (currentMonthIndex < currentMonth) {
+      if (!monthlyData[currentMonthIndex]) {
+        monthlyData[currentMonthIndex] = {
+          maxPrice: currentPriceItem,
+          minPrice: currentPriceItem,
+        };
+      } else {
+        monthlyData[currentMonthIndex].maxPrice = Math.max(
+          monthlyData[currentMonthIndex].maxPrice,
+          currentPriceItem,
+          Number(originalPrice)
+        );
+        monthlyData[currentMonthIndex].minPrice = Math.min(
+          monthlyData[currentMonthIndex].minPrice,
+          currentPriceItem,
+          Number(originalPrice)
+        );
+      }
     }
+  }
 
-    const variation = Number(maxPrice) - Number(minPrice);
-
-    if (uniquePricesArray.length === 0) {
-      maxPrice = Number(originalPrice);
-      minPrice = Number(currentPrice);
-    } else {
-      maxPrice = maxPrice > Number(currentPrice) ? Number(currentPrice) : maxPrice;
-      minPrice = minPrice > Number(originalPrice) ? Number(originalPrice) : minPrice;
-    }
-
+  const result = Object.keys(monthlyData).map((monthIndex: any) => {
+    const month = new Date(today.getFullYear(), monthIndex, 1).toLocaleString('default', { month: 'long' });
+    const { maxPrice, minPrice } = monthlyData[monthIndex];
+    const variation = maxPrice - minPrice;
     return {
-      mes: month.charAt(0).toUpperCase() + month.slice(1),
-      'Precios Mayores': maxPrice > Number(currentPrice) ? currentPrice : maxPrice,
-      'Precios Menores': minPrice > Number(originalPrice) ? originalPrice : minPrice,
+      month: month.charAt(0).toUpperCase() + month.slice(1),
+      'Precios Mayores': maxPrice,
+      'Precio Menores': minPrice,
       Variación: variation,
     };
   });
+
+  return result;
 };
