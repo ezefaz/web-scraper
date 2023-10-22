@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
+import Dropdown from './Dropdown';
 
 const navIcons = [
   { src: '/assets/icons/search.svg', alt: 'Search' },
@@ -20,7 +21,7 @@ const Navbar = () => {
   return (
     <header className='w-full fixed top-0 z-50'>
       <nav className='bg-gray-200 p-4'>
-        <div className='container mx-auto flex justify-between items-center'>
+        <div className='container ml-8 flex justify-between items-center'>
           <Link href='/' className='flex items-center gap-1'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
@@ -58,9 +59,13 @@ const Navbar = () => {
                 <li className='p-4 border-b border-gray-600 hover:bg-gray-700'>FAQs</li>
               </Link>
             </ul>
+            <Dropdown />
           </div>
+
           <div className='lg:hidden flex items-center'>
-            <div onClick={handleNav}>{nav ? <AiOutlineClose size={25} /> : <AiOutlineMenu size={25} />}</div>
+            <div onClick={handleNav} className='mx-8'>
+              {nav ? <AiOutlineClose size={25} /> : <AiOutlineMenu size={25} />}
+            </div>
           </div>
         </div>
       </nav>
