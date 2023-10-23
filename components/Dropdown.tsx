@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { signIn } from 'next-auth/react';
 
 const Dropdown = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -50,6 +53,7 @@ const Dropdown = () => {
           <a
             className='flex items-center justify-between rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100 cursor-pointer'
             role='menuitem'
+            onClick={() => signIn()}
           >
             <svg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
               <path
@@ -66,7 +70,7 @@ const Dropdown = () => {
                 strokeLinejoin='round'
               />
             </svg>
-            <span>Login</span>
+            <span>Sign In</span>
           </a>
           <a
             className='flex items-center justify-between rounded-md px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 active:bg-blue-100 cursor-pointer'
