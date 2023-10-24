@@ -8,7 +8,14 @@ import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
 
 import { getProductById, getSimilarProducts } from '@/lib/actions';
-import { formatNumber, formatUSD, getMonthlyData, getWeeklyData } from '@/lib/utils';
+import {
+  formatNumber,
+  formatUSD,
+  getCurrentMonthlyDolarData,
+  getCurrentWeekDolarData,
+  getMonthlyData,
+  getWeeklyData,
+} from '@/lib/utils';
 import { DolarHistoryItem, Product } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
 import { Card } from '@tremor/react';
@@ -82,6 +89,11 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const weeklyData = getWeeklyData(priceHistory, currentPrice, product.originalPrice);
   const monthlyData = getMonthlyData(priceHistory, currentPrice, product.originalPrice);
+
+  const dolarWeeklyData = getCurrentWeekDolarData(dolarHistory, currentPrice);
+  const dolarMonthlyData = getCurrentMonthlyDolarData(dolarHistory, currentPrice);
+
+  // console.log('asdadsa', dolarHistory);
 
   if (!product) redirect('/');
 
@@ -207,6 +219,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             dolarDate={scrapedDolarDate}
             dolarDates={uniqueDolarDatesArray}
             dolarValues={uniqueDolarValue}
+            weeklyData={dolarWeeklyData}
+            monthlyData={dolarMonthlyData}
           />
         </div>
       </div>

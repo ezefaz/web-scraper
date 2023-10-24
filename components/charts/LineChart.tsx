@@ -14,18 +14,28 @@ interface Props {
   dolarDate: Date;
   dolarDates: Array<Date>;
   dolarValues: Array<Number | number>;
+  weeklyData: Array<any>;
+  monthlyData: Array<any>;
 }
 
 const valueFormatter = (number: number) => `$ ${new Intl.NumberFormat('us').format(number).toString()}`;
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-const DolarBasedChart = ({ currentPrice, dolarValue, dolarDate, dolarValues, dolarDates }: Props) => {
+const DolarBasedChart = ({
+  currentPrice,
+  dolarValue,
+  dolarDate,
+  dolarValues,
+  dolarDates,
+  weeklyData,
+  monthlyData,
+}: Props) => {
   const [selectedTab, setSelectedTab] = useState('diario');
 
   let chartdata: any = [];
 
-  if (isDevelopment) {
+  if (!isDevelopment) {
     // Use the generated fake data in development mode
     if (selectedTab === 'diario') {
       const fakerDailyData = generateDailyDolarData(5);
@@ -78,12 +88,8 @@ const DolarBasedChart = ({ currentPrice, dolarValue, dolarDate, dolarValues, dol
       const dailyData = getDailyDolarData(currentPrice, dolarValue, dolarDate, dolarValues, dolarDates);
       chartdata = dailyData;
     } else if (selectedTab === 'semanal') {
-      const weeklyData = getCurrentWeekData(currentPrice, dolarValue, dolarDate, dolarValues, dolarDates);
-
       chartdata = weeklyData;
     } else {
-      const monthlyData = getMonthlyRealData(dolarDates, dolarValues, currentPrice);
-
       chartdata = monthlyData;
     }
   }

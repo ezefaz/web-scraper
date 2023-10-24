@@ -270,6 +270,55 @@ export function getWeekFromDate(dateString: string) {
   return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
 }
 
+// DOLAR FUNCTIONS
+
+export const getCurrentWeekDolarData = (dolarHistory: Array<any>, currentPrice: Number) => {
+  const currentDate: any = new Date();
+  const currentWeekDolarData = [];
+
+  for (let i = 0; i < dolarHistory.length; i++) {
+    const dolarDate = new Date(dolarHistory[i].date);
+    const diffTime = Math.abs(currentDate - Number(dolarDate));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    let formattedDolarPrice = dolarHistory[i].value;
+    if (formattedDolarPrice < 9) {
+      formattedDolarPrice *= 1000;
+    }
+
+    if (diffDays <= 7) {
+      currentWeekDolarData.push({
+        date: dolarDate.toISOString(),
+        'Valor Real del Producto': Number(currentPrice) / formattedDolarPrice,
+        'Valor del Dólar': formattedDolarPrice,
+      });
+    }
+  }
+
+  return currentWeekDolarData;
+};
+
+export const getCurrentMonthlyDolarData = (dolarHistory: Array<any>, currentPrice: number) => {
+  const currentDate: any = new Date();
+  const currentMonthDolarData: any[] = [];
+
+  for (let i = 0; i < dolarHistory.length; i++) {
+    const dolarDate = new Date(dolarHistory[i].date);
+    const diffTime = Math.abs(currentDate - Number(dolarDate));
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const formattedDolarPrice = dolarHistory[i].value < 9 ? dolarHistory[i].value * 1000 : dolarHistory[i].value;
+
+    if (diffDays <= 30) {
+      currentMonthDolarData.push({
+        date: dolarDate.toISOString(),
+        'Valor Real del Producto': Number(currentPrice) / formattedDolarPrice,
+        'Valor del Dólar': formattedDolarPrice,
+      });
+    }
+  }
+
+  return currentMonthDolarData;
+};
+
 export const getDailyDolarData = (
   currentPrice: number,
   dolarValue: number,
@@ -285,33 +334,33 @@ export const getDailyDolarData = (
   for (let i = 0; i < dolarDates.length; i++) {
     const currentDate = dolarDates[i];
     const currentDolarValue = dolarValues[i] ? dolarValues[i] : dolarValue;
+    const formattedDolarValue = currentDolarValue < 9 ? currentDolarValue * 1000 : currentDolarValue;
 
     if (currentDate.toISOString().slice(0, 10) === dolarDate.toISOString().slice(0, 10)) {
-      if (currentDolarValue > maxDolarValue) {
-        maxDolarValue = currentDolarValue;
+      if (formattedDolarValue > maxDolarValue) {
+        maxDolarValue = formattedDolarValue;
       }
-      if (currentDolarValue < minDolarValue) {
-        minDolarValue = currentDolarValue;
+      if (formattedDolarValue < minDolarValue) {
+        minDolarValue = formattedDolarValue;
       }
     }
+
+    productValue = currentPrice / Number(formattedDolarValue);
+
+    const formattedDate = dolarDate.toLocaleDateString('es-AR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+
+    dailyData.push({
+      date: formattedDate,
+      'Valor Real del Producto': productValue,
+      'Valor del Dólar': formattedDolarValue,
+      // 'Máximo Valor del Dólar': maxDolarValue,
+      // 'Mínimo Valor del Dólar': minDolarValue,
+    });
   }
-
-  productValue = currentPrice / dolarValue;
-
-  const formattedDate = dolarDate.toLocaleDateString('es-AR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
-  dailyData.push({
-    date: formattedDate,
-    'Valor Real del Producto': productValue,
-    'Valor del Dólar': dolarValue,
-    // 'Máximo Valor del Dólar': maxDolarValue,
-    // 'Mínimo Valor del Dólar': minDolarValue,
-  });
-
   return dailyData;
 };
 
