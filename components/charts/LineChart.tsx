@@ -35,7 +35,7 @@ const DolarBasedChart = ({
 
   let chartdata: any = [];
 
-  if (!isDevelopment) {
+  if (isDevelopment) {
     // Use the generated fake data in development mode
     if (selectedTab === 'diario') {
       const fakerDailyData = generateDailyDolarData(5);
