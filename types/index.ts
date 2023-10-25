@@ -16,7 +16,13 @@ export type CurrentDolar = {
 };
 
 export type User = {
+  userId: number;
+  name: string;
   email: string;
+  password?: string;
+  products?: Product[];
+  productsFavoritos?: Product[];
+  subscription: string;
 };
 
 export type Product = {
