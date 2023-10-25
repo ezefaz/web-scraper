@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from 'react-hot-toast';
+import { Providers } from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 const spaceGrotesk = Space_Grotesk({
@@ -21,10 +22,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='en'>
       <body className={inter.className}>
         <main className='max-w-10xl m-auto overflow-x-hidden'>
-          <Toaster position='top-center' reverseOrder={false} />
-          <Navbar />
-          {children}
-          <Analytics />
+          <Providers>
+            <Toaster position='top-center' reverseOrder={false} />
+            <Navbar />
+            {children}
+            <Analytics />
+          </Providers>
         </main>
       </body>
     </html>

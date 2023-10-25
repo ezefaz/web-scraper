@@ -5,7 +5,7 @@ const nextConfig = {
     serverComponentsExternalPackages: ['mongoose'],
   },
   images: {
-    domains: ['m.media-mercadolibre.com', 'http2.mlstatic.com', 'valordolarblue.com.ar'],
+    domains: ['m.media-mercadolibre.com', 'http2.mlstatic.com', 'valordolarblue.com.ar', 'lh3.googleusercontent.com'],
   },
 };
 
