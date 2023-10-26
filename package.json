@@ -24,13 +24,15 @@
     "react-hot-toast": "^2.4.1",
     "react-icons": "^4.11.0",
     "react-responsive-carousel": "^3.2.23",
-    "supports-color": "^8.1.1"
+    "supports-color": "^8.1.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "latest",
     "@types/nodemailer": "^6.4.11",
     "@types/react": "latest",
     "@types/react-dom": "latest",
+    "@types/uuid": "^9.0.6",
     "autoprefixer": "latest",
     "postcss": "latest",
     "tailwindcss": "latest",

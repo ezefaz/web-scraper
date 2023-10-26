@@ -11,7 +11,7 @@ const navIcons = [
   { src: '/assets/icons/user.svg', alt: 'User' },
 ];
 
-const Navbar = () => {
+const Navbar = ({ session }: any) => {
   const [nav, setNav] = useState(false);
 
   const handleNav = () => {
@@ -59,7 +59,7 @@ const Navbar = () => {
                 <li className='p-4 border-b border-gray-600 hover:bg-gray-700'>FAQs</li>
               </Link>
             </ul>
-            <Dropdown />
+            <Dropdown session={session} />
           </div>
 
           <div className='lg:hidden flex items-center'>

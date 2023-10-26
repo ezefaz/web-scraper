@@ -2,16 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
 import DropdownItem from './DropdownItem';
 
-const Dropdown = () => {
+const Dropdown = ({ session }: any) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef: any = useRef(null);
-  const { data: session } = useSession();
-  const isUserLoggedIn = session?.user;
 
-  console.log(session);
+  const isUserLoggedIn = session?.user;
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);

@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-  userId: {
-    type: Number,
-    required: true,
+  id: {
+    type: String,
+    // required: true,
     unique: true,
   },
-  token: {
-    type: String, // Token for authentication/authorization
-  },
+  // token: {
+  //   type: String,
+  // },
   name: {
     type: String,
     required: true,
@@ -18,20 +18,22 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  // hashedPassword: {
+  //   type: String,
+  // },
   image: {
     type: String,
   },
-  products: {
-    type: [String], // Array of product names or IDs
-  },
-  favoriteProducts: {
-    type: [String], // Array of favorite product names or IDs
-  },
-  subscription: {
-    type: String, // You can define the type based on your plan structure
-    default: 'basic', // Set a default value if needed
-  },
-  // Add more fields as needed
+  // products: {
+  //   type: [String],
+  // },
+  // favoriteProducts: {
+  //   type: [String],
+  // },
+  // subscription: {
+  //   type: String,
+  //   default: 'basic',
+  // },
   createdAt: {
     type: Date,
     default: Date.now,

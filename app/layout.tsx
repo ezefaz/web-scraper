@@ -5,6 +5,7 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
 import { Toaster } from 'react-hot-toast';
 import { Providers } from './providers';
+import { getServerSession } from 'next-auth';
 
 const inter = Inter({ subsets: ['latin'] });
 const spaceGrotesk = Space_Grotesk({
@@ -17,19 +18,23 @@ export const metadata: Metadata = {
   description: 'Seguí precios de tus productos favoritos y ahorrá dinero en tus compras online.',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession();
+
+  console.log('HOLA -->', session);
+
   return (
-    <html lang='en'>
-      <body className={inter.className}>
-        <main className='max-w-10xl m-auto overflow-x-hidden'>
-          <Providers>
+    <Providers>
+      <html lang='en'>
+        <body className={inter.className}>
+          <main className='max-w-10xl m-auto overflow-x-hidden'>
             <Toaster position='top-center' reverseOrder={false} />
-            <Navbar />
+            <Navbar session={session} />
             {children}
             <Analytics />
-          </Providers>
-        </main>
-      </body>
-    </html>
+          </main>
+        </body>
+      </html>
+    </Providers>
   );
 }

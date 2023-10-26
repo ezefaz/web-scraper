@@ -16,7 +16,7 @@ export type CurrentDolar = {
 };
 
 export type User = {
-  userId: number;
+  id: string;
   name: string;
   email: string;
   password?: string;
