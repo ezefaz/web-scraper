@@ -21,6 +21,7 @@ const handler = NextAuth({
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account }: { user: any; account: any }) {
       if (account?.provider === 'google') {
