@@ -25,7 +25,7 @@ const handler = NextAuth({
   callbacks: {
     async signIn({ user, account }: { user: any; account: any }) {
       if (account?.provider === 'google') {
-        const { name, email, image, _id } = user;
+        const { name, email, image } = user;
         try {
           await connectToDb();
 

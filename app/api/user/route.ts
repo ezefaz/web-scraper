@@ -2,18 +2,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { connectToDb } from '@/lib/mongoose';
 import User from '@/lib/models/user.model';
 import { NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
 
 async function handlerUser(req: any, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
       await connectToDb();
-      const { name, email, image, _id } = await req.json();
-
-      const userId = uuidv4();
+      const { name, email, image } = await req.json();
 
       const newUser = new User({
-        id: _id,
         name,
         email,
         image,
