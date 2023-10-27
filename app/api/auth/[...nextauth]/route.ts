@@ -32,7 +32,9 @@ const handler = NextAuth({
           const existingUser = await User.findOne({ email });
 
           const url: any =
-            process.env.NODE_ENV === 'production' ? process.env.PRODUCTION_API_URL : 'http://localhost:3000/api/user';
+            process.env.NODE_ENV === 'production'
+              ? 'https://savemelin.vercel.app/api/user'
+              : 'http://localhost:3000/api/user';
 
           if (!existingUser) {
             const response = await axios.post(url, {

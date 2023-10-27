@@ -19,8 +19,6 @@ async function handlerUser(req: any, res: NextApiResponse) {
         image,
       });
 
-      console.log('ENTRA ACA???  2', newUser);
-
       await newUser.save();
 
       return NextResponse.json({
@@ -32,7 +30,9 @@ async function handlerUser(req: any, res: NextApiResponse) {
       throw new Error('Server Error');
     }
   } else {
-    res.status(405).end();
+    return NextResponse.json({
+      message: 'Otro metodo.',
+    });
   }
 }
 
