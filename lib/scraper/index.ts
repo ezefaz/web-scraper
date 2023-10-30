@@ -11,6 +11,7 @@ import {
   extractStarRatings,
 } from '../utils';
 import { scrapeDolarValue } from './dolar';
+import { getCurrentUser } from '../actions';
 
 export async function scrapeMLProduct(url: string) {
   if (!url) return;
@@ -30,6 +31,8 @@ export async function scrapeMLProduct(url: string) {
     port,
     rejectUnathorized: false,
   };
+
+  const user = await getCurrentUser();
 
   try {
     const response = await axios.get(url, options);
@@ -118,6 +121,7 @@ export async function scrapeMLProduct(url: string) {
       lowestPrice: Number(currentPrice) || Number(originalPrice),
       highestPrice: Number(originalPrice) || Number(currentPrice),
       averagePrice: Number(currentPrice) || Number(originalPrice),
+      users: user ? [user] : [],
     };
 
     // console.log('PRODUCTO -->', data);
