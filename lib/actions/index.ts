@@ -23,8 +23,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
     let product = scrapedProduct;
 
-    console.log('PRODUCTO SCRAPEADO', product);
-
     const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
     const getUserProducts = scrapedProduct.users.map((user: any) => {
@@ -37,8 +35,6 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     }
 
     if (existingProduct) {
-      console.log('SCRAPEADO PERO EL PRODCUTO 2', scrapedProduct.users);
-
       const updatedExistingUser = [...existingProduct.users, { products: getUserProducts }];
 
       const updatedDolar: CurrentDolar = scrapedProduct.currentDolar;
@@ -63,14 +59,10 @@ export async function scrapeAndStoreProducts(productUrl: string) {
       };
     }
 
-    console.log('PRODUCTITOT DATOS -->', product.users);
-
     const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
       upsert: true,
       new: true,
     });
-
-    console.log('PRODUCTO NUEVO DATOS -->', newProduct.users);
 
     revalidatePath(`/products/${newProduct._id}`);
   } catch (error: any) {
