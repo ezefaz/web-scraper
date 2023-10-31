@@ -1,6 +1,6 @@
 'use server';
 
-import { CurrentDolar, PriceHistoryItem, User } from '@/types';
+import { CurrentDolar, User } from '@/types';
 import Product from '../models/product.model';
 import { connectToDb } from '../mongoose';
 import { scrapeMLProduct } from '../scraper';
@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache';
 import { generateEmailBody, sendEmail } from '../nodemailer';
 import { getServerSession } from 'next-auth';
 import UserSchema from '../models/user.model';
+import { permanentRedirect, redirect } from 'next/navigation';
 
 export async function scrapeAndStoreProducts(productUrl: string) {
   if (!productUrl) return;
@@ -67,10 +68,12 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     if (currentUser) {
       await UserSchema.findOneAndUpdate(
         { email: currentUser.email },
-        { $addToSet: { products: { $each: [scrapedProduct], $slice: 10 } } }
+        { $addToSet: { products: { $each: [scrapedProduct] } } }
       );
     }
+
     revalidatePath(`/products/${newProduct._id}`);
+    return newProduct._id.toString();
   } catch (error: any) {
     throw new Error(`Failed to create/update product: ${error.message}`);
   }
@@ -95,10 +98,6 @@ export async function getAllProducts() {
     connectToDb();
 
     const products = await Product.find();
-
-    const userProducts = await getUserProducts();
-
-    console.log('PANA', userProducts);
 
     return products;
   } catch (error) {

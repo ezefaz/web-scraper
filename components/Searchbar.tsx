@@ -3,10 +3,12 @@
 import { scrapeAndStoreProducts } from '@/lib/actions';
 import { FormEvent, useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const Searchbar = () => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const mercadolibreDomains = ['mercadolibre.com', 'mercadolibre.com.ar'];
 
@@ -28,11 +30,12 @@ const Searchbar = () => {
 
     if (!isValidLink) return toast.error('Porfavor inserte un link de mercadolibre válido.');
     setIsLoading(true);
-
-    const product = await scrapeAndStoreProducts(searchPrompt);
-
     try {
+      const product: any = await scrapeAndStoreProducts(searchPrompt);
+
+      router.push(`/products/${product}`);
     } catch (error) {
+      toast.error('No se ha podido agregar el producto.');
     } finally {
       setIsLoading(false);
     }

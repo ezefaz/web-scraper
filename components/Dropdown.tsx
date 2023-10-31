@@ -5,9 +5,11 @@ import Image from 'next/image';
 import { signIn, signOut } from 'next-auth/react';
 import DropdownItem from './DropdownItem';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const Dropdown = ({ session }: any) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const router = useRouter();
   const dropdownRef: any = useRef(null);
 
   const isUserLoggedIn = session?.user;
@@ -26,6 +28,11 @@ const Dropdown = ({ session }: any) => {
     if (event.keyCode === 27) {
       setIsDropdownOpen(false);
     }
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    router.push('/');
   };
 
   useEffect(() => {
@@ -120,7 +127,7 @@ const Dropdown = ({ session }: any) => {
                     </svg>
                   }
                   text='Cerrar Sesión'
-                  onClick={() => signOut()}
+                  onClick={handleSignOut}
                 />
               </>
             ) : (
