@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { signIn, signOut } from 'next-auth/react';
 import DropdownItem from './DropdownItem';
+import Link from 'next/link';
 
 const Dropdown = ({ session }: any) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -83,6 +84,7 @@ const Dropdown = ({ session }: any) => {
                     </svg>
                   }
                   text='Mis Productos'
+                  link='/user-products'
                 />
                 <DropdownItem
                   icon={
@@ -97,6 +99,7 @@ const Dropdown = ({ session }: any) => {
                     </svg>
                   }
                   text='Dashboards'
+                  link='/user-products'
                 />
                 <DropdownItem
                   icon={

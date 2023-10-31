@@ -64,6 +64,12 @@ export async function scrapeAndStoreProducts(productUrl: string) {
       new: true,
     });
 
+    if (currentUser) {
+      await UserSchema.findOneAndUpdate(
+        { email: currentUser.email },
+        { $addToSet: { products: { $each: [scrapedProduct], $slice: 10 } } }
+      );
+    }
     revalidatePath(`/products/${newProduct._id}`);
   } catch (error: any) {
     throw new Error(`Failed to create/update product: ${error.message}`);
@@ -90,13 +96,23 @@ export async function getAllProducts() {
 
     const products = await Product.find();
 
-    const user = await getCurrentUser();
+    const userProducts = await getUserProducts();
 
-    console.log('PRODUCTOS DEL USUARIO', user.products);
+    console.log('PANA', userProducts);
 
     return products;
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function getUserProducts() {
+  try {
+    const user = await getCurrentUser();
+
+    if (user?.products) return user.products;
+  } catch (error) {
+    console.log('El usuario no tiene productos');
   }
 }
 
