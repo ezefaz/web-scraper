@@ -3,6 +3,7 @@ import { getAllProducts, getCurrentUser, getUserProducts } from '@/lib/actions';
 import {
   Badge,
   Card,
+  Icon,
   Table,
   TableBody,
   TableCell,
@@ -14,21 +15,22 @@ import {
 } from '@tremor/react';
 import { formatNumber } from '@/lib/utils';
 import { Product } from '@/types';
+import Removal from '@/components/Removal';
 
 const page = async () => {
   const userProducts = await getUserProducts();
   const allProducts: any = await getAllProducts();
   const user = await getCurrentUser();
 
-  function getProductUrl() {
-    const matchingProducts = allProducts.filter((product: Product) => {
-      return userProducts.some((userProduct: Product) => userProduct.url === product.url);
-    });
+  // function getProductUrl() {
+  //   const matchingProducts = allProducts.filter((product: Product) => {
+  //     return userProducts.some((userProduct: Product) => userProduct.url === product.url);
+  //   });
 
-    const matchingProductIds = matchingProducts.map((product: Product) => product._id);
-  }
+  //   const matchingProductIds = matchingProducts.map((product: Product) => product._id);
+  // }
 
-  getProductUrl();
+  // const productsUrl = getProductUrl();
 
   return (
     <>
@@ -45,6 +47,7 @@ const page = async () => {
             <Table className='w-full'>
               <TableHead>
                 <TableRow>
+                  <TableHeaderCell></TableHeaderCell>
                   <TableHeaderCell>Título</TableHeaderCell>
                   <TableHeaderCell>Precio</TableHeaderCell>
                   <TableHeaderCell>Precio USD</TableHeaderCell>
@@ -55,6 +58,9 @@ const page = async () => {
               <TableBody>
                 {userProducts?.map((product: Product) => (
                   <TableRow key={product._id} className='hover:bg-gray-50 cursor-pointer'>
+                    <TableCell>
+                      <Removal product={product._id?.toString()} />
+                    </TableCell>
                     <TableCell>
                       <a className='text-blue-500 hover:underline' href={`/products/${product._id}`}>
                         {product.title}

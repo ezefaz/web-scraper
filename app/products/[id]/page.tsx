@@ -93,8 +93,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   const dolarWeeklyData = getCurrentWeekDolarData(dolarHistory, currentPrice);
   const dolarMonthlyData = getCurrentMonthlyDolarData(dolarHistory, currentPrice);
 
-  // console.log('asdadsa', dolarHistory);
-
   if (!product) redirect('/');
 
   const similarProducts = await getSimilarProducts(id);

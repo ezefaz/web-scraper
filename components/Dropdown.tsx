@@ -93,7 +93,7 @@ const Dropdown = ({ session }: any) => {
                   text='Mis Productos'
                   link='/user-products'
                 />
-                <DropdownItem
+                {/* <DropdownItem
                   icon={
                     <svg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
                       <path
@@ -107,7 +107,7 @@ const Dropdown = ({ session }: any) => {
                   }
                   text='Dashboards'
                   link='/user-products'
-                />
+                /> */}
                 <DropdownItem
                   icon={
                     <svg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
@@ -132,7 +132,7 @@ const Dropdown = ({ session }: any) => {
               </>
             ) : (
               <>
-                <DropdownItem
+                {/* <DropdownItem
                   icon={
                     <svg width='20' height='25' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
                       <path
@@ -158,7 +158,7 @@ const Dropdown = ({ session }: any) => {
                     </svg>
                   }
                   text='Dashboards'
-                />
+                /> */}
                 <DropdownItem
                   icon={
                     <svg width='20' height='20' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>

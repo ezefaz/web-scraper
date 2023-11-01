@@ -66,10 +66,15 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     });
 
     if (currentUser) {
-      await UserSchema.findOneAndUpdate(
-        { email: currentUser.email },
-        { $addToSet: { products: { $each: [scrapedProduct] } } }
-      );
+      const user = await UserSchema.findOne({ email: currentUser.email });
+
+      if (user && user.products) {
+        const existingProduct = await user.products.find((p: any) => p.url === scrapedProduct.url);
+
+        if (!existingProduct) {
+          await UserSchema.findOneAndUpdate({ email: currentUser.email }, { $addToSet: { products: scrapedProduct } });
+        }
+      }
     }
 
     revalidatePath(`/products/${newProduct._id}`);
@@ -90,6 +95,42 @@ export async function getProductById(productId: string) {
     return product;
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function deleteProduct(productId: string) {
+  try {
+    await connectToDb();
+
+    const deletedProduct = await Product.findOneAndDelete({ _id: productId });
+
+    if (!deletedProduct) {
+      throw new Error('Product not found');
+    }
+
+    return deletedProduct;
+  } catch (error: any) {
+    throw new Error(`Failed to delete product: ${error.message}`);
+  }
+}
+
+export async function removeProductFromUser(productId: string) {
+  try {
+    await connectToDb();
+
+    const updatedUser = await UserSchema.findOneAndUpdate(
+      { products: { $elemMatch: { _id: productId } } },
+      { $pull: { products: { _id: productId } } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      throw new Error('User not found or product not in the products array');
+    }
+
+    return updatedUser;
+  } catch (error: any) {
+    throw new Error(`Failed to remove product from user: ${error.message}`);
   }
 }
 
