@@ -22,7 +22,6 @@ export async function GET(request: Request) {
     // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
-        // Scrape product
         const scrapedProduct = await scrapeMLProduct(currentProduct.url);
 
         if (!scrapedProduct) return;
@@ -38,31 +37,15 @@ export async function GET(request: Request) {
                 _id: priceItem._id,
               };
             }
-            return null;
+            return currentProduct.priceHistory;
           });
-        // .filter(
-        //   (priceItem: PriceHistoryItem | null) =>
-        //     priceItem !== null && Number.isInteger(priceItem.price) && priceItem.price >= 100000
-        // );
-
-        const currentPrice = scrapedProduct.currentPrice
-          ? parseInt(scrapedProduct.currentPrice.toString().replace(/[^0-9]/g, ''), 10)
-          : null;
-        if (currentPrice === null || isNaN(currentPrice)) {
-          throw new Error('Current price is not available or not a valid number.');
-        }
 
         const previousDolarHistory = currentProduct.dolarHistory;
 
         const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
         const updatedDolarValue = scrapedProduct.currentDolar.value;
 
-        // ... (previous code remains unchanged)
-
         const updatedDolarHistory: any = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
-
-        // Filter the entries to remove those without a value
-        // const filteredDolarHistory: any = updatedDolarHistory.filter((item: any) => item.value);
 
         const filteredDolarHistory: any[] = [];
 
@@ -88,7 +71,6 @@ export async function GET(request: Request) {
           dolarHistory: filteredDolarHistory,
         };
 
-        // Update Products in DB
         const updatedProduct = await Product.findOneAndUpdate(
           {
             url: product.url,
