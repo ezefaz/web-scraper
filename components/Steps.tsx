@@ -8,16 +8,22 @@ const StepsComponent: React.FC = () => {
         <div className='items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16'>
           <div className='text-gray-500 sm:text-lg dark:text-gray-400'>
             <h2 className='mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-black'>
-              Junta tus productos en una misma plataforma y ahorra masivamente
+              Junta tus productos en una misma plataforma y{' '}
+              <span className='relative'>
+                ahorra
+                <span className='absolute bottom-0 left-0 w-full h-1 bg-primary/60'></span>
+              </span>{' '}
+              masivamente
             </h2>
-            <p className='mb-8 font-light lg:text-xl'>
+
+            <p className='mb-8 font-regular lg:text-l'>
               Te enviaremos toda la información y análisis previo a la compra, para que puedas tomar una decision
               inteligente y cuidando tu economía.
             </p>
             <ul role='list' className='pt-8 space-y-5 border-t border-gray-200 my-7 dark:border-gray-700'>
               <li className='flex space-x-3'>
                 <svg
-                  className='flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400'
+                  className='flex-shrink-0 w-5 h-5 text-primary dark:text-primary'
                   fill='currentColor'
                   viewBox='0 0 20 20'
                   xmlns='http://www.w3.org/2000/svg'
@@ -28,11 +34,11 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight  font-light'>Insertar el link del producto</span>
+                <span className='text-base font-medium leading-tight font-light'>Insertar el link del producto</span>
               </li>
               <li className='flex space-x-3'>
                 <svg
-                  className='flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400'
+                  className='flex-shrink-0 w-5 h-5 text-primary dark:text-primary'
                   fill='currentColor'
                   viewBox='0 0 20 20'
                   xmlns='http://www.w3.org/2000/svg'
@@ -47,7 +53,7 @@ const StepsComponent: React.FC = () => {
               </li>
               <li className='flex space-x-3'>
                 <svg
-                  className='flex-shrink-0 w-5 h-5 text-purple-500 dark:text-purple-400'
+                  className='flex-shrink-0 w-5 h-5 text-primary0 dark:text-primary'
                   fill='currentColor'
                   viewBox='0 0 20 20'
                   xmlns='http://www.w3.org/2000/svg'
@@ -80,9 +86,13 @@ const StepsComponent: React.FC = () => {
           />
           <div className='text-gray-500 sm:text-lg dark:text-gray-400'>
             <h2 className='mb-4 text-3xl font-extrabold tracking-tight text-black'>
-              La prioridad es cuidar tu bolsillo
+              La prioridad es{' '}
+              <span className='relative'>
+                cuidar tu bolsillo
+                <span className='absolute bottom-0 left-0 w-full h-1 bg-primary/60'></span>
+              </span>
             </h2>
-            <p className='mb-8 font-light lg:text-xl'>
+            <p className='mb-8 font-regular lg:text-l'>
               Sabemos la importancia y el impacto que puede generar el ahorro a largo plazo, por eso juntamos una serie
               de servicios para maximizarlo.
             </p>

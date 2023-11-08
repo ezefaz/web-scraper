@@ -22,7 +22,7 @@ async function handlerUser(req: any, res: NextApiResponse) {
         data: newUser,
       });
     } catch (error: any) {
-      console.log('Error creating user:', error);
+      console.log('[USER_POST], Error creating user:', error);
       throw new Error('Server Error');
     }
   } else {

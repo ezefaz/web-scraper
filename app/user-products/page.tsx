@@ -1,5 +1,5 @@
-import React from 'react';
-import { getAllProducts, getCurrentUser, getUserProducts } from '@/lib/actions';
+import React, { useState } from 'react';
+import { getCurrentUser, getUserProducts } from '@/lib/actions';
 import {
   Badge,
   Card,
@@ -11,15 +11,17 @@ import {
   TableHeaderCell,
   TableRow,
   Text,
+  TextInput,
   Title,
 } from '@tremor/react';
 import { formatNumber } from '@/lib/utils';
 import { Product } from '@/types';
 import Removal from '@/components/Removal';
+import Search from '@/components/Search';
 
 const page = async () => {
   const userProducts = await getUserProducts();
-  const allProducts: any = await getAllProducts();
+  // const allProducts: any = await getAllProducts();
   const user = await getCurrentUser();
 
   // function getProductUrl() {
@@ -32,22 +34,33 @@ const page = async () => {
 
   // const productsUrl = getProductUrl();
 
+  const limitWords = (title: string, limit: number) => {
+    const words = title.split(' ');
+    if (words.length > limit) {
+      return words.slice(0, limit).join(' ') + '...';
+    }
+    return title;
+  };
+
   return (
     <>
       {!user ? (
         <div className='flex justify-center items-center p-20 mt-20'>
           <Card>
-            <Title>Please log in to access this page.</Title>
+            <Title>Porfavor inicie sesión para ingresar en esta página.</Title>
           </Card>
         </div>
       ) : (
         <div className='flex justify-center items-center p-20 mt-20'>
           <Card className='w-full max-w-4xl'>
             <Title className='mb-4'>Listado de Productos del Usuario {user ? user.name : ''}</Title>
+            <div className='flex justify-end '>
+              <Search />
+            </div>
             <Table className='w-full'>
               <TableHead>
                 <TableRow>
-                  <TableHeaderCell></TableHeaderCell>
+                  <TableHeaderCell />
                   <TableHeaderCell>Título</TableHeaderCell>
                   <TableHeaderCell>Precio</TableHeaderCell>
                   <TableHeaderCell>Precio USD</TableHeaderCell>
@@ -63,7 +76,7 @@ const page = async () => {
                     </TableCell>
                     <TableCell>
                       <a className='text-blue-500 hover:underline' href={`/products/${product._id}`}>
-                        {product.title}
+                        {limitWords(product.title, 8)}
                       </a>
                     </TableCell>
                     <TableCell>
@@ -75,7 +88,11 @@ const page = async () => {
                       )}`}</Text>
                     </TableCell>
                     <TableCell>
-                      <Text>{product.stockAvailable}</Text>
+                      <Text>
+                        {product.stockAvailable == '1'
+                          ? `${product.stockAvailable} disponible`
+                          : product.stockAvailable}
+                      </Text>
                     </TableCell>
                     <TableCell>
                       {/* <Badge color='emerald' icon={StatusOnlineIcon}>

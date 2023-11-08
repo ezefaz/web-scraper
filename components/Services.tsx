@@ -26,9 +26,9 @@ const Services = () => {
           <div className='w-full px-4'>
             <div className='mx-auto mb-12 max-w-[510px] text-center lg:mb-20'>
               <span className='block mb-2 text-lg font-semibold text-primary'>Servicios</span>
-              <h2 className='mb-4 text-3xl font-bold text-dark sm:text-4xl md:text-[40px]'>
+              <h1 className='mb-4 text-3xl font-bold head-text sm:text-4xl md:text-[40px]'>
                 Te ayudamos a ahorrar de la siguiente manera:
-              </h2>
+              </h1>
             </div>
           </div>
         </div>
@@ -46,8 +46,8 @@ const Services = () => {
             }
           />
           <ServiceCard
-            title='Ahorro a largo plazo'
-            details='Puedes seguir la línea temporal de precios de tus productos favoritos y hacer análisis de los momentos oportunos para comprar.'
+            title='Comparación de Precios con Productos Similares'
+            details='A partir del producto seleccionado, te ofrecemos una comparación de ese mismo producto en otros mercados, de manera que puedas comprar el producto mas barato del mercado.'
             icon={
               <svg width='39' height='22' viewBox='0 0 39 22' fill='none' xmlns='http://www.w3.org/2000/svg'>
                 <path

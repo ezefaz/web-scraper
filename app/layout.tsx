@@ -15,7 +15,7 @@ const spaceGrotesk = Space_Grotesk({
 
 export const metadata: Metadata = {
   title: 'SaveMelin',
-  description: 'Seguí precios de tus productos favoritos y ahorrá dinero en tus compras online.',
+  description: 'Ahorra dinero en la compra de tus productos favoritos.',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

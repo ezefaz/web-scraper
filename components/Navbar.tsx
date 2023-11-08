@@ -25,7 +25,7 @@ const Navbar = ({ session }: any) => {
           <Link href='/' className='flex items-center gap-1'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
-          {!nav && (
+          {/* {!nav && (
             <div className='lg:flex items-center gap-5 text-black hidden lg:block'>
               <a href='#how-it-works' className='hover:underline'>
                 Funcionamiento
@@ -37,7 +37,7 @@ const Navbar = ({ session }: any) => {
                 FAQs
               </a>
             </div>
-          )}
+          )} */}
           <div>
             <ul
               className={

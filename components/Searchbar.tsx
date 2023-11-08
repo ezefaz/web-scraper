@@ -4,6 +4,8 @@ import { scrapeAndStoreProducts } from '@/lib/actions';
 import { FormEvent, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { SyncLoader } from 'react-spinners';
+import { AiOutlineSearch } from 'react-icons/ai';
 
 const Searchbar = () => {
   const [searchPrompt, setSearchPrompt] = useState('');
@@ -42,17 +44,19 @@ const Searchbar = () => {
   };
 
   return (
-    <form className='flex flex-wrap gap-4 mt-12' onSubmit={handleSubmit}>
-      <input
-        type='text'
-        value={searchPrompt}
-        onChange={(e) => setSearchPrompt(e.target.value)}
-        placeholder='Ingrese link del producto y comience a seguirlo!'
-        className='searchbar-input'
-      />
-      <button type='submit' className='searchbar-btn md:w-auto px-4 py-2' disabled={searchPrompt === ''}>
-        {isLoading ? 'Buscando...' : 'Buscar'}
-      </button>
+    <form className='flex flex-wrap gap-4 mt-12 sm:flex-col' onSubmit={handleSubmit}>
+      <div className='flex items-center'>
+        <input
+          type='text'
+          value={searchPrompt}
+          onChange={(e) => setSearchPrompt(e.target.value)}
+          placeholder='Ingrese link del producto y comience a seguirlo!'
+          className='searchbar-input'
+        />
+        <button type='submit' className='searchbar-btn ml-3 md:w-auto px-4 py-2 ' disabled={searchPrompt === ''}>
+          {isLoading ? <SyncLoader color='white' size={3} /> : <AiOutlineSearch size={20} />}
+        </button>
+      </div>
     </form>
   );
 };

@@ -2,13 +2,16 @@ import HeroCarousel from '@/components/HeroCarousel';
 import Searchbar from '@/components/Searchbar';
 import Image from 'next/image';
 
-import { getAllProducts } from '@/lib/actions';
+import { getAllProducts, getCurrentUser, getUserProducts } from '@/lib/actions';
 import ProductCard from '@/components/ProductCard';
 import Services from '@/components/Services';
 import StepsComponent from '@/components/Steps';
+import { Product } from '@/types';
 
 const Home = async () => {
   const allProducts = await getAllProducts();
+  const user = await getCurrentUser();
+  const userProducts = await getUserProducts();
 
   return (
     <>
@@ -25,12 +28,19 @@ const Home = async () => {
       >
         <div className='flex justify-center p-5 max-xl:flex-col gap-16'>
           <div>
-            <div className='small-text'>
-              Empieza a ahorrar de manera gratuita y eficaz.
+            <div className='small-text mb-4'>
+              <p className='text-muted-foreground text-xl'>Tu plataforma ideal para ahorrar dinero a largo plazo.</p>
               {/* <Image src='/assets/icons/arrow-right.svg' alt='arrow-right' width={16} height={16} /> */}
             </div>
             <div className='text-center'>
-              <h1 className='head-text'>Optimiza tus Compras</h1>
+              <h1 className='text-6xl head-text'>
+                <span className='relative'>
+                  Optimiza
+                  <span className='absolute bottom-0 left-0 w-full h-2 bg-primary'></span>
+                </span>{' '}
+                tus Compras
+              </h1>
+
               <h1 className='head-text'>
                 con Save<span className='text-primary'>Melin</span>
               </h1>
@@ -48,12 +58,12 @@ const Home = async () => {
       <Services />
       <StepsComponent />
       <section className='trending-section'>
-        <h2 className='section-text'>Trending 🔥</h2>
+        <h2 className='section-text'>{user ? 'Tus Productos' : 'Trending 🔥'}</h2>
         <div className='flex flex-wrap gap-x-8 gap-y-16'>
-          {/* {allProducts?.slice(0, 8).map((product) => ( */}
-          {allProducts?.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
+          {user
+            ? userProducts &&
+              userProducts.map((product: Product) => <ProductCard key={product._id} product={product} />)
+            : allProducts && allProducts.map((product: Product) => <ProductCard key={product._id} product={product} />)}
         </div>
       </section>
     </>

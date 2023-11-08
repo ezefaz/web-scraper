@@ -20,7 +20,7 @@ const Removal = ({ product }: any) => {
 
   return (
     <div>
-      <Icon icon={IoMdRemoveCircleOutline} variant='solid' tooltip='Delete Product' onClick={handleOnClick} />
+      <Icon icon={IoMdRemoveCircleOutline} variant='solid' tooltip='Eliminar' onClick={handleOnClick} />
     </div>
   );
 };
