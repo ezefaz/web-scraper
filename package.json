@@ -9,12 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/localizations": "^1.26.10",
+    "@clerk/nextjs": "^4.27.2",
     "@faker-js/faker": "^8.2.0",
     "@headlessui/react": "^1.7.17",
     "@tremor/react": "^3.8.2",
     "@vercel/analytics": "^1.1.1",
     "axios": "^1.5.1",
     "cheerio": "^1.0.0-rc.12",
+    "encoding": "^0.1.13",
     "mongoose": "^7.6.0",
     "next": "latest",
     "next-auth": "^4.24.3",
@@ -26,9 +29,11 @@
     "react-responsive-carousel": "^3.2.23",
     "react-spinners": "^0.13.8",
     "supports-color": "^8.1.1",
+    "svix": "^1.14.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.35",
     "@types/node": "latest",
     "@types/nodemailer": "^6.4.11",
     "@types/react": "latest",
