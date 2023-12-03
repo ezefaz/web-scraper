@@ -217,18 +217,16 @@ export async function searchUserProducts(searchTerm: string) {
 			product.title.toLowerCase().includes(searchTerm.toLowerCase())
 		);
 
-		const filteredProductsWithId = filteredProducts.map((product: any) => ({
-			title: product.title,
-			id: product.id,
-			currency: product.currency,
-			currentPrice: product.currentPrice,
-			currentDolar: product.currentDolar.value,
-			stockAvailable: product.stockAvailable,
-		}));
+		// const filteredProductsWithId = filteredProducts.map((product: any) => ({
+		// 	title: product.title,
+		// 	id: product.id,
+		// 	currency: product.currency,
+		// 	currentPrice: product.currentPrice,
+		// 	currentDolar: product.currentDolar.value,
+		// 	stockAvailable: product.stockAvailable,
+		// }));
 
-		console.log(filteredProductsWithId);
-
-		return filteredProductsWithId;
+		return filteredProducts;
 	} catch (error: any) {
 		throw new Error(`Failed to search user products: ${error.message}`);
 	}

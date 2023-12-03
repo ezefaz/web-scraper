@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
@@ -15,9 +15,10 @@ const navIcons = [
 
 const Navbar = ({ session }: any) => {
 	const [nav, setNav] = useState(false);
-	const { userId } = useAuth();
+	const [userData, setUserData] = useState(null);
 	const { user } = useUser();
 
+	// const { userId } = useAuth();
 	const handleNav = () => {
 		setNav(!nav);
 	};
@@ -79,12 +80,13 @@ const Navbar = ({ session }: any) => {
 							</Link>
 						</ul>
 
-						{!user && !userId ? (
+						{!user ? (
 							<div className='container mx-auto'>
 								<div className='float-right'>
 									<a
 										href='/sign-up'
-										className='bg-primary text-white hover:text-gray-300 hover:bg-gray-700 rounded-md py-2 px-4 transition duration-300 ease-in-out'>
+										className='bg-primary text-white hover:text-gray-300 hover:bg-gray-700 rounded-md py-2 px-4 transition duration-300 ease-in-out'
+										suppressHydrationWarning={true}>
 										Comenzar Ahora
 									</a>
 								</div>
