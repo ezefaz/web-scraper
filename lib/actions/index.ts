@@ -114,7 +114,7 @@ export async function getProductById(productId: string) {
 
 		return product;
 	} catch (error) {
-		console.log(error);
+		console.log("[GET_PRODUCT_ID]", error);
 	}
 }
 
@@ -255,7 +255,7 @@ export async function addUserEmailToProduct(
 	userEmail: string
 ) {
 	try {
-		const product = await Product.findById(productId);
+		const product = await getProductById(productId);
 
 		if (!product) return;
 
@@ -263,12 +263,16 @@ export async function addUserEmailToProduct(
 			(user: User) => user.email === userEmail
 		);
 
+		console.log("EXISTE", userExists);
+
 		if (!userExists) {
 			product.users.push({ email: userEmail });
 
 			await product.save();
+			console.log("USUARIO DE PRODUCTO", product.users);
 
 			const emailContent = await generateEmailBody(product, "WELCOME");
+			console.log("email contenttt", emailContent);
 
 			await sendEmail(emailContent, [userEmail]);
 		}
