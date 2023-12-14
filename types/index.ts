@@ -15,7 +15,7 @@ export type CurrentDolar = {
 	date: Date;
 };
 
-export type User = {
+export type UserType = {
 	id: string;
 	name: string;
 	email: string;
@@ -47,7 +47,7 @@ export type ProductType = {
 	stars: number;
 	stockAvailable?: string;
 	isOutOfStock: Boolean;
-	users?: User[];
+	users?: UserType[];
 };
 
 export type NotificationType =

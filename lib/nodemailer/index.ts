@@ -86,9 +86,6 @@ export const sendEmail = async (
 	emailContent: EmailContent,
 	sendTo: string[]
 ) => {
-	console.log("ENTRA ACA", sendTo);
-	console.log("Contenido", emailContent);
-
 	const transporter = nodemailer.createTransport({
 		pool: true,
 		service: "hotmail",

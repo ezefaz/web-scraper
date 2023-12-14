@@ -1,19 +1,21 @@
 "use client";
 
 import React, { FormEvent, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { TextInput } from "@tremor/react";
 import { AiOutlineSearch } from "react-icons/ai";
-import { getUserProducts, searchUserProducts } from "@/lib/actions";
 import { toast } from "react-hot-toast";
 import { SelectMenu } from "./Select";
 
 import { useRouter } from "next/navigation";
 import { ProductType } from "@/types";
+import { getUserProducts, searchUserProducts } from "@/lib/actions";
 
 const Search = () => {
 	const [searchTerm, setSearchTerm] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
+	const searchParams = useSearchParams();
 
 	const onSearch = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
@@ -25,7 +27,9 @@ const Search = () => {
 				searchTerm
 			);
 
-			console.log("buscado", searchedProduct);
+			const params = new URLSearchParams(searchParams);
+			params.set("search", searchTerm);
+			router.push(`?${params.toString()}`);
 		} catch (error) {
 			toast.error("No se ha podido buscar el producto.");
 		} finally {

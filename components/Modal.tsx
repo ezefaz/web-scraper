@@ -20,12 +20,10 @@ const Modal = ({ productId }: Props) => {
 	let [isSubmitting, setIsSubmitting] = useState(false);
 	let [email, setEmail] = useState(userEmail ? userEmail : "");
 
-	console.log("ENTRA AQUI", email);
 	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 
 		setIsSubmitting(true);
-		console.log("ENTRA AQUI", email);
 
 		await addUserEmailToProduct(productId, email);
 

@@ -46,8 +46,6 @@ async function handler(request: Request) {
 	let evt: any | null = null;
 
 	try {
-		console.log("ENTRA ACA MIERDA");
-
 		evt = wh.verify(
 			JSON.stringify(payload),
 			heads as IncomingHttpHeaders & WebhookRequiredHeaders
@@ -66,11 +64,7 @@ async function handler(request: Request) {
 				email: attributes.email_addresses[0]?.email_address,
 			});
 
-			console.log("ENCUENTRA O NO", existingUser);
-
 			if (existingUser) {
-				console.log("ENTRA EN EXISTENTE");
-
 				existingUser.name = attributes.first_name;
 				existingUser.email =
 					attributes.email_addresses[0]?.email_address || existingUser.email;
@@ -83,7 +77,6 @@ async function handler(request: Request) {
 					data: existingUser,
 				});
 			} else {
-				console.log("creando al usuario -->");
 				const newUser = new User({
 					name: attributes.first_name,
 					email: attributes.email_addresses[0]?.email_address,
@@ -91,8 +84,6 @@ async function handler(request: Request) {
 				});
 
 				await newUser.save();
-
-				console.log("USUARIO CREADo al usuario -->", newUser);
 
 				return NextResponse.json({
 					message: "El usuario fue creado con éxito.",

@@ -1,6 +1,6 @@
 "use server";
 
-import { CurrentDolar, ProductType, User } from "@/types";
+import { CurrentDolar, ProductType, UserType } from "@/types";
 import Product from "../models/product.model";
 import { connectToDb } from "../mongoose";
 import { scrapeMLProduct } from "../scraper";
@@ -12,6 +12,7 @@ import { currentUser } from "@clerk/nextjs";
 import UserSchema from "../models/user.model";
 import { permanentRedirect, redirect } from "next/navigation";
 import { getAuth } from "@clerk/nextjs/server";
+import User from "../models/user.model";
 
 export async function scrapeAndStoreProducts(productUrl: string) {
 	if (!productUrl) return;
@@ -134,26 +135,6 @@ export async function deleteProduct(productId: string) {
 	}
 }
 
-export async function removeProductFromUser(productId: string) {
-	try {
-		await connectToDb();
-
-		const updatedUser = await UserSchema.findOneAndUpdate(
-			{ products: { $elemMatch: { _id: productId } } },
-			{ $pull: { products: { _id: productId } } },
-			{ new: true }
-		);
-
-		if (!updatedUser) {
-			throw new Error("User not found or product not in the products array");
-		}
-
-		return updatedUser;
-	} catch (error: any) {
-		throw new Error(`Failed to remove product from user: ${error.message}`);
-	}
-}
-
 export async function getAllProducts() {
 	try {
 		connectToDb();
@@ -166,19 +147,9 @@ export async function getAllProducts() {
 	}
 }
 
-// export async function getUserProducts() {
-// 	try {
-// 		const user = await getCurrentUser();
-
-// 		if (user?.products) return user.products;
-// 	} catch (error) {
-// 		console.log("El usuario no tiene productos");
-// 	}
-// }
-
 export async function getUserProducts() {
 	try {
-		const user: User = await getCurrentUser();
+		const user: UserType = await getCurrentUser();
 
 		const products = await getAllProducts();
 		const userProducts: ProductType[] = [];
@@ -195,7 +166,7 @@ export async function getUserProducts() {
 			}
 		}
 
-		console.log("User's Products:", userProducts);
+		// console.log("User's Products:", userProducts);
 
 		return userProducts;
 	} catch (error) {
@@ -205,7 +176,7 @@ export async function getUserProducts() {
 
 export async function searchUserProducts(searchTerm: string) {
 	try {
-		const user: User = await getCurrentUser();
+		const user: UserType = await getCurrentUser();
 
 		if (!user) throw new Error("Usuario no encontrado");
 
@@ -216,15 +187,6 @@ export async function searchUserProducts(searchTerm: string) {
 		const filteredProducts = userProducts.filter((product: any) =>
 			product.title.toLowerCase().includes(searchTerm.toLowerCase())
 		);
-
-		// const filteredProductsWithId = filteredProducts.map((product: any) => ({
-		// 	title: product.title,
-		// 	id: product.id,
-		// 	currency: product.currency,
-		// 	currentPrice: product.currentPrice,
-		// 	currentDolar: product.currentDolar.value,
-		// 	stockAvailable: product.stockAvailable,
-		// }));
 
 		return filteredProducts;
 	} catch (error: any) {
@@ -260,19 +222,15 @@ export async function addUserEmailToProduct(
 		if (!product) return;
 
 		const userExists = product.users.some(
-			(user: User) => user.email === userEmail
+			(user: UserType) => user.email === userEmail
 		);
-
-		console.log("EXISTE", userExists);
 
 		if (!userExists) {
 			product.users.push({ email: userEmail });
 
 			await product.save();
-			console.log("USUARIO DE PRODUCTO", product.users);
 
 			const emailContent = await generateEmailBody(product, "WELCOME");
-			console.log("email contenttt", emailContent);
 
 			await sendEmail(emailContent, [userEmail]);
 		}

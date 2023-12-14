@@ -22,19 +22,7 @@ import { currentUser } from "@clerk/nextjs";
 
 const page = async () => {
 	const userProducts = await getUserProducts();
-	// const allProducts: any = await getAllProducts();
-	// const user = await getCurrentUser();
 	const user = await currentUser();
-
-	// function getProductUrl() {
-	//   const matchingProducts = allProducts.filter((product: Product) => {
-	//     return userProducts.some((userProduct: Product) => userProduct.url === product.url);
-	//   });
-
-	//   const matchingProductIds = matchingProducts.map((product: Product) => product._id);
-	// }
-
-	// const productsUrl = getProductUrl();
 
 	const limitWords = (title: string, limit: number) => {
 		const words = title.split(" ");
@@ -49,7 +37,13 @@ const page = async () => {
 			{!user ? (
 				<div className='flex justify-center items-center p-20 mt-20'>
 					<Card>
-						<Title>Porfavor inicie sesión para ingresar en esta página.</Title>
+						<Title>Porfavor inicie sesion para ingresar a esta página</Title>
+					</Card>
+				</div>
+			) : !userProducts || userProducts.length === 0 ? (
+				<div className='flex justify-center items-center p-20 mt-20'>
+					<Card>
+						<Title>No hay ningún producto</Title>
 					</Card>
 				</div>
 			) : (
