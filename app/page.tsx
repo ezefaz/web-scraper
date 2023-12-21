@@ -37,7 +37,7 @@ const Home = async () => {
 							<h1 className='text-6xl head-text'>
 								<span className='relative'>
 									Optimiza
-									<span className='absolute bottom-0 left-0 w-full h-2 bg-primary'></span>
+									<span className='absolute bottom-0 left-0 w-full h-2 '></span>
 								</span>{" "}
 								tus Compras
 							</h1>

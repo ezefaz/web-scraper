@@ -221,21 +221,20 @@ export async function addUserEmailToProduct(
 
 		if (!product) return;
 
-		const userExists = product.users.some(
+		const userExists: boolean = product.users.some(
 			(user: UserType) => user.email === userEmail
 		);
 
 		if (!userExists) {
-			product.users.push({ email: userEmail });
+			product.users.push({ email: userEmail, isFollowing: true });
 
 			await product.save();
 
 			const emailContent = await generateEmailBody(product, "WELCOME");
-
 			await sendEmail(emailContent, [userEmail]);
 		}
 	} catch (error) {
-		console.log(error);
+		console.log("[ADD_USER_EMAIL_TO_PRODUCT]", error);
 	}
 }
 

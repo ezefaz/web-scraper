@@ -10,7 +10,6 @@ import Product from "@/lib/models/product.model";
 import { scrapeMLProduct } from "@/lib/scraper";
 import { generateEmailBody, sendEmail } from "@/lib/nodemailer";
 import { CurrentDolar, PriceHistoryItem } from "@/types";
-import { scrapeDolarValue } from "@/lib/scraper/dolar";
 
 export const maxDuration = 10; // This function can run for a maximum of 300 seconds
 export const dynamic = "force-dynamic";
@@ -75,6 +74,8 @@ export async function GET(request: Request) {
 					}
 				});
 
+				const existingUsers = currentProduct.users;
+
 				const product = {
 					...scrapedProduct,
 					priceHistory: updatedPriceHistory,
@@ -83,6 +84,7 @@ export async function GET(request: Request) {
 					averagePrice: getAveragePrice(updatedPriceHistory),
 					currentDolar: updatedCurrentDolar,
 					dolarHistory: filteredDolarHistory,
+					users: existingUsers,
 				};
 
 				const updatedProduct = await Product.findOneAndUpdate(
@@ -98,21 +100,34 @@ export async function GET(request: Request) {
 					currentProduct
 				);
 
-				if (emailNotifType && updatedProduct.users.length > 0) {
+				console.log(
+					"PRODUCTO USUARIOS normal",
+					emailNotifType && currentProduct.users.length > 0
+				);
+				if (
+					(emailNotifType && currentProduct.users.length > 0) ||
+					(emailNotifType && scrapedProduct.users.length > 0)
+				) {
+					console.log("ENTRA EN VALIDACION", currentProduct.users);
+
 					const productInfo = {
 						title: updatedProduct.title,
 						url: updatedProduct.url,
 					};
-					// Construct emailContent
+
 					const emailContent = await generateEmailBody(
 						productInfo,
 						emailNotifType
 					);
-					// Get array of user emails
-					const userEmails = updatedProduct.users.map(
-						(user: any) => user.email
-					);
-					// Send email notification
+
+					const userEmails = scrapedProduct.users
+						? scrapedProduct.users.map((user: any) => user.email)
+						: currentProduct.users.map((user: any) => user.email);
+
+					console.log("CORREO DE USUARIOS", userEmails);
+
+					if (!userEmails) return;
+
 					await sendEmail(emailContent, userEmails);
 				}
 

@@ -48,6 +48,10 @@ const productSchema = new mongoose.Schema(
 				image: {
 					type: String,
 				},
+				isFollowing: {
+					type: Boolean,
+					default: false,
+				},
 				products: [
 					{
 						url: { type: String, required: true, unique: true },
