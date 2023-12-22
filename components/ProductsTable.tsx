@@ -25,8 +25,8 @@ interface UserProduct {
 	currentDolarValue: number;
 	currency: string;
 	stock: string;
-	category: string;
 	isFollowing: boolean;
+	category: string;
 }
 
 interface ProductTableProps {
@@ -43,8 +43,6 @@ const limitWords = (title: string, limit: number) => {
 };
 
 const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
-	console.log("SEGUIMIENTO", userProducts);
-
 	return (
 		<div className='flex w-full justify-start items-center p-20 mt-20'>
 			<Card className='w-full max-w-4xl p-10'>

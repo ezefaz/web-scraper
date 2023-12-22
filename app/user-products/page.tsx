@@ -26,7 +26,7 @@ const page = async () => {
 	const userProducts = await getUserProducts();
 	const user = await currentUser();
 
-	const extractedData = userProducts?.map((product: any) => ({
+	const extractedData: any = userProducts?.map((product: any) => ({
 		id: product._id,
 		title: product.title,
 		currentPrice: product.currentPrice,
