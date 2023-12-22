@@ -7,7 +7,11 @@ import PriceInfoCard from "@/components/PriceInfoCard";
 import ProductCard from "@/components/ProductCard";
 import BarChart from "@/components/charts/BarChart";
 
-import { getProductById, getSimilarProducts } from "@/lib/actions";
+import {
+	getCurrentUser,
+	getProductById,
+	getSimilarProducts,
+} from "@/lib/actions";
 import {
 	formatNumber,
 	formatUSD,
@@ -16,7 +20,7 @@ import {
 	getMonthlyData,
 	getWeeklyData,
 } from "@/lib/utils";
-import { DolarHistoryItem, ProductType } from "@/types";
+import { ProductType } from "@/types";
 import DolarBasedChart from "@/components/charts/LineChart";
 import { Card } from "@tremor/react";
 
@@ -26,6 +30,13 @@ type Props = {
 
 const ProductDetails = async ({ params: { id } }: Props) => {
 	const product: ProductType = await getProductById(id);
+	const currentUser = await getCurrentUser();
+
+	const isFollowing = product.users?.some(
+		(user) => user.email === currentUser.email && user.isFollowing
+	);
+
+	console.log(isFollowing);
 
 	const { currentDolar, priceHistory, currentPrice, dolarHistory } = product;
 
@@ -255,8 +266,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 							/>
 						</div>
 					</div>
-
-					<Modal productId={id} />
+					{!isFollowing && <Modal productId={id} />}
 				</div>
 			</div>
 			<div className='flex flex-col lg:flex-row gap-5 m-auto'>

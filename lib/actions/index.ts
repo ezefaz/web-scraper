@@ -129,7 +129,7 @@ export async function deleteProduct(productId: string) {
 			throw new Error("Product not found");
 		}
 
-		return deletedProduct;
+		return deletedProduct.id; // Return the deleted product's id
 	} catch (error: any) {
 		throw new Error(`Failed to delete product: ${error.message}`);
 	}

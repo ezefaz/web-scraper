@@ -6,19 +6,23 @@ import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { deleteProduct } from "@/lib/actions";
 import toast from "react-hot-toast";
 
-const Removal = ({ product }: any) => {
+interface RemovalProps {
+	productId: string;
+}
+
+const Removal = ({ productId }: RemovalProps) => {
 	const handleDeleteProduct = async () => {
 		try {
-			await deleteProduct(product);
+			const deletedProductId = await deleteProduct(productId);
 
-			toast.success("Producto eliminado correctamente.");
+			if (deletedProductId) {
+				toast.success("Producto eliminado correctamente.");
+			} else {
+				console.error("Product ID not returned after deletion.");
+			}
 		} catch (error) {
 			console.error("Error deleting product: ", error);
 		}
-	};
-
-	const handleOnClick = () => {
-		handleDeleteProduct();
 	};
 
 	return (
@@ -27,7 +31,7 @@ const Removal = ({ product }: any) => {
 				icon={IoMdRemoveCircleOutline}
 				variant='solid'
 				tooltip='Eliminar'
-				onClick={handleOnClick}
+				onClick={() => handleDeleteProduct()}
 			/>
 		</div>
 	);

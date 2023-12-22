@@ -23,6 +23,7 @@ export type UserType = {
 	products?: ProductType[];
 	productsFavoritos?: ProductType[];
 	subscription: string;
+	isFollowing?: boolean;
 };
 
 export type ProductType = {

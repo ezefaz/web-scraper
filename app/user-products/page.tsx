@@ -19,7 +19,6 @@ import { ProductType } from "@/types";
 import Removal from "@/components/Removal";
 import Search from "@/components/Search";
 import { currentUser } from "@clerk/nextjs";
-import UserTable from "@/components/UserTable";
 import ProductsTable from "@/components/ProductsTable";
 
 const page = async () => {

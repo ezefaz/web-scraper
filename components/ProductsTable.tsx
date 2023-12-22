@@ -2,6 +2,7 @@
 
 import {
 	Badge,
+	BadgeDelta,
 	Card,
 	Icon,
 	Table,
@@ -17,6 +18,7 @@ import {
 import Search from "./Search";
 import { ProductType } from "@/types";
 import { formatNumber } from "@/lib/utils";
+import Removal from "./Removal";
 
 interface UserProduct {
 	id: string;
@@ -44,12 +46,12 @@ const limitWords = (title: string, limit: number) => {
 
 const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
 	return (
-		<div className='flex w-full justify-start items-center p-20 mt-20'>
-			<Card className='w-full max-w-4xl p-10'>
+		<div className='flex w-full justify-center items-center p-20 mt-20'>
+			<Card className='w-full  p-10'>
 				<Title className='mb-4'>Listado de Productos del Usuario {user}</Title>
-				<div className='flex justify-end'>
+				{/* <div className='flex justify-end'>
 					<Search />
-				</div>
+				</div> */}
 				<Table className='w-full'>
 					<TableHead>
 						<TableRow>
@@ -68,7 +70,7 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
 								key={product.id}
 								className='hover:bg-gray-50 cursor-pointer'>
 								<TableCell>
-									{/* <Removal product={product._id?.toString()} /> */}
+									<Removal productId={product.id} />
 								</TableCell>
 								<TableCell>
 									<a
@@ -76,7 +78,7 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
 										href={`/products/${product.id}`}
 										target='_blank'
 										rel='noopener noreferrer'>
-										{limitWords(product.title, 6)}
+										{limitWords(product.title, 10)}
 									</a>
 								</TableCell>
 								<TableCell>{product.category}</TableCell>
@@ -98,9 +100,16 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
 									)}`}</Text>
 								</TableCell>
 								<TableCell>
-									<Text>
+									{/* <Text>
 										{product.isFollowing ? "Siguiendo" : "Sin Seguimiento"}
-									</Text>
+									</Text> */}
+									<TableCell className='text-right'>
+										<BadgeDelta
+											deltaType={product.isFollowing ? "increase" : "unchanged"}
+											size='xs'>
+											{product.isFollowing ? "Siguiendo" : "Sin Seguimiento"}
+										</BadgeDelta>
+									</TableCell>
 								</TableCell>
 								<TableCell>
 									{/* <Badge color='emerald' icon={StatusOnlineIcon}>
