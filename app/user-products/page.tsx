@@ -20,6 +20,7 @@ import Removal from "@/components/Removal";
 import Search from "@/components/Search";
 import { currentUser } from "@clerk/nextjs";
 import ProductsTable from "@/components/ProductsTable";
+import ScraperButton from "@/components/ScraperButton";
 
 const page = async () => {
 	const userProducts = await getUserProducts();
@@ -56,6 +57,7 @@ const page = async () => {
 						user={`${user.firstName} ${user.lastName}`}
 						userProducts={extractedData}
 					/>
+					<ScraperButton productTitle={userProducts[0].title} />
 				</>
 			)}
 		</>

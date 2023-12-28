@@ -32,11 +32,11 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 	const product: ProductType = await getProductById(id);
 	const currentUser = await getCurrentUser();
 
-	const isFollowing = product.users?.some(
-		(user) => user.email === currentUser.email && user.isFollowing
-	);
-
-	console.log(isFollowing);
+	const isFollowing = currentUser
+		? product.users?.some(
+				(user) => user.email === currentUser.email && user.isFollowing
+		  )
+		: null;
 
 	const { currentDolar, priceHistory, currentPrice, dolarHistory } = product;
 
@@ -266,7 +266,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 							/>
 						</div>
 					</div>
-					{!isFollowing && <Modal productId={id} />}
+					{currentUser && !isFollowing && <Modal productId={id} />}
 				</div>
 			</div>
 			<div className='flex flex-col lg:flex-row gap-5 m-auto'>
