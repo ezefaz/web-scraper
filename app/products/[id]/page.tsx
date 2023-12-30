@@ -23,6 +23,8 @@ import {
 import { ProductType } from "@/types";
 import DolarBasedChart from "@/components/charts/LineChart";
 import { Card } from "@tremor/react";
+import PriceComparisson from "@/components/PriceComparisson";
+import ScraperButton from "@/components/ScraperButton";
 
 type Props = {
 	params: { id: string };
@@ -136,6 +138,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 						/>
 					</Card>
 				</div>
+
 				<div className='flex-1 flex flex-col'>
 					<div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
 						<div className='flex flex-col gap-3'>
@@ -216,7 +219,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 								<div className='product-stock'>
 									{/* <Image src='/assets/icons/comment.svg' alt='comment' width={16} height={16} /> */}
 									<p className='text-sm text-secondary font-semibold'>
-										{product.stockAvailable || "0"}
+										{product.stockAvailable == "1"
+											? `${product.stockAvailable} disponible`
+											: product.stockAvailable}
 									</p>
 								</div>
 							</div>
@@ -225,7 +230,33 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 								los compradores recomiendan esto.
 							</p>
 						</div>
+						<div className='flex flex-col gap-16'>
+							<div className='flex flex-col gap-5'>
+								{product.description.length > 2 && (
+									<>
+										<h3 className='text-2xl text-secondary font-semibold'>
+											Descripción
+										</h3>
+										<div className='flex flex-col gap-4'>
+											{product?.description?.split("/n")}
+										</div>
+									</>
+								)}
+							</div>
+							<button className='btn w-fit mx-auto flex items-center justify-center gap-3 min-w-[200px]'>
+								<Image
+									src='/assets/icons/bag.svg'
+									alt='check'
+									width={22}
+									height={22}
+								/>
+								<Link href='/' className='text-base'>
+									Comprar Ahora
+								</Link>
+							</button>
+						</div>
 					</div>
+
 					<div className='my-7 w-full flex flex-col-2 gap-5'>
 						<div className='flex m-auto gap-6 flex-wrap'>
 							<PriceInfoCard
@@ -266,6 +297,13 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 							/>
 						</div>
 					</div>
+					<div className='flex gap-28 xl:flex-row flex-row h-[max-content]'>
+						<ScraperButton
+							productTitle={product.title}
+							productPrice={product.currentPrice}
+						/>
+					</div>
+
 					{currentUser && !isFollowing && <Modal productId={id} />}
 				</div>
 			</div>
@@ -291,26 +329,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 						monthlyData={dolarMonthlyData}
 					/>
 				</div>
-			</div>
-			<div className='flex flex-col gap-16'>
-				<div className='flex flex-col gap-5'>
-					{product.description.length > 2 && (
-						<>
-							<h3 className='text-2xl text-secondary font-semibold'>
-								Descripción
-							</h3>
-							<div className='flex flex-col gap-4'>
-								{product?.description?.split("/n")}
-							</div>
-						</>
-					)}
-				</div>
-				{/* <button className='btn w-fit mx-auto flex items-center justify-center gap-3 min-w-[200px]'>
-          <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
-          <Link href='/' className='text-base'>
-            Comprar Ahora
-          </Link>
-        </button> */}
 			</div>
 			{similarProducts && similarProducts?.length > 0 && (
 				<div className='py-14 flex flex-col gap-2 w-full' id='trending'>

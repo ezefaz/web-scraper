@@ -21,7 +21,7 @@ export async function scrapeGoogleShopping(productTitle: string) {
 	};
 
 	try {
-		const searchUrl = `https://listado.mercadolibre.com.ar/iphone14pro`;
+		const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}`;
 
 		const response = await axios.get(searchUrl);
 
@@ -33,15 +33,29 @@ export async function scrapeGoogleShopping(productTitle: string) {
 			(index, element) => {
 				const product = $(element);
 				const title = product.find(".ui-search-item__title").text().trim();
-				const price = product
-					.find(".andes-money-amount__fraction")
-					.text()
-					.trim();
+				const url = product.find("a.ui-search-link").attr("href") || "";
+				let priceLabel = product.find(".andes-money-amount").attr("aria-label");
+
+				// Remove 'Antes' if it exists in the priceLabel
+				if (priceLabel && priceLabel.includes("Antes")) {
+					priceLabel = priceLabel.replace("Antes: ", "");
+				}
+
+				let price = "";
+				if (priceLabel) {
+					price = priceLabel.replace(" pesos", "");
+				} else {
+					const priceElement = product.find(
+						".andes-money-amount.ui-search-price__part"
+					);
+					price = priceElement.attr("aria-label") || "";
+				}
+
 				const image = product
 					.find(".ui-search-result-image__element")
-					.attr("src");
+					.attr("data-src");
 
-				productList.push({ title, price, image });
+				productList.push({ url, title, price, image });
 			}
 		);
 

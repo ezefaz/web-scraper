@@ -57,7 +57,6 @@ const page = async () => {
 						user={`${user.firstName} ${user.lastName}`}
 						userProducts={extractedData}
 					/>
-					<ScraperButton productTitle={userProducts[0].title} />
 				</>
 			)}
 		</>
