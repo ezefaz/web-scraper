@@ -28,7 +28,7 @@ export default async function RootLayout({
 
 	return (
 		<Providers>
-			<html lang='en'>
+			<html lang='es'>
 				<body className={inter.className}>
 					<main className='max-w-10xl m-auto overflow-x-hidden'>
 						<ClientOnly>

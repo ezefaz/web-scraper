@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import Dropdown from "./Dropdown";
 import { UserButton, useAuth, useUser } from "@clerk/nextjs";
+import LoginButton from "./auth/LoginButton";
 
 const navIcons = [
 	{ src: "/assets/icons/search.svg", alt: "Search" },
@@ -81,16 +82,14 @@ const Navbar = ({ session }: any) => {
 						</ul>
 
 						{!user ? (
-							<div className='container mx-auto'>
-								<div className='float-right'>
-									<a
-										href='/sign-up'
-										className='bg-primary text-white hover:text-gray-300 hover:bg-gray-700 rounded-md py-2 px-4 transition duration-300 ease-in-out'
-										suppressHydrationWarning={true}>
-										Comenzar Ahora
-									</a>
-								</div>
-							</div>
+							<LoginButton>
+								<a
+									// href='/sign-up'
+									className='bg-primary text-white hover:text-gray-300 hover:bg-gray-700 rounded-md py-2 px-4 transition duration-300 ease-in-out'
+									suppressHydrationWarning={true}>
+									Comenzar Ahora
+								</a>
+							</LoginButton>
 						) : (
 							<div className='container mx-auto flex justify-between items-center'>
 								<div className='flex justify-end mr-28'>

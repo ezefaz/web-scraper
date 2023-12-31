@@ -1,3 +1,5 @@
+"use server";
+
 import { NextApiRequest, NextApiResponse } from "next";
 import { connectToDb } from "@/lib/mongoose";
 import User from "@/lib/models/user.model";
