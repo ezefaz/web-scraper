@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema({
 	image: {
 		type: String,
 	},
+	password: {
+		type: String,
+	},
 	emailVerified: Date,
 	role: { type: String, enum: ["ADMIN", "USER"], default: "USER" },
 	isTwoFactorEnabled: { type: Boolean, default: false },
