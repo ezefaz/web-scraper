@@ -47,8 +47,8 @@ const LoginForm = (props: Props) => {
 
 		startTransition(() => {
 			login(values).then((data: any) => {
-				setError(data.error);
-				setSuccess(data.success);
+				setError(data?.error);
+				// setSuccess(data?.success);
 			});
 		});
 	};
@@ -118,16 +118,16 @@ const LoginForm = (props: Props) => {
 				</form>
 				<div className='mt-4 flex justify-between items-center'>
 					<span className='text-sm text-gray-700'>O inicia sesión con:</span>
-					<div className='flex items-center space-x-3'>
-						{/* <Social /> */}
+					{/* <div className='flex items-center space-x-3'> */}
+					<Social />
 
-						<button className='rounded-full bg-red-600 text-white p-2 hover:bg-red-700'>
+					{/* <button className='rounded-full bg-red-600 text-white p-2 hover:bg-red-700'>
 							<FaGoogle size={20} />
 						</button>
 						<button className='rounded-full bg-black text-white p-2 hover:bg-gray-800'>
 							<FaGithub size={20} />
 						</button>
-					</div>
+					</div> */}
 				</div>
 			</CardWrapper>
 		</div>
