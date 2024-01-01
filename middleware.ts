@@ -1,45 +1,41 @@
-// import { getToken } from 'next-auth/jwt';
-// import { NextRequest, NextResponse } from 'next/server';
+import authConfig from "./auth.config";
+import NextAuth from "next-auth";
 
-// export { default } from 'next-auth/middleware';
+import {
+	DEFAULT_LOGIN_REDIRECT,
+	apiAuthPrefix,
+	authRoutes,
+	publicRoutes,
+} from "@/routes";
 
-// export async function middleware(req: NextRequest) {
-//   const session = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+const { auth } = NextAuth(authConfig);
 
-//   if (!session) {
-//     const requestedPage = req.nextUrl.pathname;
-//     const url = req.nextUrl.clone();
+export default auth((req) => {
+	const { nextUrl } = req;
+	const isLoggedIn = !!req.auth;
 
-//     url.pathname = '/';
-//     url.search = `p=${requestedPage}`;
+	const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+	const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+	const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-//     return NextResponse.redirect(url);
-//   }
+	if (isApiAuthRoute) {
+		return null;
+	}
 
-//   return NextResponse.next();
-// }
+	if (isAuthRoute) {
+		if (isLoggedIn) {
+			return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+		}
+		return null;
+	}
 
-// export const config = { matcher: ['/user-products'] };
-import { withClerkMiddleware } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-
-export default withClerkMiddleware((req: NextRequest) => {
-	return NextResponse.next();
+	if (!isLoggedIn && !isPublicRoute) {
+		return Response.redirect(new URL("/sign-in", nextUrl));
+	}
+	return null;
 });
 
-// Stop Middleware running on static files and public folder
+// Optionally, don't invoke Middleware on some paths
 export const config = {
-	matcher: [
-		/*
-		 * Match all request paths except for the ones starting with:
-		 * - _next
-		 * - static (static files)
-		 * - favicon.ico (favicon file)
-		 * - public folder
-		 * - public folder
-		 */
-		"/((?!static|.*\\..*|_next|favicon.ico).*)",
-		"/",
-	],
+	matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

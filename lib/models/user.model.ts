@@ -1,6 +1,5 @@
-import { UUID } from "mongodb";
 import mongoose, { Schema } from "mongoose";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 
 const userSchema = new mongoose.Schema({
 	// id: { type: String, default: uuidv4() },
@@ -17,7 +16,9 @@ const userSchema = new mongoose.Schema({
 	password: {
 		type: String,
 	},
-	emailVerified: Date,
+	emailVerified: {
+		type: Date,
+	},
 	role: { type: String, enum: ["ADMIN", "USER"], default: "USER" },
 	isTwoFactorEnabled: { type: Boolean, default: false },
 	twoFactorConfirmation: {
@@ -73,47 +74,6 @@ const userSchema = new mongoose.Schema({
 	},
 });
 
-const accountSchema = new Schema({
-	id: { type: String, default: UUID },
-	userId: { type: String, ref: "User" },
-	type: String,
-	provider: { type: String, unique: true },
-	providerAccountId: { type: String, unique: true },
-	refresh_token: { type: String, select: false },
-	access_token: { type: String, select: false },
-	expires_at: Number,
-	token_type: String,
-	scope: String,
-	id_token: { type: String, select: false },
-	session_state: String,
-});
-
-const tokenSchema = new Schema({
-	id: { type: String, default: uuidv4() },
-	email: String,
-	token: { type: String, unique: true },
-	expires: Date,
-});
-
-const twoFactorConfirmationSchema = new Schema({
-	id: { type: String, default: uuidv4() },
-	userId: { type: String, ref: "User" },
-});
-
 const User = mongoose.models.User || mongoose.model("User", userSchema);
-const Account =
-	mongoose.models.Account || mongoose.model("Account", accountSchema);
-const VerificationToken =
-	mongoose.models.VerificationToken ||
-	mongoose.model("VerificationToken", tokenSchema);
-const PasswordResetToken =
-	mongoose.models.PasswordResetToken ||
-	mongoose.model("PasswordResetToken", tokenSchema);
-const TwoFactorToken =
-	mongoose.models.TwoFactorToken ||
-	mongoose.model("TwoFactorToken", tokenSchema);
-const TwoFactorConfirmation =
-	mongoose.models.TwoFactorConfirmation ||
-	mongoose.model("TwoFactorConfirmation", twoFactorConfirmationSchema);
 
 export default User;

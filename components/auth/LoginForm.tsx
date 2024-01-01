@@ -9,14 +9,22 @@ import { LoginSchema } from "@/schemas";
 import CardWrapper from "../CardWrapper";
 import FormError from "./FormError";
 import FormSuccess from "./FormSuccess";
-import axios from "axios";
+
 import { useState, useTransition } from "react";
 import { Button } from "@tremor/react";
 import { login } from "@/app/actions/login";
+import { Social } from "./Social";
+import { useSearchParams } from "next/navigation";
 
 type Props = {};
 
 const LoginForm = (props: Props) => {
+	const searchParams = useSearchParams();
+	const urlError =
+		searchParams.get("error") === "OAuthAccountNotLinked"
+			? "El correo es utilizado con otro proveedor"
+			: "";
+
 	const [error, setError] = useState<string | undefined>("");
 	const [success, setSuccess] = useState<string | undefined>("");
 	const [isPending, startTransition] = useTransition();
@@ -38,7 +46,7 @@ const LoginForm = (props: Props) => {
 		setSuccess("");
 
 		startTransition(() => {
-			login(values).then((data) => {
+			login(values).then((data: any) => {
 				setError(data.error);
 				setSuccess(data.success);
 			});
@@ -81,7 +89,6 @@ const LoginForm = (props: Props) => {
 					<div>
 						<label
 							htmlFor='password'
-							placeholder='*******'
 							className='block text-sm font-medium text-gray-700'>
 							Contraseña
 						</label>
@@ -89,6 +96,7 @@ const LoginForm = (props: Props) => {
 							id='password'
 							type='password'
 							disabled={isPending}
+							placeholder='*******'
 							{...register("password")}
 							className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
 						/>
@@ -96,7 +104,7 @@ const LoginForm = (props: Props) => {
 							<span className='text-red-500'>{errors.password.message}</span>
 						)}
 					</div>
-					<FormError message={error} />
+					<FormError message={error || urlError} />
 					<FormSuccess message={success} />
 					<div>
 						<Button
@@ -111,6 +119,8 @@ const LoginForm = (props: Props) => {
 				<div className='mt-4 flex justify-between items-center'>
 					<span className='text-sm text-gray-700'>O inicia sesión con:</span>
 					<div className='flex items-center space-x-3'>
+						{/* <Social /> */}
+
 						<button className='rounded-full bg-red-600 text-white p-2 hover:bg-red-700'>
 							<FaGoogle size={20} />
 						</button>

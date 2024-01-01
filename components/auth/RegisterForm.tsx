@@ -99,7 +99,6 @@ const RegisterForm = (props: Props) => {
 					<div>
 						<label
 							htmlFor='password'
-							placeholder='*******'
 							className='block text-sm font-medium text-gray-700'>
 							Contraseña
 						</label>
@@ -107,6 +106,7 @@ const RegisterForm = (props: Props) => {
 							id='password'
 							type='password'
 							disabled={isPending}
+							placeholder='*******'
 							{...register("password")}
 							className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
 						/>
