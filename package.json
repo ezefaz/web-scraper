@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/mongodb-adapter": "^2.0.10",
     "@clerk/localizations": "^1.26.10",
     "@clerk/nextjs": "^4.27.2",
     "@faker-js/faker": "^8.2.0",
