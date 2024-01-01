@@ -12,7 +12,7 @@ async function handlerUser(req: any, res: NextApiResponse) {
 			const { id, name, email, image } = await req.json();
 
 			const newUser = new User({
-				id,
+				// id,
 				name,
 				email,
 				image,
