@@ -18,13 +18,14 @@ import { formatNumber } from "@/lib/utils";
 import { ProductType } from "@/types";
 import Removal from "@/components/Removal";
 import Search from "@/components/Search";
-import { currentUser } from "@clerk/nextjs";
 import ProductsTable from "@/components/ProductsTable";
 import ScraperButton from "@/components/ScraperButton";
+import { auth } from "@/auth";
 
 const page = async () => {
 	const userProducts = await getUserProducts();
-	const user = await currentUser();
+	const session = await auth();
+	const user = session?.user;
 
 	const extractedData: any = userProducts?.map((product: any) => ({
 		id: product._id,
@@ -53,10 +54,7 @@ const page = async () => {
 				</div>
 			) : (
 				<>
-					<ProductsTable
-						user={`${user.firstName} ${user.lastName}`}
-						userProducts={extractedData}
-					/>
+					<ProductsTable user={user.name} userProducts={extractedData} />
 				</>
 			)}
 		</>

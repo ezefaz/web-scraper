@@ -5,17 +5,19 @@ import { Dialog, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { addUserEmailToProduct } from "@/lib/actions";
 import { toast } from "react-hot-toast";
-// import { useUser } from "@clerk/clerk-react";
+import { auth } from "@/auth";
 
 interface Props {
 	productId: string;
 }
 
 const Modal = ({ productId }: Props) => {
-	// const { user } = useUser();
+	const { user } = auth();
+
+	if (!user) return;
 
 	// const userEmail = "" user?.emailAddresses[0]?.emailAddress;
-	const userEmail = "";
+	const userEmail = user.email;
 
 	let [isOpen, setIsOpen] = useState(true);
 	let [isSubmitting, setIsSubmitting] = useState(false);

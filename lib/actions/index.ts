@@ -8,9 +8,9 @@ import { getAveragePrice, getHighestPrice, getLowestPrice } from "../utils";
 import { revalidatePath } from "next/cache";
 import { generateEmailBody, sendEmail } from "../nodemailer";
 // import { getServerSession } from "next-auth";
-import { currentUser } from "@clerk/nextjs";
 import { permanentRedirect, redirect } from "next/navigation";
 import User from "../models/user.model";
+import { auth } from "@/auth";
 
 export async function scrapeAndStoreProducts(productUrl: string) {
 	if (!productUrl) return;
@@ -241,10 +241,11 @@ export async function addUserEmailToProduct(
 
 export async function getCurrentUser() {
 	try {
-		const user = await currentUser();
-		if (!user) return null;
+		const session = await auth();
+		// const user = await currentUser();
+		if (!session) return null;
 
-		const currentUserEmail = user?.emailAddresses[0]?.emailAddress;
+		const currentUserEmail = session.user?.email;
 
 		const userDb = await User.findOne({ email: currentUserEmail });
 

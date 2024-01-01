@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import Dropdown from "./Dropdown";
-import { UserButton, useAuth, useUser } from "@clerk/nextjs";
 import LoginButton from "./auth/LoginButton";
 
 const navIcons = [
@@ -17,7 +16,7 @@ const navIcons = [
 const Navbar = ({ session }: any) => {
 	const [nav, setNav] = useState(false);
 	const [userData, setUserData] = useState(null);
-	const { user } = useUser();
+	const { user } = session;
 
 	// const { userId } = useAuth();
 	const handleNav = () => {
@@ -54,7 +53,7 @@ const Navbar = ({ session }: any) => {
 							className={
 								nav
 									? "fixed left-0 top-0 w-[60%] h-full border-r border-r-white bg-[#000300] transition-all duration-1000 overflow-y-auto bg-[#e5e7eb]"
-									: "fixed left-0 top-0 w-[60%] h-full transition-all duration-1000 left-[-100%]"
+									: "fixed left-0 top-0 w-[60%] h-full transition-all duration-1000"
 							}>
 							<Link href='/' className='flex items-center gap-1 mt-3 ml-2'>
 								<Image
@@ -81,7 +80,7 @@ const Navbar = ({ session }: any) => {
 							</Link>
 						</ul>
 
-						{!user ? (
+						{!session && !session.user ? (
 							<LoginButton>
 								<a
 									// href='/sign-up'
@@ -99,7 +98,7 @@ const Navbar = ({ session }: any) => {
 										Productos
 									</a>
 								</div>
-								<UserButton afterSignOutUrl='/' />
+								{/* <UserButton afterSignOutUrl='/' /> */}
 							</div>
 						)}
 

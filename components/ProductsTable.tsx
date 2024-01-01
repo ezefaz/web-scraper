@@ -32,7 +32,7 @@ interface UserProduct {
 }
 
 interface ProductTableProps {
-	user: string;
+	user: string | any;
 	userProducts: Array<UserProduct>;
 }
 

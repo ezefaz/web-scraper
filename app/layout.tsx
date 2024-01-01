@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
-import { Providers } from "./providers";
 import ClientOnly from "@/components/ClientOnly";
+import { auth } from "@/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 const spaceGrotesk = Space_Grotesk({
@@ -23,23 +23,20 @@ export default async function RootLayout({
 }: {
 	children: React.ReactNode;
 }) {
-	// const session = await getServerSession();
+	const session = auth();
 
 	return (
-		<Providers>
-			<html lang='es'>
-				<body className={inter.className}>
-					<main className='max-w-10xl m-auto overflow-x-hidden'>
-						<ClientOnly>
-							<Toaster position='top-center' reverseOrder={false} />
-							{/* <Navbar session={session} /> */}
-							<Navbar />
-							{children}
-							<Analytics />
-						</ClientOnly>
-					</main>
-				</body>
-			</html>
-		</Providers>
+		<html lang='es'>
+			<body className={inter.className}>
+				<main className='max-w-10xl m-auto overflow-x-hidden'>
+					<ClientOnly>
+						<Toaster position='top-center' reverseOrder={false} />
+						<Navbar session={session} />
+						{children}
+						<Analytics />
+					</ClientOnly>
+				</main>
+			</body>
+		</html>
 	);
 }

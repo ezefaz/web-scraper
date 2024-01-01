@@ -1,5 +1,4 @@
 import RegisterForm from "@/components/auth/RegisterForm";
-import { SignUp } from "@clerk/nextjs";
 
 export default function Page() {
 	return (
