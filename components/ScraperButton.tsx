@@ -19,9 +19,8 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
 
       const data = await scrapeGoogleShopping(formattedProductTitle);
       setScrapedData(data);
-      console.log('Scraped Data:', scrapedData);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error Comparing prices:', error);
     } finally {
       setScrapingInProgress(false);
     }
@@ -32,11 +31,11 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
       <button
         onClick={handleScrapeClick}
         disabled={scrapingInProgress}
-        className='px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 transition duration-300'
+        className='px-4 py-2 bg-primary text-white rounded-md shadow-md hover:bg-primary-200 transition duration-300'
       >
         {scrapingInProgress ? 'Comparando...' : 'Inciar Comparación de Precios'}
       </button>
-      <div className='flex justify-center m-auto'>
+      <div className=''>
         <PriceComparisson scrapedData={scrapedData} productPrice={productPrice} />
       </div>
     </div>

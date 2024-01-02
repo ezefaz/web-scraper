@@ -179,9 +179,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
                   </>
                 )}
               </div> */}
-              <button className='btn w-fit m-auto flex items-center justify-center gap-3 min-w-[200px]'>
+              <button className='btn w-fit m-auto flex items-center justify-center gap-2 min-w-[200px]'>
                 <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
-                <Link href={product.url} target='_blank' className='text-base'>
+                <Link href={product.url} target='_blank' className='text-base text-white'>
                   Comprar Ahora
                 </Link>
               </button>
