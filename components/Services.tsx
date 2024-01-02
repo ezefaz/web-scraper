@@ -26,7 +26,7 @@ const Services = () => {
           <div className='w-full px-4'>
             <div className='mx-auto mb-12 max-w-[510px] text-center lg:mb-20'>
               <span className='block mb-2 text-lg font-semibold text-primary'>Servicios</span>
-              <h1 className='mb-4 text-3xl font-bold head-text sm:text-4xl md:text-[40px]'>
+              <h1 className='mb-4 text-3xl font-bold head-text sm:text-1xl md:text-[40px]'>
                 Te ayudamos a ahorrar de la siguiente manera:
               </h1>
             </div>

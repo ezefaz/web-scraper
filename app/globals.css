@@ -21,8 +21,10 @@
 	}
 
 	.head-text {
-		@apply mt-4 text-7xl leading-[72px] font-bold tracking-[-1.2px] text-gray-900;
+		@apply mt-2 xl:text-7xl leading-[72px] font-bold tracking-[-1.2px] text-gray-900 text-6xl;
 	}
+
+	
 
 	.section-text {
 		@apply text-secondary text-[32px] m-auto font-semibold;
@@ -156,6 +158,6 @@
 	}
 
 	.searchbar-btn {
-		@apply w-full bg-gray-900 border border-gray-900 rounded-lg  px-5 py-3 text-white text-base font-semibold hover:opacity-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40;
+		@apply w-full bg-gray-900 border border-gray-900 rounded-lg px-5 flex flex-col  py-3 text-white text-base font-semibold hover:opacity-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40;
 	}
 }
