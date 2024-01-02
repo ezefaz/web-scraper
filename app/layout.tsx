@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
 import ClientOnly from "@/components/ClientOnly";
 import { auth } from "@/auth";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 const spaceGrotesk = Space_Grotesk({
@@ -26,17 +27,19 @@ export default async function RootLayout({
 	const session = auth();
 
 	return (
-		<html lang='es'>
-			<body className={inter.className}>
-				<main className='max-w-10xl m-auto overflow-x-hidden'>
-					<ClientOnly>
-						<Toaster position='top-center' reverseOrder={false} />
-						<Navbar session={session} />
-						{children}
-						<Analytics />
-					</ClientOnly>
-				</main>
-			</body>
-		</html>
+		<SessionProvider>
+			<html lang='es'>
+				<body className={inter.className}>
+					<main className='max-w-10xl m-auto overflow-x-hidden'>
+						<ClientOnly>
+							<Toaster position='top-center' reverseOrder={false} />
+							<Navbar />
+							{children}
+							<Analytics />
+						</ClientOnly>
+					</main>
+				</body>
+			</html>
+		</SessionProvider>
 	);
 }

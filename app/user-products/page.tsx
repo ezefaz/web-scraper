@@ -19,7 +19,7 @@ import { ProductType } from "@/types";
 import Removal from "@/components/Removal";
 import Search from "@/components/Search";
 import ProductsTable from "@/components/ProductsTable";
-import ScraperButton from "@/components/ScraperButton";
+
 import { auth } from "@/auth";
 
 const page = async () => {

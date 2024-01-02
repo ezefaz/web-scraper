@@ -6,6 +6,8 @@ import Google from "next-auth/providers/google";
 
 import { LoginSchema } from "@/schemas";
 import { getUserByEmail } from "@/data/user";
+import User from "@/lib/models/user.model";
+import { connectToDb } from "@/lib/mongoose";
 
 export default {
 	providers: [

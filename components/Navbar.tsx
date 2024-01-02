@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import Dropdown from "./Dropdown";
 import LoginButton from "./auth/LoginButton";
+import { useSession } from "next-auth/react";
 
 const navIcons = [
 	{ src: "/assets/icons/search.svg", alt: "Search" },
@@ -13,12 +14,13 @@ const navIcons = [
 	{ src: "/assets/icons/user.svg", alt: "User" },
 ];
 
-const Navbar = ({ session }: any) => {
+const Navbar = () => {
 	const [nav, setNav] = useState(false);
 	const [userData, setUserData] = useState(null);
-	const { user } = session;
+	const session = useSession();
 
-	// const { userId } = useAuth();
+	const user = session?.data?.user;
+
 	const handleNav = () => {
 		setNav(!nav);
 	};
@@ -49,7 +51,7 @@ const Navbar = ({ session }: any) => {
 						</div>
 					)} */}
 					<div>
-						<ul
+						{/* <ul
 							className={
 								nav
 									? "fixed left-0 top-0 w-[60%] h-full border-r border-r-white bg-[#000300] transition-all duration-1000 overflow-y-auto bg-[#e5e7eb]"
@@ -78,9 +80,9 @@ const Navbar = ({ session }: any) => {
 									FAQs
 								</li>
 							</Link>
-						</ul>
+						</ul> */}
 
-						{!session && !session.user ? (
+						{!session && !user ? (
 							<LoginButton>
 								<a
 									// href='/sign-up'
@@ -91,25 +93,24 @@ const Navbar = ({ session }: any) => {
 							</LoginButton>
 						) : (
 							<div className='container mx-auto flex justify-between items-center'>
-								<div className='flex justify-end mr-28'>
+								{/* <div className='flex justify-end mr-28'>
 									<a
 										href='/user-products'
 										className='text-secondary hover:text-primary hover:underline transition duration-300 ease-in-out'>
 										Productos
 									</a>
-								</div>
-								{/* <UserButton afterSignOutUrl='/' /> */}
+								</div> */}
+
+								<Dropdown />
 							</div>
 						)}
-
-						{/* <Dropdown session={session} /> */}
 					</div>
 
-					<div className='lg:hidden flex items-center'>
+					{/* <div className='lg:hidden flex items-center'>
 						<div onClick={handleNav} className='mx-8'>
 							{nav ? <AiOutlineClose size={25} /> : <AiOutlineMenu size={25} />}
 						</div>
-					</div>
+					</div> */}
 				</div>
 			</nav>
 		</header>

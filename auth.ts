@@ -4,6 +4,8 @@ import authConfig from "@/auth.config";
 
 import { getUserById } from "@/data/user";
 import clientPromise from "@/lib/mongodb";
+import User from "./lib/models/user.model";
+import TwoFactorConfirmation from "./lib/models/TwoFactorConfirmation.model";
 
 export const {
 	handlers: { GET, POST },
@@ -16,46 +18,40 @@ export const {
 		signIn: "/sign-in",
 		error: "/error",
 	},
+	events: {
+		async linkAccount({ user }: any) {
+			await User.updateOne({
+				where: { _id: user.id },
+				data: { emailVerified: new Date() },
+			});
+		},
+	},
 	callbacks: {
-		// async signIn({ user, account }: { user: any; account: any }) {
-		// 	if (account?.provider === "google") {
-		// 		const { name, email, image } = user;
-		// 		try {
-		// 			await connectToDb();
+		async signIn({ user, account }: any) {
+			// Allow OAuth without email verification
+			if (account?.provider !== "credentials") return true;
 
-		// 			const existingUser = await User.findOne({ email });
+			const existingUser = await getUserById(user.id);
 
-		// 			const url: any =
-		// 				process.env.NODE_ENV === "production"
-		// 					? "https://savemelin.vercel.app/api/user"
-		// 					: "http://localhost:3000/api/user";
+			// Prevent sign in without email verification
+			if (!existingUser?.emailVerified) return false;
 
-		// 			if (!existingUser) {
-		// 				const response = await axios.post(url, {
-		// 					// id,
-		// 					name,
-		// 					email,
-		// 					image,
-		// 				});
+			// if (existingUser.isTwoFactorEnabled) {
+			// 	const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+			// 		existingUser.id
+			// 	);
 
-		// 				if (response) {
-		// 					return user;
-		// 				}
-		// 			}
-		// 		} catch (error: any) {
-		// 			throw new Error(
-		// 				`Error al crear usuario con Google: ${error.message}`
-		// 			);
-		// 		}
-		// 	}
-		// },
-		// async signIn({ user }: any) {
-		// 	const existingUser = await getUserById(user.id);
+			// 	if (!twoFactorConfirmation) return false;
 
-		// 	if (!existingUser || !existingUser.emailVerified) {
-		// 		return false;
-		// 	}
-		// },
+			// 	// Delete two factor confirmation for next sign in
+			// 	await TwoFactorConfirmation.deleteOne({
+			// 		where: { id: twoFactorConfirmation.id },
+			// 	});
+			// }
+
+			return true;
+		},
+
 		async session({ token, session }: any) {
 			if (token.sub && session.user) {
 				session.user.id = token.sub;

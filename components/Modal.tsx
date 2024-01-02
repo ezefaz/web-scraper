@@ -5,19 +5,21 @@ import { Dialog, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { addUserEmailToProduct } from "@/lib/actions";
 import { toast } from "react-hot-toast";
-import { auth } from "@/auth";
+import { useSession } from "next-auth/react";
 
 interface Props {
 	productId: string;
 }
 
 const Modal = ({ productId }: Props) => {
-	const { user } = auth();
+	const session = useSession();
 
-	if (!user) return;
+	const currentUser = session?.data?.user;
+
+	if (!currentUser) return;
 
 	// const userEmail = "" user?.emailAddresses[0]?.emailAddress;
-	const userEmail = user.email;
+	const userEmail = currentUser.email;
 
 	let [isOpen, setIsOpen] = useState(true);
 	let [isSubmitting, setIsSubmitting] = useState(false);
