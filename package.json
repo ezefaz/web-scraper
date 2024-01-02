@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/mongodb-adapter": "^2.0.10",
     "@faker-js/faker": "^8.2.0",
     "@headlessui/react": "^1.7.17",
     "@hookform/resolvers": "^3.3.3",

@@ -1,4 +1,5 @@
-export { GET, POST } from "@/auth";
+export { GET, POST } from '@/auth';
+export const runtine = 'edge';
 
 // import User from "@/lib/models/user.model";
 // import UserModel from "@/lib/models/user.model";
