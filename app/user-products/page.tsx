@@ -14,10 +14,6 @@ import {
   TextInput,
   Title,
 } from '@tremor/react';
-import { formatNumber } from '@/lib/utils';
-import { ProductType } from '@/types';
-import Removal from '@/components/Removal';
-import Search from '@/components/Search';
 import ProductsTable from '@/components/ProductsTable';
 
 import { auth } from '@/auth';

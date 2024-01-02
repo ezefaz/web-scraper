@@ -46,12 +46,9 @@ const limitWords = (title: string, limit: number) => {
 
 const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
   return (
-    <div className='flex w-full justify-center items-center p-20 mt-20'>
+    <div className='flex w-full justify-center items-center  mt-20'>
       <Card className='w-full  p-10'>
         <Title className='mb-4'>Listado de Productos del Usuario {user}</Title>
-        <div className='flex justify-end'>
-          <Search />
-        </div>
         <Table className='w-full'>
           <TableHead>
             <TableRow>

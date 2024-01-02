@@ -128,7 +128,6 @@ const Dropdown = () => {
               text='Cerrar Sesión'
               onClick={handleSignOut}
             />
-            )
           </div>
         </div>
       </div>
