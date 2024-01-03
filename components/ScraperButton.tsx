@@ -1,5 +1,5 @@
 'use client';
-import { scrapeGoogleShopping } from '@/lib/scraper/google';
+import { scrapePriceComparissonProducts } from '@/lib/scraper/price-comparisson';
 import React, { useState } from 'react';
 import PriceComparisson from './PriceComparisson';
 
@@ -17,7 +17,7 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
     try {
       const formattedProductTitle = productTitle.replace(/\s/g, '-');
 
-      const data = await scrapeGoogleShopping(formattedProductTitle);
+      const data = await scrapePriceComparissonProducts(formattedProductTitle);
       setScrapedData(data);
     } catch (error) {
       console.error('Error Comparing prices:', error);

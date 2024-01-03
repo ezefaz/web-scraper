@@ -2,8 +2,9 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { scrapeDolarValue } from './dolar';
 
-export async function scrapeGoogleShopping(productTitle: string) {
+export async function scrapePriceComparissonProducts(productTitle: string) {
   // bright data proxy configuration
   const username = String(process.env.BRIGHT_DATA_USERNAME);
   const password = String(process.env.BRIGHT_DATA_PASSWORD);
@@ -28,6 +29,8 @@ export async function scrapeGoogleShopping(productTitle: string) {
     const html = response.data;
     const $ = cheerio.load(html);
 
+    const scrapedDolarValue = await scrapeDolarValue();
+
     const productList: any = [];
     $('.ui-search-layout.ui-search-layout--stack .ui-search-layout__item').each((index, element) => {
       const product = $(element);
@@ -50,7 +53,9 @@ export async function scrapeGoogleShopping(productTitle: string) {
 
       const image = product.find('.ui-search-result-image__element').attr('data-src');
 
-      productList.push({ url, title, price, image });
+      const dolarPrice = Number(price) / Number(scrapedDolarValue);
+
+      productList.push({ url, title, price, image, dolarPrice });
     });
 
     return productList;

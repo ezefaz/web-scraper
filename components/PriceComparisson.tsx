@@ -26,6 +26,7 @@ interface Product {
   title: string;
   price: string;
   image: string;
+  dolarPrice: number;
 }
 
 interface Props {
@@ -122,29 +123,71 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Imagen</TableHeaderCell>
-              <TableHeaderCell className='text-right'>Titulo</TableHeaderCell>
-              <TableHeaderCell className='text-right'>Precio ($)</TableHeaderCell>
-              <TableHeaderCell className='text-right'>Precio (USD)</TableHeaderCell>
+              <TableHeaderCell className='bg-white'>Imagen</TableHeaderCell>
+              <TableHeaderCell className='bg-white text-center'>Titulo</TableHeaderCell>
+              <TableHeaderCell className='bg-white text-center'>Precio</TableHeaderCell>
+              <TableHeaderCell className='bg-white text-center '>Diferencia de Precio</TableHeaderCell>
+              <TableHeaderCell className='bg-white text-center'>Precio (USD)</TableHeaderCell>
+              <TableHeaderCell className='bg-white text-center'>Acciones</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {scrapedData.map((product) => (
-              <TableRow key={product.title}>
-                <TableCell className='w-1/6 sm:w-auto'>
-                  <Image src={product.image} alt={product.title} width={50} height={50} />
-                </TableCell>
-                <TableCell className='text-right'>
-                  <Text>{product.price}</Text>
-                </TableCell>
-                {/* <TableCell className='text-right'>
-                  <Text>{product.lastActive}</Text>
-                </TableCell>
-                <TableCell className='text-right'>
-                  <Text>{product.transactions}</Text>
-                </TableCell> */}
-              </TableRow>
-            ))}
+            {scrapedData.map((product, index) => {
+              const itemPrice = Number(product.price);
+
+              const deltaType =
+                productPrice === itemPrice
+                  ? 'unchanged'
+                  : productPrice > itemPrice
+                  ? 'moderateIncrease'
+                  : 'moderateDecrease';
+              const priceDifference = productPrice - itemPrice;
+
+              return (
+                <TableRow key={index}>
+                  <TableCell className='w-1/6 sm:w-auto'>
+                    <Image src={product.image} alt={product.title} width={60} height={60} />
+                  </TableCell>
+                  <TableCell>{product.title}</TableCell>
+                  {/* <TableCell className='text-right'>
+                              <Text>{product.country}</Text>
+                            </TableCell> */}
+                  <TableCell className='text-right'>
+                    <Text>${formatNumber(itemPrice)}</Text>
+                  </TableCell>
+                  <TableCell className='w-1/6 sm:w-auto'>
+                    {' '}
+                    <BadgeDelta deltaType={deltaType} isIncreasePositive={true} size='xs' className='text-sm'>
+                      {`$${formatNumber(priceDifference)}`}{' '}
+                    </BadgeDelta>{' '}
+                  </TableCell>
+                  <TableCell className='text-right'>
+                    <Text>${formatNumber(product.dolarPrice)}</Text>
+                  </TableCell>
+                  <TableCell className='w-1/6 sm:w-auto'>
+                    <div className='flex gap-2'>
+                      <button
+                        className='text-sm text-primary hover:underline focus:outline-none'
+                        onClick={() => window.open(product.url, '_blank')}
+                        aria-label={`Visitar ${product.title}`}
+                      >
+                        Visitar
+                      </button>
+                      <div
+                        className='cursor-pointer text-gray-500 hover:text-blue-500'
+                        onClick={() => copyToClipboard(product.url)}
+                      >
+                        {!copySuccess ? (
+                          <Icon icon={HiClipboard} variant='solid' size='sm' tooltip='Copiar link' />
+                        ) : (
+                          <Icon icon={HiClipboardCheck} variant='solid' size='sm' tooltip='Copiado!' />
+                        )}
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
         <div className='inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-white pt-12 pb-8 absolute rounded-b-lg'>
@@ -194,6 +237,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                           <TableHeaderCell className='bg-white text-center'>Precio</TableHeaderCell>
                           <TableHeaderCell className='bg-white text-center '>Diferencia de Precio</TableHeaderCell>
                           <TableHeaderCell className='bg-white text-center'>Precio (USD)</TableHeaderCell>
+                          <TableHeaderCell className='bg-white text-center'>Acciones</TableHeaderCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -230,6 +274,36 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                                 >
                                   {`$${formatNumber(priceDifference)}`}{' '}
                                 </BadgeDelta>{' '}
+                              </TableCell>
+                              <TableCell className='text-right'>
+                                <Text>${formatNumber(product.dolarPrice)}</Text>
+                              </TableCell>
+
+                              <TableCell className='w-1/6 sm:w-auto'>
+                                <div className='flex gap-2'>
+                                  {/* <TableCell>
+                                    <Button size='xs' variant='secondary' color='gray'>
+                                      Acción
+                                    </Button>
+                                  </TableCell> */}
+                                  <button
+                                    className='text-sm text-primary hover:underline focus:outline-none'
+                                    onClick={() => window.open(product.url, '_blank')}
+                                    aria-label={`Visitar ${product.title}`}
+                                  >
+                                    Visitar
+                                  </button>
+                                  <div
+                                    className='cursor-pointer text-gray-500 hover:text-blue-500'
+                                    onClick={() => copyToClipboard(product.url)}
+                                  >
+                                    {!copySuccess ? (
+                                      <Icon icon={HiClipboard} variant='simple' size='sm' tooltip='Copiar link' />
+                                    ) : (
+                                      <Icon icon={HiClipboardCheck} variant='simple' size='sm' tooltip='Copiado!' />
+                                    )}
+                                  </div>
+                                </div>
                               </TableCell>
                             </TableRow>
                           );
