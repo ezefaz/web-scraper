@@ -29,14 +29,12 @@ const Home = async () => {
         <div className='flex justify-center p-5 max-xl:flex-col gap-16'>
           <div>
             <div className='small-text mb-4'>
-              <p className='text-muted-foreground text-xl text-center'>
-                Tu plataforma ideal para ahorrar dinero a largo plazo.
-              </p>
+              <p className='text-muted-foreground text-xl text-center'>Tu plataforma ideal de ahorro a largo plazo.</p>
               {/* <Image src='/assets/icons/arrow-right.svg' alt='arrow-right' width={16} height={16} /> */}
             </div>
             <div className='text-center'>
               <h1 className='text-6xl head-text'>
-                <span className='relative text-center'>
+                <span className='relative text-center relative after:bg-primary/50 after:-z-10 after:absolute after:h-6 after:w-full after:bottom-0 after:end-0'>
                   Optimiza
                   <span className='absolute bottom-0 left-0 w-full h-2 text-center'></span>
                 </span>{' '}
@@ -44,7 +42,7 @@ const Home = async () => {
               </h1>
 
               <h1 className='head-text text-center '>
-                con Save<span className='text-primary text-center xl:text-7xl  sm:mt-4 sm:text-4xl'>Melin</span>
+                con Save<span className='text-primary text-center xl:text-7xl  sm:mt-4 sm:text-4xl '>Melin</span>
               </h1>
             </div>
             {''}
