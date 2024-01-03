@@ -15,6 +15,7 @@ import { Button } from '@tremor/react';
 import { login } from '@/app/actions/login';
 import { Social } from './Social';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 type Props = {};
 
@@ -89,6 +90,9 @@ const LoginForm = (props: Props) => {
               className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
             />
             {errors.password && <span className='text-red-500'>{errors.password.message}</span>}
+            <button className='block px-0 py-2 mt-2 text-sm font-normal text-gray-600 hover:text-primary focus:outline-none focus:text-blue-500'>
+              <Link href='/reset'>Olvidaste tu contraseña?</Link>
+            </button>
           </div>
           <FormError message={error || urlError} />
           <FormSuccess message={success} />

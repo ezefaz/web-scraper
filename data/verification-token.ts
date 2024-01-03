@@ -2,9 +2,7 @@ import VerificationToken from '@/lib/models/verificationToken.model';
 
 export const getVerificationTokenByToken = async (token: string) => {
   try {
-    console.log('randal', token);
-    const verificationToken = await VerificationToken.findOne({ token: token });
-    console.log('randal', verificationToken);
+    const verificationToken = await VerificationToken.findOne({ token });
 
     return verificationToken;
   } catch (error) {

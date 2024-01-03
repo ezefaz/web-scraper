@@ -1,145 +1,117 @@
-import { NextResponse } from "next/server";
-import {
-	getLowestPrice,
-	getHighestPrice,
-	getAveragePrice,
-	getEmailNotifType,
-} from "@/lib/utils";
-import { connectToDb } from "@/lib/mongoose";
-import Product from "@/lib/models/product.model";
-import { scrapeMLProduct } from "@/lib/scraper";
-import { generateEmailBody, sendEmail } from "@/lib/nodemailer";
-import { CurrentDolar, PriceHistoryItem } from "@/types";
+import { NextResponse } from 'next/server';
+import { getLowestPrice, getHighestPrice, getAveragePrice, getEmailNotifType } from '@/lib/utils';
+import { connectToDb } from '@/lib/mongoose';
+import Product from '@/lib/models/product.model';
+import { scrapeMLProduct } from '@/lib/scraper';
+import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
+import { CurrentDolar, PriceHistoryItem } from '@/types';
 
 export const maxDuration = 10; // This function can run for a maximum of 300 seconds
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: Request) {
-	try {
-		connectToDb();
+  try {
+    connectToDb();
 
-		const products = await Product.find({});
+    const products = await Product.find({});
 
-		if (!products) throw new Error("No product fetched");
+    if (!products) throw new Error('No product fetched');
 
-		// ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
-		const updatedProducts = await Promise.all(
-			products.map(async (currentProduct) => {
-				const scrapedProduct = await scrapeMLProduct(currentProduct.url);
+    // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
+    const updatedProducts = await Promise.all(
+      products.map(async (currentProduct) => {
+        const scrapedProduct = await scrapeMLProduct(currentProduct.url);
 
-				if (!scrapedProduct) return;
+        if (!scrapedProduct) return;
 
-				const updatedPriceHistory = currentProduct.priceHistory
-					.filter(
-						(priceItem: PriceHistoryItem) =>
-							priceItem && priceItem.price !== undefined
-					)
-					.map((priceItem: PriceHistoryItem) => {
-						const price = priceItem.price
-							? parseInt(priceItem.price.toString().replace(/[^0-9]/g, ""), 10)
-							: null;
-						if (price !== null && !isNaN(price)) {
-							return {
-								price,
-								date: priceItem.date,
-								_id: priceItem._id,
-							};
-						}
-						return currentProduct.priceHistory;
-					});
+        const updatedPriceHistory = currentProduct.priceHistory
+          .filter((priceItem: PriceHistoryItem) => priceItem && priceItem.price !== undefined)
+          .map((priceItem: PriceHistoryItem) => {
+            const price = priceItem.price ? parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10) : null;
+            if (price !== null && !isNaN(price)) {
+              return {
+                price,
+                date: priceItem.date,
+                _id: priceItem._id,
+              };
+            }
+            return currentProduct.priceHistory;
+          });
 
-				const previousDolarHistory = currentProduct.dolarHistory;
+        const previousDolarHistory = currentProduct.dolarHistory;
 
-				const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
-				const updatedDolarValue = scrapedProduct.currentDolar.value;
+        const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
+        const updatedDolarValue = scrapedProduct.currentDolar.value;
 
-				const updatedDolarHistory: any = [
-					...previousDolarHistory,
-					{ value: updatedDolarValue, date: new Date() },
-				];
+        const updatedDolarHistory: any = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
 
-				const filteredDolarHistory: any[] = [];
+        const filteredDolarHistory: any[] = [];
 
-				// Filtering out entries with the same date and value
-				updatedDolarHistory.forEach((item: any) => {
-					const existingItem = filteredDolarHistory.find(
-						(filteredItem) =>
-							new Date(filteredItem.date).toISOString().split("T")[0] ===
-								new Date(item.date).toISOString().split("T")[0] &&
-							filteredItem.value === item.value
-					);
-					if (!existingItem) {
-						filteredDolarHistory.push(item);
-					}
-				});
+        // Filtering out entries with the same date and value
+        updatedDolarHistory.forEach((item: any) => {
+          const existingItem = filteredDolarHistory.find(
+            (filteredItem) =>
+              new Date(filteredItem.date).toISOString().split('T')[0] ===
+                new Date(item.date).toISOString().split('T')[0] && filteredItem.value === item.value
+          );
+          if (!existingItem) {
+            filteredDolarHistory.push(item);
+          }
+        });
 
-				const existingUsers = currentProduct.users;
+        const existingUsers = currentProduct.users;
 
-				const product = {
-					...scrapedProduct,
-					priceHistory: updatedPriceHistory,
-					lowestPrice: getLowestPrice(updatedPriceHistory),
-					highestPrice: getHighestPrice(updatedPriceHistory),
-					averagePrice: getAveragePrice(updatedPriceHistory),
-					currentDolar: updatedCurrentDolar,
-					dolarHistory: filteredDolarHistory,
-					users: existingUsers,
-				};
+        const product = {
+          ...scrapedProduct,
+          priceHistory: updatedPriceHistory,
+          lowestPrice: getLowestPrice(updatedPriceHistory),
+          highestPrice: getHighestPrice(updatedPriceHistory),
+          averagePrice: getAveragePrice(updatedPriceHistory),
+          currentDolar: updatedCurrentDolar,
+          dolarHistory: filteredDolarHistory,
+          users: existingUsers,
+        };
 
-				const updatedProduct = await Product.findOneAndUpdate(
-					{
-						url: product.url,
-					},
-					product
-				);
+        const updatedProduct = await Product.findOneAndUpdate(
+          {
+            url: product.url,
+          },
+          product
+        );
 
-				// CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
-				const emailNotifType = getEmailNotifType(
-					scrapedProduct,
-					currentProduct
-				);
+        // CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
+        const emailNotifType = getEmailNotifType(scrapedProduct, currentProduct);
 
-				console.log(
-					"PRODUCTO USUARIOS normal",
-					emailNotifType && currentProduct.users.length > 0
-				);
-				if (
-					(emailNotifType && currentProduct.users.length > 0) ||
-					(emailNotifType && scrapedProduct.users.length > 0)
-				) {
-					console.log("ENTRA EN VALIDACION", currentProduct.users);
+        if (
+          (emailNotifType && currentProduct.users.length > 0) ||
+          (emailNotifType && scrapedProduct.users.length > 0)
+        ) {
+          const productInfo = {
+            title: updatedProduct.title,
+            url: updatedProduct.url,
+          };
 
-					const productInfo = {
-						title: updatedProduct.title,
-						url: updatedProduct.url,
-					};
+          const emailContent = await generateEmailBody(productInfo, emailNotifType);
 
-					const emailContent = await generateEmailBody(
-						productInfo,
-						emailNotifType
-					);
+          const userEmails = scrapedProduct.users
+            ? scrapedProduct.users.map((user: any) => user.email)
+            : currentProduct.users.map((user: any) => user.email);
 
-					const userEmails = scrapedProduct.users
-						? scrapedProduct.users.map((user: any) => user.email)
-						: currentProduct.users.map((user: any) => user.email);
+          if (!userEmails) return;
 
-					console.log("CORREO DE USUARIOS", userEmails);
+          await sendEmail(emailContent, userEmails);
+        }
 
-					if (!userEmails) return;
+        return updatedProduct;
+      })
+    );
 
-					await sendEmail(emailContent, userEmails);
-				}
-
-				return updatedProduct;
-			})
-		);
-
-		return NextResponse.json({
-			message: "Ok",
-			data: updatedProducts,
-		});
-	} catch (error: any) {
-		throw new Error(`Failed to get all products: ${error.message}`);
-	}
+    return NextResponse.json({
+      message: 'Ok',
+      data: updatedProducts,
+    });
+  } catch (error: any) {
+    throw new Error(`Failed to get all products: ${error.message}`);
+  }
 }

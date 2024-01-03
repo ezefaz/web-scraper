@@ -8,8 +8,6 @@ import VerificationToken from '@/lib/models/verificationToken.model';
 export const newVerification = async (token: string) => {
   const existingToken: any = await getVerificationTokenByToken(token);
 
-  console.log('TOKENIZED', existingToken);
-
   if (!existingToken) {
     return { error: 'El token no existe.' };
   }
@@ -22,8 +20,6 @@ export const newVerification = async (token: string) => {
 
   const existingUser: any = await getUserByEmail(existingToken.email);
 
-  console.log('COMO QUE NO', existingUser);
-
   if (!existingUser) {
     return { error: 'El correo no existe.' };
   }
@@ -33,6 +29,7 @@ export const newVerification = async (token: string) => {
     emailVerified: new Date(),
     email: existingToken.email,
   });
+  console.log('updateado', updatedUser);
 
   await VerificationToken.deleteOne({ _id: existingToken._id });
 };

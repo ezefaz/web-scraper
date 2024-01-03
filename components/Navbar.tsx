@@ -21,8 +21,6 @@ const Navbar = () => {
 
   const user = session?.data?.user;
 
-  console.log(session);
-
   const handleNav = () => {
     setNav(!nav);
   };

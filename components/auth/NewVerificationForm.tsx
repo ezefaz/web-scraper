@@ -19,14 +19,16 @@ const NewVerificationForm = (props: Props) => {
   const token = searchParams.get('token');
 
   const onSubmit = useCallback(() => {
+    if (success || error) return;
+
     if (!token) {
       setError('Falta el token!');
       return;
     }
 
     newVerification(token)
-      .then((data) => {
-        console.log('JAJAJAJA', data);
+      .then(({ data }: any) => {
+        console.log(data);
 
         setSuccess(data?.success);
         setError(data?.error);
@@ -34,7 +36,7 @@ const NewVerificationForm = (props: Props) => {
       .catch(() => {
         setError('Algo salio mal...');
       });
-  }, [token]);
+  }, [token, success, error]);
 
   useEffect(() => {
     onSubmit();
@@ -52,7 +54,7 @@ const NewVerificationForm = (props: Props) => {
       <div className='flex items-center w-full justify-center mt-12 mb-12'>
         {!success && !error && <SyncLoader />}
         <FormSuccess message={success} />
-        <FormError message={success} />
+        {!success && <FormError message={error} />}
       </div>
     </CardWrapper>
   );

@@ -1,8 +1,5 @@
-import { getVerificationTokenByEmail } from '@/data/verification-token';
 import { v4 as uuidv4 } from 'uuid';
 import VerificationToken from './models/verificationToken.model';
-import { connectToDb } from './mongoose';
-import mongoose from 'mongoose';
 
 export const generateVerificationToken = async (email: string) => {
   try {
