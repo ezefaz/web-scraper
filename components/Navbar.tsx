@@ -7,6 +7,7 @@ import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Dropdown from './Dropdown';
 import LoginButton from './auth/LoginButton';
 import { useSession } from 'next-auth/react';
+import { useCurrentUser } from '@/hooks/use-current-use';
 
 const navIcons = [
   { src: '/assets/icons/search.svg', alt: 'Search' },
@@ -16,10 +17,8 @@ const navIcons = [
 
 const Navbar = () => {
   const [nav, setNav] = useState(false);
-  const [userData, setUserData] = useState(null);
-  const session = useSession();
 
-  const user = session?.data?.user;
+  const user = useCurrentUser();
 
   const handleNav = () => {
     setNav(!nav);

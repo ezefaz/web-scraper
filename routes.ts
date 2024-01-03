@@ -12,7 +12,7 @@ export const publicRoutes = ['/', '/new-verification'];
  * @type {string[]}
  */
 
-export const authRoutes = ['/sign-in', '/sign-up', '/error'];
+export const authRoutes = ['/sign-in', '/sign-up', '/error', '/reset', '/new-password'];
 
 /**
  * The prefix for API authentication routes
@@ -27,4 +27,4 @@ export const apiAuthPrefix = '/api/auth';
  * @type {string}
  */
 
-export const DEFAULT_LOGIN_REDIRECT = '/settings';
+export const DEFAULT_LOGIN_REDIRECT = '/profile';

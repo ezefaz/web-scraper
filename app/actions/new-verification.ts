@@ -24,12 +24,9 @@ export const newVerification = async (token: string) => {
     return { error: 'El correo no existe.' };
   }
 
-  const updatedUser = await User.updateOne({
-    where: { _id: existingUser._id },
-    emailVerified: new Date(),
-    email: existingToken.email,
-  });
-  console.log('updateado', updatedUser);
+  await User.updateOne({ _id: existingUser._id }, { $set: { emailVerified: new Date(), email: existingToken.email } });
 
-  await VerificationToken.deleteOne({ _id: existingToken._id });
+  await VerificationToken.deleteOne({ id: existingToken.id });
+
+  return { success: 'El correo fue verificado con éxito!' };
 };

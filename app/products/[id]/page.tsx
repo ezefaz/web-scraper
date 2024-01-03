@@ -19,7 +19,6 @@ import {
 import { ProductType } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
 import { Card } from '@tremor/react';
-import PriceComparisson from '@/components/PriceComparisson';
 import ScraperButton from '@/components/ScraperButton';
 
 type Props = {

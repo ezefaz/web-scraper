@@ -2,19 +2,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { signIn, signOut } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import DropdownItem from './DropdownItem';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useCurrentUser } from '@/hooks/use-current-use';
 
 const Dropdown = () => {
-  const session = useSession();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const router = useRouter();
   const dropdownRef: any = useRef(null);
 
-  const isUserLoggedIn = session?.data?.user;
+  const loggedUser = useCurrentUser();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -55,8 +53,8 @@ const Dropdown = () => {
           onClick={toggleDropdown}
           className='inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500'
         >
-          {isUserLoggedIn && session?.data?.user.image ? (
-            <Image src={session?.data?.user.image} alt='User' width={25} height={25} className='rounded-full' />
+          {loggedUser && loggedUser.image ? (
+            <Image src={loggedUser.image} alt='User' width={25} height={25} className='rounded-full' />
           ) : (
             <Image src='/assets/icons/user.svg' alt='User' width={25} height={25} />
           )}
@@ -70,13 +68,13 @@ const Dropdown = () => {
           <div className='py-2' role='menu' aria-orientation='vertical' aria-labelledby='dropdown-button'>
             <div className='flex flex-col items-center px-4 py-2'>
               <div className='mb-2'>
-                {session?.data?.user.image ? (
-                  <Image src={session?.data?.user.image} alt='User' width={40} height={40} className='rounded-full' />
+                {loggedUser && loggedUser.image ? (
+                  <Image src={loggedUser.image} alt='User' width={40} height={40} className='rounded-full' />
                 ) : (
                   <Image src='/assets/icons/user.svg' alt='User' width={25} height={25} />
                 )}
               </div>
-              <p className='text-sm text-gray-700'>{session?.data?.user.email}</p>
+              <p className='text-sm text-gray-700'>{loggedUser?.email}</p>
               <div className='my-2 border-b border-gray-300 w-4/5'></div>
             </div>
             <DropdownItem
@@ -104,8 +102,8 @@ const Dropdown = () => {
                   />
                 </svg>
               }
-              text='Configuración'
-              link='/settings'
+              text='Perfil'
+              link='/profile'
             />
             <DropdownItem
               icon={

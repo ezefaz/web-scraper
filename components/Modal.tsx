@@ -5,18 +5,16 @@ import { Dialog, Transition } from '@headlessui/react';
 import Image from 'next/image';
 import { addUserEmailToProduct } from '@/lib/actions';
 import { toast } from 'react-hot-toast';
-import { useSession } from 'next-auth/react';
 
 import { BsSearchHeart } from 'react-icons/bs';
+import { useCurrentUser } from '@/hooks/use-current-use';
 
 interface Props {
   productId: string;
 }
 
 const Modal = ({ productId }: Props) => {
-  const session = useSession();
-
-  const currentUser = session?.data?.user;
+  const currentUser = useCurrentUser();
 
   if (!currentUser) return;
 
@@ -50,7 +48,7 @@ const Modal = ({ productId }: Props) => {
   return (
     <>
       <button type='button' className='btn text-white' onClick={openModal}>
-        <Image src='/assets/icons/search-plus.svg' alt='check' width={22} height={22} className='m-auto' />
+        {/* <Image src='/assets/icons/search-plus.svg' alt='check' width={22} height={22} className='m-auto' /> */}
         Inciar Seguimiento
       </button>
 

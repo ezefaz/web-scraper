@@ -7,7 +7,6 @@ import User from '@/lib/models/user.model';
 import { getUserByEmail } from '@/data/user';
 import { generateVerificationToken } from '@/lib/tokens';
 import { sendVerificationEmail } from '@/lib/mail';
-import { connectToDb } from '@/lib/mongoose';
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
@@ -25,9 +24,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Correo en uso' };
   }
 
-  await connectToDb();
-
-  const createdUser = await User.create({
+  await User.create({
     name,
     email,
     password: hashedPassword,
@@ -37,5 +34,5 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
   await sendVerificationEmail(verificationToken.email, verificationToken.token);
 
-  return { success: 'Confirmation email sent!' };
+  return { success: 'Correo de confirmación enviado!' };
 };

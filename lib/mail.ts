@@ -28,3 +28,30 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   `,
   });
 };
+
+export const sendPasswordResetEmail = async (email: string, token: string) => {
+  const resetLink = `http://localhost:3000/new-password?token=${token}`;
+
+  await resend.emails.send({
+    from: 'hello@webgeenix.com',
+    to: email,
+    subject: 'Reiniciar Contraseña',
+    html: `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="text-align: center; color: #333;">Reinicia tu contraseña!</h2>
+      <p style="text-align: center; color: #555;">
+        Haz click <a href="${resetLink}" style="color: #007bff; text-decoration: none;">aquí</a>
+        para reinciar tu contraseña.
+      </p>
+      <p style="text-align: center; color: #555;">
+        Si el botón no funciona, copia y pega este enlace en tu navegador:
+        <br />
+        <span style="color: #007bff;">${resetLink}</span>
+      </p>
+      <p style="text-align: center; color: #888; font-size: 12px;">
+        Este correo electrónico fue generado automáticamente. Por favor, no responder a este mensaje.
+      </p>
+    </div>
+  `,
+  });
+};

@@ -44,7 +44,7 @@ const NewVerificationForm = (props: Props) => {
 
   return (
     <CardWrapper
-      HeaderLabel='Confirmando tu verificación'
+      HeaderLabel='Confirmando tu verificación...'
       backButtonHref='/sign-in'
       backButtonLabel='Volver a Iniciar Sesion'
     >
@@ -52,7 +52,7 @@ const NewVerificationForm = (props: Props) => {
         <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
       </div>
       <div className='flex items-center w-full justify-center mt-12 mb-12'>
-        {!success && !error && <SyncLoader />}
+        {!success && !error && <SyncLoader color='#e29656' />}
         <FormSuccess message={success} />
         {!success && <FormError message={error} />}
       </div>

@@ -21,6 +21,7 @@ type Props = {};
 
 const LoginForm = (props: Props) => {
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl');
   const urlError =
     searchParams.get('error') === 'OAuthAccountNotLinked' ? 'El correo es utilizado con otro proveedor' : '';
 
@@ -45,10 +46,12 @@ const LoginForm = (props: Props) => {
     setSuccess('');
 
     startTransition(() => {
-      login(values).then((data: any) => {
-        setError(data?.error);
-        setSuccess(data?.success);
-      });
+      login(values, callbackUrl)
+        .then((data: any) => {
+          setError(data?.error);
+          setSuccess(data?.success);
+        })
+        .catch(() => setError('Algo salio mal.'));
     });
   };
   return (
