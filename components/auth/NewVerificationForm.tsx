@@ -18,23 +18,21 @@ const NewVerificationForm = (props: Props) => {
 
   const token = searchParams.get('token');
 
-  const onSubmit = useCallback(() => {
+  const onSubmit = useCallback(async () => {
     if (success || error) return;
 
     if (!token) {
-      setError('Falta el token!');
+      setError('Missing token!');
       return;
     }
 
-    newVerification(token)
-      .then(({ data }: any) => {
-        console.log(data);
-
-        setSuccess(data?.success);
-        setError(data?.error);
+    await newVerification(token)
+      .then((data) => {
+        setSuccess(data.success);
+        setError(data.error);
       })
       .catch(() => {
-        setError('Algo salio mal...');
+        setError('Something went wrong!');
       });
   }, [token, success, error]);
 

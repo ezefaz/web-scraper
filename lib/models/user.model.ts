@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   emailVerified: {
     type: Date,
+    default: false,
   },
   role: { type: String, enum: ['ADMIN', 'USER'], default: 'USER' },
   isTwoFactorEnabled: { type: Boolean, default: false },
@@ -26,7 +27,7 @@ const userSchema = new mongoose.Schema({
   },
   products: [
     {
-      url: { type: String, unique: true },
+      url: { type: String },
       currency: { type: String },
       image: { type: String },
       title: { type: String },

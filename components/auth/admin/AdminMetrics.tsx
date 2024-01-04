@@ -38,7 +38,7 @@ const AdminMetrics = (props: Props) => {
               <Text>Usuarios</Text>
               <Metric className='truncate'>{item.metric}</Metric>
             </div>
-            <BadgeDelta deltaType='moderateIncrease'>{item}</BadgeDelta>
+            <BadgeDelta deltaType='moderateIncrease'>{item.delta}</BadgeDelta>
           </Flex>
           <Flex className='mt-4 space-x-2'>
             <Text className='truncate'>{`${item.progress}% (${item.metric})`}</Text>

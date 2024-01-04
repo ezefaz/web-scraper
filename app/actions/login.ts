@@ -10,7 +10,7 @@ import { generateVerificationToken } from '@/lib/tokens';
 import { getUserByEmail } from '@/data/user';
 import { sendVerificationEmail } from '@/lib/mail';
 
-export const login = async (values: z.infer<typeof LoginSchema>, callbackUrl?: string | null) => {
+export const login = async (values: z.infer<typeof LoginSchema>) => {
   const validatedFields = LoginSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -21,7 +21,7 @@ export const login = async (values: z.infer<typeof LoginSchema>, callbackUrl?: s
 
   const existingUser = await getUserByEmail(email);
 
-  if (!existingUser || !existingUser.email) {
+  if (!existingUser || !existingUser.email || !existingUser.password) {
     return { error: 'El usuario no existe!' };
   }
 
@@ -32,11 +32,12 @@ export const login = async (values: z.infer<typeof LoginSchema>, callbackUrl?: s
 
     return { success: 'Verifica tu correo!' };
   }
+
   try {
     await signIn('credentials', {
       email,
       password,
-      redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
+      redirectTo: DEFAULT_LOGIN_REDIRECT,
     });
   } catch (error) {
     if (error instanceof AuthError) {

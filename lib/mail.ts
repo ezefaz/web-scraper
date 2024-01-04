@@ -3,7 +3,14 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-  const confirmLink = `http://localhost:3000/new-verification?token=${token}`;
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  const developmentBaseURL = 'http://localhost:3000';
+  const productionBaseURL = 'https://savemelin.vercel.app';
+
+  const confirmLink = isDevelopment
+    ? `${developmentBaseURL}/new-verification?token=${token}`
+    : `${productionBaseURL}/new-verification?token=${token}`;
 
   await resend.emails.send({
     from: 'hello@webgeenix.com',

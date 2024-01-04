@@ -19,11 +19,18 @@ export const {
     error: '/error',
   },
   events: {
-    async linkAccount({ user }: any) {
-      await User.updateOne({
-        where: { _id: user.id },
-        data: { emailVerified: new Date() },
-      });
+    async linkAccount({ user }) {
+      try {
+        const updatedUser = await User.findByIdAndUpdate(user.id, { emailVerified: new Date() }, { new: true });
+
+        if (updatedUser) {
+          console.log(`Actualizado: ${user.id}`);
+        } else {
+          console.log(`El Usuario con ID: ${user.id} no se encontró`);
+        }
+      } catch (error) {
+        console.error('Error Actualizando el Usuario:', error);
+      }
     },
   },
   callbacks: {
