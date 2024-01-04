@@ -39,12 +39,12 @@ const UserInfo = ({ user, label }: UserInfoProps) => {
                 {user?.role?.toLowerCase()}
               </span>
             </div>
-            <div className='flex flex-row items-center mt-4'>
+            {/* <div className='flex flex-row items-center mt-4'>
               <p className='text-md w-32 font-semibold'>Cantidad de Productos:</p>
               <span className='truncate text-xs max-w-[180px] font-mono p-1 bg-slate-100 rounded-md text-end ml-2'>
                 {user?.products?.length}
               </span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
