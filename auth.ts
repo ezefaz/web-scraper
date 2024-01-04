@@ -4,8 +4,8 @@ import authConfig from '@/auth.config';
 
 import { getUserById } from '@/data/user';
 import clientPromise from '@/lib/mongodb';
-import User from './lib/models/user.model';
-import TwoFactorConfirmation from './lib/models/TwoFactorConfirmation.model';
+import User from '@/lib/models/user.model';
+import TwoFactorConfirmation from '@/lib/models/TwoFactorConfirmation.model';
 import { getAccountByUserId } from './data/account';
 
 export const {

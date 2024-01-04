@@ -5,10 +5,10 @@ import { LoginSchema } from '@/schemas';
 
 import { signIn } from '@/auth';
 import { DEFAULT_LOGIN_REDIRECT } from '@/routes';
-import { AuthError } from 'next-auth';
 import { generateVerificationToken } from '@/lib/tokens';
 import { getUserByEmail } from '@/data/user';
 import { sendVerificationEmail } from '@/lib/mail';
+import { AuthError } from 'next-auth';
 
 export const login = async (values: z.infer<typeof LoginSchema>, callbackUrl?: string | null) => {
   const validatedFields = LoginSchema.safeParse(values);
