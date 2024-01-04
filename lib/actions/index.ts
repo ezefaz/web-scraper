@@ -130,6 +130,48 @@ export async function getAllProducts() {
   }
 }
 
+export async function getProductsForDashboard() {
+  try {
+    const products = await Product.find();
+
+    const dashboardProducts = products.map((product) => ({
+      id: product._id.toString(),
+      image: product.image,
+      currentPrice: product.currentPrice,
+      stock: product.stockAvailable,
+      title: product.title,
+      createdAt: product.createdAt,
+      url: product.url,
+    }));
+
+    return dashboardProducts;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
+export async function getUsersForDashboard() {
+  try {
+    const users = await User.find();
+
+    const dashboardUsers = users.map((user) => ({
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      emailVerified: user.emailVerified.toISOString(),
+      products: user.products.length,
+      createdAt: user.createdAt.toISOString(),
+      role: user.role,
+    }));
+
+    return dashboardUsers;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+
 export async function getUserProducts() {
   try {
     const user: any = await getCurrentUser();

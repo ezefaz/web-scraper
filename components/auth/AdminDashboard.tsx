@@ -43,8 +43,8 @@ type Kpi = {
 
 const kpiData: Kpi[] = [
   {
-    title: 'Sales',
-    metric: '$ 12,699',
+    title: 'Productos',
+    metric: '549',
     progress: 15.9,
     target: '$ 80,000',
     delta: '13.2%',
@@ -68,7 +68,10 @@ const kpiData: Kpi[] = [
   },
 ];
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { getProductsForDashboard } from '@/lib/actions';
+import ProductsDashboard from './admin/ProductsDashboard';
+import UsersDashboard from './admin/UsersDashboard';
 
 const usNumberformatter = (number: number, decimals = 0) =>
   Intl.NumberFormat('us', {
@@ -195,11 +198,30 @@ export default function AdminDashboard() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const selectedKpi = kpiList[selectedIndex];
   const [selectedStatus, setSelectedStatus] = useState('all');
-  const [selectedNames, setSelectedNames] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
-  const isSalesPersonSelected = (salesPerson: SalesPerson) =>
-    (salesPerson.status === selectedStatus || selectedStatus === 'all') &&
-    (selectedNames.includes(salesPerson.name) || selectedNames.length === 0);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const fetchedProducts: any = await getProductsForDashboard();
+        setProducts(fetchedProducts);
+        setLoading(false);
+      } catch (error: any) {
+        setError(error);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const isProductSelected = (product: any) =>
+    // (product.id === selectedStatus || selectedStatus === 'all') &&
+    selectedProducts.includes(product.title) || selectedProducts.length === 0;
 
   const areaChartArgs = {
     className: 'mt-5 h-72',
@@ -212,13 +234,12 @@ export default function AdminDashboard() {
     yAxisWidth: 60,
   };
   return (
-    <main>
+    <main className='pt-20'>
       <Title>Dashboard</Title>
-      <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</Text>
-
+      <Text>Información global acerca de SaveMelin.</Text>
       <TabGroup className='mt-6'>
         <TabList>
-          <Tab>Overview</Tab>
+          <Tab>General</Tab>
           <Tab>Usuarios</Tab>
           <Tab>Productos</Tab>
         </TabList>
@@ -248,21 +269,21 @@ export default function AdminDashboard() {
                   <div className='md:flex justify-between'>
                     <div>
                       <Flex className='space-x-0.5' justifyContent='start' alignItems='center'>
-                        <Title> Performance History </Title>
+                        <Title> Historial de Performance</Title>
                         <Icon
                           icon={IoMdInformationCircleOutline}
                           variant='simple'
-                          tooltip='Shows daily increase or decrease of particular domain'
+                          tooltip='Muestra datos globales acerca del uso de la aplicación'
                         />
                       </Flex>
-                      <Text> Daily change per domain </Text>
+                      {/* <Text> Daily change per domain </Text> */}
                     </div>
                     <div>
                       <TabGroup index={selectedIndex} onIndexChange={setSelectedIndex}>
                         <TabList color='gray' variant='solid'>
-                          <Tab>Sales</Tab>
                           <Tab>Profit</Tab>
-                          <Tab>Customers</Tab>
+                          <Tab>Productos</Tab>
+                          <Tab>Usuarios</Tab>
                         </TabList>
                       </TabGroup>
                     </div>
@@ -279,140 +300,8 @@ export default function AdminDashboard() {
               </Card>
             </div>
           </TabPanel>
-          <TabPanel>
-            <div className='mt-6'>
-              <Card>
-                <>
-                  <div>
-                    <Flex className='space-x-0.5' justifyContent='start' alignItems='center'>
-                      <Title> Historial de Usuarios </Title>
-                      <Icon
-                        icon={IoMdInformationCircleOutline}
-                        variant='simple'
-                        tooltip='Muestra la cantidad actual de usuarios'
-                      />
-                    </Flex>
-                  </div>
-                  <div className='flex space-x-2'>
-                    <MultiSelect
-                      className='max-w-full sm:max-w-xs'
-                      onValueChange={setSelectedNames}
-                      placeholder='Select Salespeople...'
-                    >
-                      {salesPeople.map((item) => (
-                        <MultiSelectItem key={item.name} value={item.name}>
-                          {item.name}
-                        </MultiSelectItem>
-                      ))}
-                    </MultiSelect>
-                    <Select className='max-w-full sm:max-w-xs' defaultValue='all' onValueChange={setSelectedStatus}>
-                      <SelectItem value='all'>All Performances</SelectItem>
-                      <SelectItem value='overperforming'>Overperforming</SelectItem>
-                      <SelectItem value='average'>Average</SelectItem>
-                      <SelectItem value='underperforming'>Underperforming</SelectItem>
-                    </Select>
-                  </div>
-                  <Table className='mt-6'>
-                    <TableHead>
-                      <TableRow>
-                        <TableHeaderCell>Nombre</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Email</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Rol</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Cantidad de Productos</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Status</TableHeaderCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {salesPeople
-                        .filter((item) => isSalesPersonSelected(item))
-                        .map((item) => (
-                          <TableRow key={item.name}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell className='text-right'>{item.leads}</TableCell>
-                            <TableCell className='text-right'>{item.sales}</TableCell>
-                            <TableCell className='text-right'>{item.quota}</TableCell>
-                            <TableCell className='text-right'>
-                              <BadgeDelta deltaType={deltaTypes[item.status]} size='xs'>
-                                {item.status}
-                              </BadgeDelta>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </>
-              </Card>
-            </div>
-          </TabPanel>
-          <TabPanel>
-            <div className='mt-6'>
-              <Card>
-                <>
-                  <div>
-                    <Flex className='space-x-0.5' justifyContent='start' alignItems='center'>
-                      <Title>Historial de Productos</Title>
-                      <Icon
-                        icon={IoMdInformationCircleOutline}
-                        variant='simple'
-                        tooltip='Shows sales performance per employee'
-                      />
-                    </Flex>
-                  </div>
-                  <div className='flex space-x-2'>
-                    <MultiSelect
-                      className='max-w-full sm:max-w-xs'
-                      onValueChange={setSelectedNames}
-                      placeholder='Select Salespeople...'
-                    >
-                      {salesPeople.map((item) => (
-                        <MultiSelectItem key={item.name} value={item.name}>
-                          {item.name}
-                        </MultiSelectItem>
-                      ))}
-                    </MultiSelect>
-                    <Select className='max-w-full sm:max-w-xs' defaultValue='all' onValueChange={setSelectedStatus}>
-                      <SelectItem value='all'>All Performances</SelectItem>
-                      <SelectItem value='overperforming'>Overperforming</SelectItem>
-                      <SelectItem value='average'>Average</SelectItem>
-                      <SelectItem value='underperforming'>Underperforming</SelectItem>
-                    </Select>
-                  </div>
-                  <Table className='mt-6'>
-                    <TableHead>
-                      <TableRow>
-                        <TableHeaderCell>ID</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Titulo</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Precio ($)</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Precio USD ($)</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Stock</TableHeaderCell>
-                        <TableHeaderCell className='text-right'>Status</TableHeaderCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {salesPeople
-                        .filter((item) => isSalesPersonSelected(item))
-                        .map((item) => (
-                          <TableRow key={item.name}>
-                            <TableCell>{item.name}</TableCell>
-                            <TableCell className='text-right'>{item.leads}</TableCell>
-                            <TableCell className='text-right'>{item.sales}</TableCell>
-                            <TableCell className='text-right'>{item.quota}</TableCell>
-                            <TableCell className='text-right'>{item.variance}</TableCell>
-                            <TableCell className='text-right'>
-                              <BadgeDelta deltaType={deltaTypes[item.status]} size='xs'>
-                                {item.status}
-                              </BadgeDelta>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </>
-              </Card>
-            </div>
-          </TabPanel>
+          <UsersDashboard />
+          <ProductsDashboard />
           <TabPanel>
             <div className='mt-6'>
               <Card>
@@ -430,7 +319,7 @@ export default function AdminDashboard() {
                   <div className='flex space-x-2'>
                     <MultiSelect
                       className='max-w-full sm:max-w-xs'
-                      onValueChange={setSelectedNames}
+                      onValueChange={setSelectedProducts}
                       placeholder='Select Salespeople...'
                     >
                       {salesPeople.map((item) => (
@@ -461,7 +350,7 @@ export default function AdminDashboard() {
 
                     <TableBody>
                       {salesPeople
-                        .filter((item) => isSalesPersonSelected(item))
+                        .filter((item) => isProductSelected(item))
                         .map((item) => (
                           <TableRow key={item.name}>
                             <TableCell>{item.name}</TableCell>
