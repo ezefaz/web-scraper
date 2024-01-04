@@ -1,8 +1,6 @@
 import mongoose, { Schema } from 'mongoose';
-// import { v4 as uuidv4 } from "uuid";
 
 const userSchema = new mongoose.Schema({
-  // id: { type: String, default: uuidv4() },
   name: {
     type: String,
   },
@@ -17,7 +15,6 @@ const userSchema = new mongoose.Schema({
   },
   emailVerified: {
     type: Date,
-    default: false,
   },
   role: { type: String, enum: ['ADMIN', 'USER'], default: 'USER' },
   isTwoFactorEnabled: { type: Boolean, default: false },
@@ -74,6 +71,4 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
-
-export default User;
+export default mongoose.models?.User || mongoose.model('User', userSchema);

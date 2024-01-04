@@ -21,7 +21,7 @@ type Props = {};
 
 const LoginForm = (props: Props) => {
   const searchParams = useSearchParams();
-  // const callbackUrl = searchParams.get('callbackUrl');
+  const callbackUrl = searchParams.get('callbackUrl');
   const urlError =
     searchParams.get('error') === 'OAuthAccountNotLinked' ? 'El correo es utilizado con otro proveedor' : '';
 
@@ -45,15 +45,28 @@ const LoginForm = (props: Props) => {
     setError('');
     setSuccess('');
 
-    startTransition(async () => {
-      await login(values)
-        .then((data: any) => {
-          setError(data?.error);
-          setSuccess(data?.success);
-        })
-        .catch(() => setError('Algo salio mal.'));
-    });
+    try {
+      startTransition(async () => {
+        const data = await login(values, callbackUrl);
+
+        console.log(data);
+
+        if (data?.error) {
+          console.log('Error:', data.error);
+          setError(data.error);
+        }
+
+        if (data?.success) {
+          console.log('Success:', data.success);
+          setSuccess(data.success);
+        }
+      });
+    } catch (error) {
+      setError('Something went wrong');
+      console.error('Error occurred during login:', error);
+    }
   };
+
   return (
     <div className='flex justify-center items-center h-screen'>
       <CardWrapper

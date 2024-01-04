@@ -10,10 +10,11 @@ import { generateVerificationToken } from '@/lib/tokens';
 import { getUserByEmail } from '@/data/user';
 import { sendVerificationEmail } from '@/lib/mail';
 
-export const login = async (values: z.infer<typeof LoginSchema>) => {
+export const login = async (values: z.infer<typeof LoginSchema>, callbackUrl?: string | null) => {
   const validatedFields = LoginSchema.safeParse(values);
 
   if (!validatedFields.success) {
+    console.error('Validation error:', validatedFields.error);
     return { error: 'Campos incorrectos' };
   }
 
@@ -22,10 +23,13 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
   const existingUser = await getUserByEmail(email);
 
   if (!existingUser || !existingUser.email || !existingUser.password) {
+    console.error('User not found or incomplete data:', existingUser);
+
     return { error: 'El usuario no existe!' };
   }
 
   if (!existingUser.emailVerified) {
+    console.log('Email not verified. Sending verification...');
     const verificationToken = await generateVerificationToken(existingUser.email);
 
     await sendVerificationEmail(verificationToken.email, verificationToken.token);
@@ -34,10 +38,11 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
   }
 
   try {
+    console.log('Signing in...');
     await signIn('credentials', {
       email,
       password,
-      redirectTo: DEFAULT_LOGIN_REDIRECT,
+      redirectTo: callbackUrl || DEFAULT_LOGIN_REDIRECT,
     });
   } catch (error) {
     if (error instanceof AuthError) {

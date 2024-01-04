@@ -6,6 +6,7 @@ import { getUserById } from '@/data/user';
 import clientPromise from '@/lib/mongodb';
 import User from './lib/models/user.model';
 import TwoFactorConfirmation from './lib/models/TwoFactorConfirmation.model';
+import { getAccountByUserId } from './data/account';
 
 export const {
   handlers: { GET, POST },
@@ -35,6 +36,8 @@ export const {
   },
   callbacks: {
     async signIn({ user, account }: any) {
+      console.log('datos usuario???');
+
       // Allow OAuth without email verification
       if (account?.provider !== 'credentials') return true;
 
@@ -42,6 +45,17 @@ export const {
 
       // Prevent sign in without email verification
       if (!existingUser?.emailVerified) return false;
+
+      // if (existingUser.isTwoFactorEnabled) {
+      //   const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
+
+      //   if (!twoFactorConfirmation) return false;
+
+      //   // Delete two factor confirmation for next sign in
+      //   await TwoFactorConfirmation.deleteOne({
+      //     id: twoFactorConfirmation.id,
+      //   });
+      // }
 
       // if (existingUser.isTwoFactorEnabled) {
       // 	const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
@@ -69,6 +83,16 @@ export const {
         session.user.role = token.role;
       }
 
+      // if (session.user) {
+      //   session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      // }
+
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.isOAuth = token.isOAuth as boolean;
+      }
+
       return session;
     },
     async jwt({ token }: any) {
@@ -78,7 +102,13 @@ export const {
 
       if (!existingUser) return token;
 
+      const existingAccount = await getAccountByUserId(existingUser._id);
+
+      token.isOAuth = !!existingAccount;
+      token.name = existingUser.name;
+      token.email = existingUser.email;
       token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;
     },
