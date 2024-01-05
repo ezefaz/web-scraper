@@ -83,24 +83,36 @@ export async function GET(request: Request) {
         // CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
         const emailNotifType = getEmailNotifType(scrapedProduct, currentProduct);
 
+        console.log('TIPO DE NOTIFICATION', emailNotifType);
+        console.log('TIPO DE USUARIO', currentProduct.users);
+        console.log('TIPO DE SCRAPER', scrapedProduct.users.length > 0);
+
         if (
-          (emailNotifType && currentProduct.users.length > 0) ||
-          (emailNotifType && scrapedProduct.users.length > 0)
+          (emailNotifType && currentProduct.users && currentProduct.users.length > 0) ||
+          (emailNotifType && scrapedProduct.users && scrapedProduct.users.length > 0)
         ) {
           const productInfo = {
             title: updatedProduct.title,
+            image: updatedProduct.image,
             url: updatedProduct.url,
           };
 
           const emailContent = await generateEmailBody(productInfo, emailNotifType);
 
-          const userEmails = scrapedProduct.users
-            ? scrapedProduct.users.map((user: any) => user.email)
-            : currentProduct.users.map((user: any) => user.email);
+          let userEmails = [];
 
-          if (!userEmails) return;
+          if (scrapedProduct.users && scrapedProduct.users.length > 0) {
+            userEmails = scrapedProduct.users.map((user) => user.email);
+          } else if (currentProduct.users && currentProduct.users.length > 0) {
+            userEmails = currentProduct.users.map((user: any) => user.email);
+          }
 
-          await sendEmail(emailContent, userEmails);
+          console.log('ENTRA ???');
+          console.log('CORREOS', userEmails);
+
+          if (userEmails.length > 0) {
+            await sendEmail(emailContent, userEmails);
+          }
         }
 
         return updatedProduct;
