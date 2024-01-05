@@ -7,6 +7,8 @@ import ProductCard from '@/components/ProductCard';
 import Services from '@/components/Services';
 import StepsComponent from '@/components/Steps';
 import { ProductType } from '@/types';
+import { StartSteps } from '@/components/StartSteps';
+import Stats from '@/components/Stats';
 
 const Home = async () => {
   const allProducts = await getAllProducts();
@@ -36,7 +38,7 @@ const Home = async () => {
               <h1 className='text-6xl head-text'>
                 <span className='relative text-center relative after:bg-primary/50 after:-z-10 after:absolute after:h-6 after:w-full after:bottom-0 after:end-0'>
                   Optimiza
-                  <span className='absolute bottom-0 left-0 w-full h-2 text-center'></span>
+                  <span className='absolute bottom-0 tracking-right left-0 w-full h-2 text-center'></span>
                 </span>{' '}
                 tus Compras
               </h1>
@@ -55,8 +57,10 @@ const Home = async () => {
           {/* <HeroCarousel /> */}
         </div>
       </section>
+      <StartSteps />
       <Services />
       <StepsComponent />
+      <Stats />
       <section className='trending-section'>
         <h2 className='section-text'>{userProducts && userProducts.length > 1 ? 'Tus Productos' : 'Trending 🔥'}</h2>
         <div className='flex flex-wrap gap-x-8 gap-y-16'>

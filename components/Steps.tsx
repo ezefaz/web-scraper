@@ -8,7 +8,7 @@ const StepsComponent: React.FC = () => {
         <div className='items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16'>
           <div className='text-gray-500 sm:text-lg dark:text-gray-400'>
             <h2 className='mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-black'>
-              Junta tus productos en una misma plataforma y{' '}
+              Arma tu cartera de productos en una misma plataforma y{' '}
               <span className='relative'>
                 ahorra
                 <span className='absolute bottom-0 left-0 w-full h-1 bg-primary/60'></span>
@@ -16,7 +16,7 @@ const StepsComponent: React.FC = () => {
               masivamente
             </h2>
 
-            <p className='mb-8 font-regular lg:text-l'>
+            <p className='mb-8 font-regular text-gray-500 lg:text-l'>
               Te enviaremos toda la información y análisis previo a la compra, para que puedas tomar una decision
               inteligente y cuidando tu economía.
             </p>
@@ -34,7 +34,9 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight font-light'>Insertar el link del producto</span>
+                <span className='text-base font-medium leading-tight text-gray-500 font-light'>
+                  Insertar el link del producto
+                </span>
               </li>
               <li className='flex space-x-3'>
                 <svg
@@ -49,7 +51,7 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight'>Seguimiento de Producto</span>
+                <span className='text-base font-medium leading-tight text-gray-500'>Seguimiento de Producto</span>
               </li>
               <li className='flex space-x-3'>
                 <svg
@@ -64,7 +66,7 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight '>Comenzar a ahorrar</span>
+                <span className='text-base font-medium leading-tight text-gray-500 '>Comenzar a ahorrar</span>
               </li>
             </ul>
           </div>
@@ -92,7 +94,7 @@ const StepsComponent: React.FC = () => {
                 <span className='absolute bottom-0 left-0 w-full h-1 bg-primary/60'></span>
               </span>
             </h2>
-            <p className='mb-8 font-regular lg:text-l'>
+            <p className='mb-8 font-regular lg:text-l text-gray-500'>
               Sabemos la importancia y el impacto que puede generar el ahorro a largo plazo, por eso juntamos una serie
               de servicios para maximizarlo.
             </p>
@@ -110,7 +112,7 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight'>Reportes y Graficos Dinámicos</span>
+                <span className='text-base font-medium leading-tight text-gray-500'>Reportes y Graficos Dinámicos</span>
               </li>
               <li className='flex space-x-3'>
                 <svg
@@ -125,7 +127,9 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight'>Precios menores, mayores, promedio y en USD</span>
+                <span className='text-base font-medium leading-tight text-gray-500'>
+                  Precios menores, mayores, promedio y en USD
+                </span>
               </li>
               <li className='flex space-x-3'>
                 <svg
@@ -140,7 +144,9 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight'>Actualización a tu correo electrónico</span>
+                <span className='text-base font-medium leading-tight text-gray-500'>
+                  Actualización a tu correo electrónico
+                </span>
               </li>
               <li className='flex space-x-3'>
                 <svg
@@ -155,7 +161,9 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight'>Comparación de Precios entre Productos</span>
+                <span className='text-base font-medium leading-tight text-gray-500'>
+                  Comparación de Precios entre Productos
+                </span>
               </li>
               <li className='flex space-x-3'>
                 <svg
@@ -170,7 +178,9 @@ const StepsComponent: React.FC = () => {
                     clipRule='evenodd'
                   ></path>
                 </svg>
-                <span className='text-base font-medium leading-tight'>Colección de productos y ahorro masivo</span>
+                <span className='text-base font-medium leading-tight text-gray-500'>
+                  Colección de productos y ahorro masivo
+                </span>
               </li>
             </ul>
           </div>
