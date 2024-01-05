@@ -47,7 +47,7 @@ const Dropdown = () => {
 
   return (
     <>
-      <div className='relative inline-block text-left' ref={dropdownRef}>
+      <div className='relative inline-block text-left p-10 mr-4' ref={dropdownRef}>
         <button
           id='dropdown-button'
           onClick={toggleDropdown}
@@ -65,7 +65,7 @@ const Dropdown = () => {
             isDropdownOpen ? '' : 'hidden'
           }`}
         >
-          <div className='py-2' role='menu' aria-orientation='vertical' aria-labelledby='dropdown-button'>
+          <div className='py-2 mr-2' role='menu' aria-orientation='vertical' aria-labelledby='dropdown-button'>
             <div className='flex flex-col items-center px-4 py-2'>
               <div className='mb-2'>
                 {loggedUser && loggedUser.image ? (

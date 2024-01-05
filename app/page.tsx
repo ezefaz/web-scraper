@@ -42,7 +42,7 @@ const Home = async () => {
               </h1>
 
               <h1 className='head-text text-center '>
-                con Save<span className='text-primary text-center xl:text-7xl  sm:mt-4 sm:text-4xl '>Melin</span>
+                con Save<span className='text-primary text-center xl:text-7xl  sm:mt-4 sm:text-8xl '>Melin</span>
               </h1>
             </div>
             {''}
