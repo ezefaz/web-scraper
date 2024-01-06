@@ -31,6 +31,8 @@ type Props = {
 
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: ProductType = await getProductById(id);
+  console.log('ACTUAL', product);
+
   const currentUser = await getCurrentUser();
 
   const isFollowing = currentUser
@@ -128,6 +130,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               >
                 Visitar Producto
               </Link>
+              <p>Tienda {product.storeName ? product.storeName : ''}</p>
             </div>
 
             {/* <div className='flex items-center gap-3 py-3'>

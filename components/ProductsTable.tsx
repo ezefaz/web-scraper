@@ -48,7 +48,7 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
   return (
     <div className='flex w-full justify-center items-center  mt-20'>
       <Card className='w-full  p-10'>
-        <Title className='mb-4'>Listado de Productos del Usuario {user}</Title>
+        <Title className='mb-4 mt-10'>Listado de Productos del Usuario {user}</Title>
         <Table className='w-full'>
           <TableHead>
             <TableRow>

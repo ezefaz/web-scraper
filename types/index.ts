@@ -50,6 +50,8 @@ export type ProductType = {
   stockAvailable?: string;
   isOutOfStock: Boolean;
   users?: UserType[];
+  storeName?: String;
+  isFreeReturning?: Boolean;
 };
 
 export type NotificationType = 'WELCOME' | 'CHANGE_OF_STOCK' | 'LOWEST_PRICE' | 'THRESHOLD_MET';
