@@ -35,7 +35,7 @@ export const StartSteps = () => {
       <div className='grid gap-10 lg:grid-cols-4 sm:grid-cols-2'>
         <div>
           <div className='flex items-center justify-between mb-6'>
-            <p className='text-2xl font-bold'>Agrega tu Producto</p>
+            <p className='text-2xl font-bold'>1. Agregar Producto</p>
             <svg
               className='w-6 text-gray-700 transform rotate-90 sm:rotate-0'
               stroke='currentColor'
@@ -52,7 +52,7 @@ export const StartSteps = () => {
         </div>
         <div>
           <div className='flex items-center justify-between mb-6'>
-            <p className='text-2xl font-bold'>Compara Precios</p>
+            <p className='text-2xl font-bold'>2. Comparar Precios</p>
             <svg
               className='w-6 text-gray-700 transform rotate-90 sm:rotate-0'
               stroke='currentColor'
@@ -72,7 +72,7 @@ export const StartSteps = () => {
         </div>
         <div>
           <div className='flex items-center justify-between mb-6'>
-            <p className='text-2xl font-bold'>Sigue al Producto</p>
+            <p className='text-2xl font-bold'>3. Seguir Producto</p>
             <svg
               className='w-6 text-gray-700 transform rotate-90 sm:rotate-0'
               stroke='currentColor'

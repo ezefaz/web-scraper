@@ -90,24 +90,38 @@ export function extractDescription($: any) {
 
   return '';
 }
-
-export function extractStarRatings($: any) {
+export function extractStars($: any) {
   const selectors = [
-    '.ui-pdp-review__rating',
-    '.ui-review-capability__rating__average.ui-review-capability__rating__average--desktop',
+    '.ui-review-capability__rating > div > p',
+    '..ui-review-capability__rating__rating .andes-visually-hidden',
+    '.ui-review-capability__rating__average ui-review-capability__rating__average--desktop',
   ];
 
   for (const selector of selectors) {
     const elements = $(selector);
     if (elements.length > 0) {
-      const textContent = elements.map((_: any, element: any) => $(element).text());
+      const textContent = elements
+        .map((_: any, element: any) => $(element).text().trim())
+        .get()
+        .join('\n');
       return textContent;
     }
   }
 
-  // If no matching elements were found, return an empty string
   return '';
 }
+
+// export function extractStarRatings($: any) {
+//   const selectors = [
+//     '.ui-review-capability__rating__average ui-review-capability__rating__average--desktop',
+//     '.ui-pdp-review__rating',
+//     '.ui-pdp-review__amount',
+//   ];
+
+//   selectors.text()
+
+//   return '';
+// }
 
 export function getHighestPrice(priceList: PriceHistoryItem[]) {
   if (priceList.length === 0 || !priceList[0].price) {

@@ -27,7 +27,7 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
   };
 
   return (
-    <div className='flex flex-col items-center justify-center space-y-4'>
+    <div className='flex flex-col items-center justify-center space-y-4 w-full'>
       <button
         className='btn text-white flex items-center justify-center p-2'
         onClick={handleScrapeClick}
@@ -42,7 +42,7 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
       >
         {scrapingInProgress ? 'Comparando...' : 'Inciar Comparación de Precios'}
       </button> */}
-      <div className=''>
+      <div className='w-full'>
         <PriceComparisson scrapedData={scrapedData} productPrice={productPrice} />
       </div>
     </div>

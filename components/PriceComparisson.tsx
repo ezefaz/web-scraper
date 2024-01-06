@@ -119,7 +119,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
 
   return (
     <>
-      <Card className='relative max-w-xl mx-auto h-96 overflow-hidden'>
+      <Card className='relative  mx-auto h-96 overflow-hidden w-full'>
         <Table>
           <TableHead>
             <TableRow>
@@ -190,7 +190,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
             })}
           </TableBody>
         </Table>
-        <div className='inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-white pt-12 pb-8 absolute rounded-b-lg'>
+        <div className='inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-white pt-12 pb-8 absolute rounded-b-lg w-full'>
           <Button
             icon={BsArrowBarRight}
             className='bg-white shadow-md border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'
@@ -213,7 +213,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
           >
             <div className='fixed inset-0 bg-gray-900 bg-opacity-25' />
           </Transition.Child>
-          <div className='fixed inset-0 overflow-y-auto'>
+          <div className='fixed inset-0 overflow-y-auto w-ful'>
             <div className='flex min-h-full items-center justify-center p-4 text-center'>
               <Transition.Child
                 as={Fragment}
@@ -225,7 +225,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                 leaveTo='opacity-0 scale-95'
               >
                 <Dialog.Panel
-                  className='w-full max-w-xl transform overflow-hidden ring-tremor bg-white
+                  className='w-full w-[60%] transform overflow-hidden ring-tremor bg-white
                                   p-6 text-left align-middle shadow-tremor transition-all rounded-xl'
                 >
                   <div className='relative mt-3'>

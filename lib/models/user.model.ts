@@ -56,6 +56,13 @@ const userSchema = new mongoose.Schema({
       stockAvailable: { type: String },
       stars: { type: String },
       isOutOfStock: { type: Boolean, default: false },
+      isFreeShipping: {
+        type: Boolean,
+      },
+      isFreeReturning: {
+        type: Boolean,
+      },
+      status: { type: String, enum: ['NUEVO', 'USADO', 'REACONDICIONADO'] },
     },
   ],
   favoriteProducts: {

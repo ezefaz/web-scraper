@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -18,8 +18,12 @@ import {
 } from '@/lib/utils';
 import { ProductType } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
-import { Card } from '@tremor/react';
+import { Badge, Card, Tab, TabGroup, TabList } from '@tremor/react';
 import ScraperButton from '@/components/ScraperButton';
+import ProductTabs from '@/components/ProductTabs';
+
+import { IoIosStarOutline } from 'react-icons/io';
+import ProductBadges from '@/components/ProductBadges';
 
 type Props = {
   params: { id: string };
@@ -104,15 +108,15 @@ const ProductDetails = async ({ params: { id } }: Props) => {
   const similarProducts = await getSimilarProducts(id);
 
   return (
-    <div className='product-container mt-16'>
+    <div className='product-container mt-16' id='information'>
       {' '}
+      <ProductTabs />
       <div className='flex gap-10 sm:cap-5 xl:flex-row flex-col'>
         <div className='flex flex-row flex-col h-[max-content]'>
           <Card decoration='bottom' decorationColor='orange'>
             <Image src={product.image} alt={product.title} width={450} height={450} />
           </Card>
         </div>
-
         <div className='flex-1 flex flex-col'>
           <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
             <div className='flex flex-col gap-3'>
@@ -145,30 +149,16 @@ const ProductDetails = async ({ params: { id } }: Props) => {
                 product.currency
               } ${formatNumber(currentPrice)}`}</p>
               <p className='text-[21px] text-black opacity-50 line-through '>
-                {`${product.currency} ${formatNumber(product.originalPrice)}`}
+                {product.currentPrice !== product.originalPrice
+                  ? `${product.currency} ${formatNumber(product.originalPrice)}`
+                  : ''}
               </p>
             </div>
-            <div className='flex flex-col gap-4'>
-              <div className='flex gap-3'>
-                <div className='product-stars'>
-                  <Image src='/assets/icons/star.svg' alt='star' width={16} height={16} />
-                  <p className='text-sm text-primary-orange font-semibold'>{product.stars || '4.5'}</p>
-                </div>
-                <div className='product-reviews'>
-                  <Image src='/assets/icons/comment.svg' alt='comment' width={16} height={16} />
-                  <p className='text-sm text-center text-secondary font-semibold'>{product.reviewsCount} Reseñas</p>
-                </div>
-                <div className='product-stock'>
-                  {/* <Image src='/assets/icons/comment.svg' alt='comment' width={16} height={16} /> */}
-                  <p className='text-sm text-center text-secondary font-semibold'>
-                    {product.stockAvailable == '1' ? `${product.stockAvailable} disponible` : product.stockAvailable}
-                  </p>
-                </div>
-              </div>
-              <p className='text-sm text-black opacity-50'>
-                <span className='text-primary-green font-semibold'>93%</span> de los compradores recomiendan esto.
-              </p>
-            </div>
+            <ProductBadges
+              stars={product.stars}
+              reviewsCount={product.reviewsCount}
+              stockAvailable={product.stockAvailable}
+            />
             <div className='flex flex-col gap-10'>
               {/* <div className='flex flex-col gap-5'>
                 {product.description.length > 2 && (
@@ -225,7 +215,13 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           {currentUser && !isFollowing && <Modal productId={id} />}
         </div>
       </div>
-      <div className='flex flex-col lg:flex-row gap-5 m-auto'>
+      <div id='history'></div>
+      <div className='mx-auto max-w-[510px] text-center mb-2'>
+        <div id='comparisson'></div>
+        <span className='block text-lg font-semibold text-primary'>Graficos</span>
+        <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px]'>Historial de Precios</h1>
+      </div>
+      <div className='flex flex-col lg:flex-row gap-20 m-auto mt-10 w-full'>
         <div className='w-full m-auto lg:w-[50%]'>
           <BarChart
             productTitle={product.title}
@@ -248,12 +244,20 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           />
         </div>
       </div>
-      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20'>
+      <div className='mx-auto max-w-[510px] text-center mb-2'>
+        <div id='comparisson'></div>
+        <span className='block text-lg font-semibold text-primary'>Precios</span>
+        <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px]'>Comparación de Precios</h1>
+      </div>
+      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
         <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />
       </div>
       {similarProducts && similarProducts?.length > 0 && (
         <div className='py-14 flex flex-col gap-2 w-full' id='trending'>
-          <p className='section-text'>Trending</p>
+          <div className='mx-auto max-w-[510px] text-center mb-2'>
+            {/* <span className='block text-lg font-semibold text-primary'>Graficos</span> */}
+            <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px]'>Otros Productos</h1>
+          </div>
           <div className='flex flex-wrap gap-10 mt-7 w-full'>
             {similarProducts.map((product) => (
               <ProductCard key={product._id} product={product} />

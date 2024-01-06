@@ -219,19 +219,25 @@ export async function searchUserProducts(searchTerm: string) {
 
 export async function getSimilarProducts(productId: string) {
   try {
-    connectToDb();
-
+    await connectToDb();
     const currentProduct = await Product.findById(productId);
 
     if (!currentProduct) return null;
 
-    const similarProducts = await Product.find({
+    const similarProductsInSameCategory = await Product.find({
       _id: { $ne: productId },
+      category: currentProduct.category,
     }).limit(3);
 
-    return similarProducts;
+    if (similarProductsInSameCategory.length === 0) {
+      const randomProducts = await Product.aggregate([{ $sample: { size: 3 } }]);
+      return randomProducts;
+    }
+
+    return similarProductsInSameCategory;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    throw new Error('Error fetching similar products');
   }
 }
 

@@ -33,7 +33,15 @@ const productSchema = new mongoose.Schema(
     reviewsCount: { type: Number },
     stockAvailable: { type: String },
     stars: { type: String },
-    isOutOfStock: { type: Boolean, default: false },
+    isOutOfStock: { type: Boolean },
+    isFreeReturning: {
+      type: Boolean,
+    },
+    isFreeShipping: {
+      type: Boolean,
+    },
+    status: { type: String, enum: ['Nuevo', 'Usado', 'Reacondicionado'] },
+    storeName: { type: String },
     users: [
       {
         name: {
