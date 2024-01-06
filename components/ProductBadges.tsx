@@ -8,9 +8,9 @@ import { IoChatboxEllipsesOutline } from 'react-icons/io5';
 import { MdOutlineProductionQuantityLimits } from 'react-icons/md';
 
 interface ProductBadgesProps {
-  stars: string;
-  reviewsCount: string;
-  stockAvailable: string;
+  stars: string | number;
+  reviewsCount: string | number;
+  stockAvailable: string | undefined;
 }
 
 const ProductBadges = ({ stars, reviewsCount, stockAvailable }: ProductBadgesProps) => {
