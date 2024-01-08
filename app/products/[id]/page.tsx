@@ -31,7 +31,6 @@ type Props = {
 
 const ProductDetails = async ({ params: { id } }: Props) => {
   const product: ProductType = await getProductById(id);
-  console.log('ACTUAL', product);
 
   const currentUser = await getCurrentUser();
 
@@ -161,6 +160,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               stars={product.stars}
               reviewsCount={product.reviewsCount}
               stockAvailable={product.stockAvailable}
+              isFreeReturning={product.isFreeReturning}
+              isFreeShipping={product.isFreeShipping}
+              status={product.status}
             />
             <div className='flex flex-col gap-10'>
               {/* <div className='flex flex-col gap-5'>

@@ -49,8 +49,6 @@ const LoginForm = (props: Props) => {
       startTransition(async () => {
         const data = await login(values, callbackUrl);
 
-        console.log(data);
-
         if (data?.error) {
           console.log('Error:', data.error);
           setError(data.error);

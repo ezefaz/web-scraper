@@ -83,10 +83,6 @@ export async function GET(request: Request) {
         // CHECK EACH PRODUCT'S STATUS & SEND EMAIL ACCORDINGLY
         const emailNotifType = getEmailNotifType(scrapedProduct, currentProduct);
 
-        console.log('TIPO DE NOTIFICATION', emailNotifType);
-        console.log('TIPO DE USUARIO', currentProduct.users);
-        console.log('TIPO DE SCRAPER', scrapedProduct.users.length > 0);
-
         if (
           (emailNotifType && currentProduct.users && currentProduct.users.length > 0) ||
           (emailNotifType && scrapedProduct.users && scrapedProduct.users.length > 0)
@@ -106,9 +102,6 @@ export async function GET(request: Request) {
           } else if (currentProduct.users && currentProduct.users.length > 0) {
             userEmails = currentProduct.users.map((user: any) => user.email);
           }
-
-          console.log('ENTRA ???');
-          console.log('CORREOS', userEmails);
 
           if (userEmails.length > 0) {
             await sendEmail(emailContent, userEmails);

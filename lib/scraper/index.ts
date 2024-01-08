@@ -2,14 +2,7 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import {
-  extractCategories,
-  extractCategory,
-  extractCurrency,
-  extractDescription,
-  extractPrice,
-  extractStars,
-} from '../utils';
+import { extractCategory, extractCurrency, extractDescription, extractPrice, extractStars } from '../utils';
 import { scrapeDolarValue } from './dolar';
 import { getCurrentUser } from '../actions';
 
@@ -120,14 +113,36 @@ export async function scrapeMLProduct(url: string) {
     const statusText = statusElement.text().trim();
     const status = statusText.split(' ')[0];
 
-    const storeNameElement = $('.ui-pdp-action-modal__link .ui-pdp-color--BLUE.ui-pdp-family--REGULAR').first();
-    const storeName = storeNameElement.text();
+    // const storeNameElement = $('.ui-pdp-action-modal__link .ui-pdp-color--BLUE.ui-pdp-family--REGULAR').first();
+    // const storeName = storeNameElement.text();
 
     const categories = extractCategory($);
-    // const category = categories[4].length > 1 ? categories[4] : categories[0];
     const category = categories[0];
 
     const today = new Date();
+
+    const storeInformation = $('.ui-pdp-seller__header__info-container');
+
+    // SELLER INFO
+
+    // STORE NAME
+
+    const store = storeInformation
+      .map((index, element) => {
+        const originalText = $(element).text().trim();
+
+        // Find the position of "Vendido por" and "|"
+        const vendidoPorIndex = originalText.indexOf('Vendido por');
+        const pipeIndex = originalText.indexOf('|');
+
+        // Extract the substring between "Vendido por" and "|"
+        const extractedText = originalText.substring(vendidoPorIndex + 'Vendido por'.length, pipeIndex).trim();
+
+        return extractedText;
+      })
+      .get();
+
+    const storeName = store[0];
 
     const data = {
       url,

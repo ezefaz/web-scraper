@@ -37,7 +37,16 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetLink = `http://localhost:3000/new-password?token=${token}`;
+  // const resetLink = `http://localhost:3000/new-password?token=${token}`;
+
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  const developmentBaseURL = 'http://localhost:3000';
+  const productionBaseURL = 'https://savemelin.vercel.app';
+
+  const resetLink = isDevelopment
+    ? `${developmentBaseURL}/new-verification?token=${token}`
+    : `${productionBaseURL}/new-verification?token=${token}`;
 
   await resend.emails.send({
     from: 'hello@webgeenix.com',

@@ -36,8 +36,6 @@ export const {
   },
   callbacks: {
     async signIn({ user, account }: any) {
-      console.log('datos usuario???');
-
       // Allow OAuth without email verification
       if (account?.provider !== 'credentials') return true;
 
