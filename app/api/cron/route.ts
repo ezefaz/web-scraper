@@ -6,7 +6,7 @@ import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
 import { CurrentDolar, PriceHistoryItem } from '@/types';
 
-export const maxDuration = 10; // This function can run for a maximum of 300 seconds
+export const maxDuration = 20;
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
