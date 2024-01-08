@@ -6,9 +6,11 @@ import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
 import { CurrentDolar, PriceHistoryItem } from '@/types';
 
-export const maxDuration = 20;
+export const maxDuration = 10;
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+
+const start = performance.now();
 
 export async function GET(request: Request) {
   try {
@@ -120,3 +122,6 @@ export async function GET(request: Request) {
     throw new Error(`Failed to get all products: ${error.message}`);
   }
 }
+
+const end = performance.now();
+console.log(`Function execution time: ${end - start} milliseconds`);
