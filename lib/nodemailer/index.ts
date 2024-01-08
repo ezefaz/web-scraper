@@ -105,17 +105,18 @@ export async function generateEmailBody(product: EmailProductInfo, type: Notific
 export const sendEmail = async (emailContent: EmailContent, sendTo: string[]) => {
   const transporter = nodemailer.createTransport({
     pool: true,
-    service: 'hotmail',
-    port: 2525,
+    service: 'gmail',
+    port: 465,
+    secure: true,
     auth: {
-      user: 'tiendademarquillas@hotmail.com',
+      user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
     },
     maxConnections: 1,
   });
 
   const mailOptions = {
-    from: 'tiendademarquillas@hotmail.com',
+    from: process.env.EMAIL_USER,
     to: sendTo,
     html: emailContent.body,
     subject: emailContent.subject,
