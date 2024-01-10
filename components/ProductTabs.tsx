@@ -12,11 +12,11 @@ const ProductTabs = (props: Props) => {
   };
 
   return (
-    <TabGroup className='flex justify-end'>
+    <TabGroup className='flex justify-center md:justify-end'>
       <TabList className='mt-8'>
         <Tab onClick={() => handleTabClick('information')}>Información</Tab>
         <Tab onClick={() => handleTabClick('history')}>Historial</Tab>
-        <Tab onClick={() => handleTabClick('comparisson')}>Comparación</Tab>
+        <Tab onClick={() => handleTabClick('comparison')}>Comparación</Tab>
       </TabList>
     </TabGroup>
   );

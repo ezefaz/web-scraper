@@ -62,7 +62,7 @@ const Home = async () => {
       <StepsComponent />
       <Stats />
       <section className='trending-section'>
-        <h2 className='section-text'>{userProducts && userProducts.length > 1 ? 'Tus Productos' : 'Trending 🔥'}</h2>
+        <h2 className='section-text'>{userProducts && userProducts.length > 1 ? 'Tus Productos' : 'Destacados 🔥'}</h2>
         <div className='flex flex-wrap gap-x-8 gap-y-16'>
           {userProducts && userProducts.length > 1
             ? userProducts &&

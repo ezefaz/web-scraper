@@ -70,16 +70,14 @@ export async function scrapeMLProduct(url: string) {
     const reviewsCountText = $('.ui-pdp-review__amount').text();
     const reviewsCount = reviewsCountText ? parseInt(reviewsCountText.replace(/\D+/g, ''), 10) : 0;
 
-    // const starsText = $('.ui-pdp-review__rating').text();
-    // const stars = extractStarRatings($);
-    // const stars = parseFloat(starsText);
-
     // DESCRIPTION
 
     const description = extractDescription($);
 
     // RATING
     const stars = extractStars($);
+
+    // BADGES
 
     const stockAvailable =
       $('.ui-pdp-buybox__quantity__available')
@@ -109,23 +107,22 @@ export async function scrapeMLProduct(url: string) {
       }
     });
 
+    // STATUS
+
     const statusElement = $('.ui-pdp-subtitle');
     const statusText = statusElement.text().trim();
     const status = statusText.split(' ')[0];
 
-    // const storeNameElement = $('.ui-pdp-action-modal__link .ui-pdp-color--BLUE.ui-pdp-family--REGULAR').first();
-    // const storeName = storeNameElement.text();
+    // CATEGORIES
 
     const categories = extractCategory($);
     const category = categories[0];
 
     const today = new Date();
 
+    // STORE INFO
+
     const storeInformation = $('.ui-pdp-seller__header__info-container');
-
-    // SELLER INFO
-
-    // STORE NAME
 
     const store = storeInformation
       .map((index, element) => {
@@ -141,6 +138,16 @@ export async function scrapeMLProduct(url: string) {
         return extractedText;
       })
       .get();
+
+    const reviewParagraphs = $('.ui-review-capability-comments__comment__content');
+
+    const productReviews: Array<string> = [];
+
+    reviewParagraphs.each((index, element) => {
+      const reviews = $(element).text();
+
+      productReviews.push(reviews);
+    });
 
     const storeName = store[0];
 
@@ -169,6 +176,7 @@ export async function scrapeMLProduct(url: string) {
       storeName,
       status,
       isFreeShipping,
+      productReviews,
     };
 
     // console.log('PRODUCTO -->', data);

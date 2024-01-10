@@ -113,7 +113,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       {' '}
       <ProductTabs />
       <div className='flex gap-10 sm:cap-5 xl:flex-row flex-col'>
-        <div className='flex flex-row flex-col h-[max-content]'>
+        <div className='flex flex-row flex-col mr-8 h-[max-content]'>
           <Card decoration='bottom' decorationColor='orange'>
             <Image src={product.image} alt={product.title} width={450} height={450} />
           </Card>
@@ -164,7 +164,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               isFreeShipping={product.isFreeShipping}
               status={product.status}
             />
-            <div className='flex flex-col gap-10'>
+            <div className='flex flex-col gap-10 m-auto'>
               {/* <div className='flex flex-col gap-5'>
                 {product.description.length > 2 && (
                   <>
@@ -183,7 +183,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
 
           <div className='my-7 w-full flex flex-col-2 gap-5'>
-            <div className='flex m-auto gap-6 flex-wrap'>
+            <div className='flex mr-5 m-auto gap-6 flex-wrap'>
               <PriceInfoCard
                 title='Precio Actual'
                 iconSrc='/assets/icons/price-tag.svg'
@@ -224,9 +224,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div className='mx-auto max-w-[510px] text-center mb-2'>
         <div id='comparisson'></div>
         <span className='block text-lg font-semibold text-primary'>Graficos</span>
-        <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px]'>Historial de Precios</h1>
+        <h1 className=' text-3xl mr-3 font-bold head-text  sm:text-1xl md:text-[40px]'>Historial de Precios</h1>
       </div>
-      <div className='flex flex-col lg:flex-row gap-20 m-auto mt-10 w-full'>
+      <div className='flex flex-col lg:flex-row  gap-20 mt-10 w-full'>
         <div className='w-full m-auto lg:w-[50%]'>
           <BarChart
             productTitle={product.title}
@@ -252,7 +252,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div className='mx-auto max-w-[510px] text-center mb-2'>
         <div id='comparisson'></div>
         <span className='block text-lg font-semibold text-primary'>Precios</span>
-        <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px]'>Comparación de Precios</h1>
+        <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px]'>Comparación de Precios</h1>
       </div>
       <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
         <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />

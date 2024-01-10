@@ -20,8 +20,9 @@
 		@apply py-3 px-3 hover:bg-opacity-70 rounded-[30px] text-lg bg-primary font-semibold;
 	}
 
+
 	.head-text {
-		@apply mt-2 xl:text-7xl leading-[72px] font-bold tracking-[-1.2px] text-gray-900 text-6xl;
+		@apply mt-2 xl:text-7xl leading-[72px] font-bold tracking-[-1.2px] text-gray-900 text-5xl;
 	}
 
 	

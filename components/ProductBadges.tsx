@@ -29,7 +29,7 @@ const ProductBadges = ({
 }: ProductBadgesProps) => {
   return (
     <div className='flex flex-col gap-4'>
-      <div className='flex gap-4'>
+      <div className='flex flex-col gap-3 md:flex-row md:gap-4'>
         <Badge icon={IoCartOutline} color={status.toLowerCase() == 'nuevo' ? 'green' : 'orange'}>
           {status}
         </Badge>
@@ -53,8 +53,10 @@ const ProductBadges = ({
         </Badge>
       </div>
       <p className='text-sm text-black opacity-50'>
-        <span className='text-primary-green font-semibold'>{stars ? (Number(stars) / 5) * 100 : '95'}%</span> de los
-        compradores recomiendan esto.
+        <span className='text-primary-green font-semibold'>
+          {stars ? ((Number(stars) / 5) * 100).toFixed(2) : '95.00'}%
+        </span>{' '}
+        de los compradores recomiendan esto.
       </p>
     </div>
   );

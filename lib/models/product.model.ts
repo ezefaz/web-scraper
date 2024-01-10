@@ -42,6 +42,7 @@ const productSchema = new mongoose.Schema(
     },
     status: { type: String, enum: ['Nuevo', 'Usado', 'Reacondicionado'] },
     storeName: { type: String },
+    productReviews: { type: Array },
     users: [
       {
         name: {

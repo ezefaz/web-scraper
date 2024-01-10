@@ -54,6 +54,7 @@ export type ProductType = {
   isFreeReturning?: boolean;
   isFreeShipping?: boolean;
   status: string;
+  productReviews: Array<string>;
 };
 
 export type NotificationType = 'WELCOME' | 'CHANGE_OF_STOCK' | 'LOWEST_PRICE' | 'THRESHOLD_MET';
