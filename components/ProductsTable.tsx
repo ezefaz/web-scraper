@@ -17,7 +17,7 @@ import {
 } from '@tremor/react';
 import Search from './Search';
 import { ProductType } from '@/types';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber, formatUSD } from '@/lib/utils';
 import Removal from './Removal';
 
 interface UserProduct {
@@ -85,7 +85,7 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
                   <Text>{`${product.currency} ${formatNumber(product.currentPrice)}`}</Text>
                 </TableCell>
                 <TableCell>
-                  <Text>${product.currentDolarValue}</Text>
+                  <Text>{formatUSD(product.currentDolarValue)}</Text>
                 </TableCell>
                 <TableCell>
                   {/* <Text>
