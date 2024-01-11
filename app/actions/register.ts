@@ -7,6 +7,8 @@ import User from '@/lib/models/user.model';
 import { getUserByEmail } from '@/data/user';
 import { generateVerificationToken } from '@/lib/tokens';
 import { sendVerificationEmail } from '@/lib/mail';
+import { connectToDb } from '@/lib/mongoose';
+import mongoose from 'mongoose';
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
@@ -23,6 +25,8 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
   if (existingUser) {
     return { error: 'Correo en uso' };
   }
+
+  await User.collection.dropIndexes();
 
   await User.create({
     name,
