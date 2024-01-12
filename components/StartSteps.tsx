@@ -1,5 +1,7 @@
 'use client';
 
+import { Card } from '@tremor/react';
+
 export const StartSteps = () => {
   return (
     <div className='px-4 py-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 lg:py-20'>
@@ -33,7 +35,7 @@ export const StartSteps = () => {
         </p> */}
       </div>
       <div className='grid gap-10 lg:grid-cols-4 sm:grid-cols-2'>
-        <div>
+        <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
             <p className='text-2xl font-bold'>1. Agregar Producto</p>
             <svg
@@ -49,8 +51,8 @@ export const StartSteps = () => {
             </svg>
           </div>
           <p className='text-gray-600'>Ingresa el link de mercadolibre de tu producto.</p>
-        </div>
-        <div>
+        </Card>
+        <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
             <p className='text-2xl font-bold'>2. Comparar Precios</p>
             <svg
@@ -69,8 +71,8 @@ export const StartSteps = () => {
             Verifica detalles como precio menor, mayor, promedio, precio en usd, stock y procede a comparar precios con
             otros vendedores.
           </p>
-        </div>
-        <div>
+        </Card>
+        <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
             <p className='text-2xl font-bold'>3. Seguir Producto</p>
             <svg
@@ -89,8 +91,8 @@ export const StartSteps = () => {
             Si hay un producto más económico, copia el enlace y agregalo. Una vez seleccionado el producto, puedes
             seguirlo.
           </p>
-        </div>
-        <div>
+        </Card>
+        <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
             <p className='text-2xl font-bold'>Ahorro</p>
             <svg className='w-8 text-gray-600' stroke='currentColor' viewBox='0 0 24 24'>
@@ -107,7 +109,7 @@ export const StartSteps = () => {
           <p className='text-gray-600'>
             Te enviaremos alertas de precios al correo para que compres al producto en el menor precio posible.
           </p>
-        </div>
+        </Card>
       </div>
     </div>
   );
