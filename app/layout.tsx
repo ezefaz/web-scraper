@@ -7,6 +7,7 @@ import { Toaster } from 'react-hot-toast';
 import ClientOnly from '@/components/ClientOnly';
 import { auth } from '@/auth';
 import { SessionProvider } from 'next-auth/react';
+import { Providers } from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 const spaceGrotesk = Space_Grotesk({
@@ -28,10 +29,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <body className={inter.className}>
           <main className='overflow-x-hidden'>
             <ClientOnly>
-              <Toaster position='top-center' reverseOrder={false} />
-              <Navbar />
-              {children}
-              <Analytics />
+              <Providers>
+                <Toaster position='top-center' reverseOrder={false} />
+                <Navbar />
+                {children}
+                <Analytics />
+              </Providers>
             </ClientOnly>
           </main>
         </body>

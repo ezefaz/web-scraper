@@ -25,6 +25,7 @@ const page = async () => {
 
   const extractedData: any = userProducts?.map((product: any) => ({
     id: product._id,
+    url: product.url,
     title: product.title,
     currentPrice: product.currentPrice,
     currentDolarValue: product.currentDolar.value || product.currentDolarValue,

@@ -1,11 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 /* eslint-disable max-len */
+import { nextui } from '@nextui-org/react';
+
 module.exports = {
   content: [
     './app/**/*.{js,ts,jsx,tsx}',
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     './node_modules/@tremor/**/*.{js,ts,jsx,tsx}',
+    './node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     transparent: 'transparent',
@@ -117,6 +120,6 @@ module.exports = {
   maxWidth: {
     '10xl': '1440px',
   },
-
-  plugins: [require('@headlessui/tailwindcss')],
+  darkMode: 'class',
+  plugins: [require('@headlessui/tailwindcss'), nextui()],
 };

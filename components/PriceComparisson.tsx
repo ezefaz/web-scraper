@@ -47,159 +47,94 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
-  // return (
-  //   <div className='flex justify-center'>
-  //     <Card>
-  //       <Title>Comparación de precios para el producto</Title>
-  //       <div className='overflow-x-auto'>
-  //         <Table className='min-w-full'>
-  //           <TableHead>
-  //             <TableRow>
-  //               <TableHeaderCell className='w-1/6 sm:w-auto'>Imagen</TableHeaderCell>
-  //               <TableHeaderCell className='w-1/6 sm:w-auto'>Titulo</TableHeaderCell>
-  //               <TableHeaderCell className='w-1/6 sm:w-auto'>Precio ($)</TableHeaderCell>
-  //               <TableHeaderCell className='w-1/6 sm:w-auto'>Diferencia</TableHeaderCell>
-  //               <TableHeaderCell className='w-1/6 sm:w-auto'>Acciones</TableHeaderCell>
-  //             </TableRow>
-  //           </TableHead>
-  //           <TableBody>
-  //             {scrapedData.map((item, index) => {
-  //               const itemPrice = Number(item.price);
-  //               const priceDifference = productPrice - itemPrice;
-  //               const deltaType =
-  //                 productPrice === itemPrice
-  //                   ? 'unchanged'
-  //                   : productPrice > itemPrice
-  //                   ? 'moderateIncrease'
-  //                   : 'moderateDecrease';
-
-  //               return (
-  //                 <TableRow key={index}>
-  //                   <TableCell className='w-1/6 sm:w-auto'>
-  //                     <Image src={item.image} alt={item.title} width={50} height={50} />
-  //                   </TableCell>
-  //                   <TableCell className='w-1/6 sm:w-auto'>{item.title}</TableCell>
-  //                   <TableCell className='w-1/6 sm:w-auto'>${formatNumber(itemPrice)}</TableCell>
-  //                   <TableCell className='w-1/6 sm:w-auto'>
-  //                     <BadgeDelta deltaType={deltaType} isIncreasePositive={true} size='xs' className='text-sm'>
-  //                       {`$${formatNumber(priceDifference)}`}
-  //                     </BadgeDelta>
-  //                   </TableCell>
-  //                   <TableCell className='w-1/6 sm:w-auto'>
-  //                     <div className='flex gap-2'>
-  //                       <button
-  //                         className='text-sm text-primary hover:underline focus:outline-none'
-  //                         onClick={() => window.open(item.url, '_blank')}
-  //                         aria-label={`Visitar ${item.title}`}
-  //                       >
-  //                         Visitar
-  //                       </button>
-  //                       <div
-  //                         className='cursor-pointer text-gray-500 hover:text-blue-500'
-  //                         onClick={() => copyToClipboard(item.url)}
-  //                       >
-  //                         {!copySuccess ? (
-  //                           <Icon icon={HiClipboard} variant='solid' size='sm' tooltip='Copiar link' />
-  //                         ) : (
-  //                           <Icon icon={HiClipboardCheck} variant='solid' size='sm' tooltip='Copiado!' />
-  //                         )}
-  //                       </div>
-  //                     </div>
-  //                   </TableCell>
-  //                 </TableRow>
-  //               );
-  //             })}
-  //           </TableBody>
-  //         </Table>
-  //       </div>
-  //     </Card>
-  //   </div>
-  // );
-  // };
-
   return (
     <>
-      <Card className='relative  mx-auto h-96 overflow-hidden w-full'>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell className='bg-white'>Imagen</TableHeaderCell>
-              <TableHeaderCell className='bg-white text-center'>Titulo</TableHeaderCell>
-              <TableHeaderCell className='bg-white text-center'>Precio</TableHeaderCell>
-              <TableHeaderCell className='bg-white text-center '>Diferencia de Precio</TableHeaderCell>
-              <TableHeaderCell className='bg-white text-center'>Precio (USD)</TableHeaderCell>
-              <TableHeaderCell className='bg-white text-center'>Acciones</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {scrapedData.map((product, index) => {
-              const itemPrice = Number(product.price);
+      {scrapedData.length > 0 ? (
+        <Card className='relative  mx-auto h-96 overflow-hidden w-full'>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeaderCell className='bg-white'>Imagen</TableHeaderCell>
+                <TableHeaderCell className='bg-white text-center'>Titulo</TableHeaderCell>
+                <TableHeaderCell className='bg-white text-center'>Precio</TableHeaderCell>
+                <TableHeaderCell className='bg-white text-center '>Diferencia de Precio</TableHeaderCell>
+                <TableHeaderCell className='bg-white text-center'>Precio (USD)</TableHeaderCell>
+                <TableHeaderCell className='bg-white text-center'>Acciones</TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {scrapedData.map((product, index) => {
+                const itemPrice = Number(product.price);
 
-              const deltaType =
-                productPrice === itemPrice
-                  ? 'unchanged'
-                  : productPrice > itemPrice
-                  ? 'moderateIncrease'
-                  : 'moderateDecrease';
-              const priceDifference = productPrice - itemPrice;
+                const deltaType =
+                  productPrice === itemPrice
+                    ? 'unchanged'
+                    : productPrice > itemPrice
+                    ? 'moderateIncrease'
+                    : 'moderateDecrease';
+                const priceDifference = productPrice - itemPrice;
 
-              return (
-                <TableRow key={index}>
-                  <TableCell className='w-1/6 sm:w-auto'>
-                    <Image src={product.image} alt={product.title} width={60} height={60} />
-                  </TableCell>
-                  <TableCell>{product.title}</TableCell>
-                  {/* <TableCell className='text-right'>
+                return (
+                  <TableRow key={index}>
+                    <TableCell className='w-1/6 sm:w-auto'>
+                      <Image src={product.image} alt={product.title} width={60} height={60} />
+                    </TableCell>
+                    <TableCell>{product.title}</TableCell>
+                    {/* <TableCell className='text-right'>
                               <Text>{product.country}</Text>
                             </TableCell> */}
-                  <TableCell className='text-right'>
-                    <Text>${formatNumber(itemPrice)}</Text>
-                  </TableCell>
-                  <TableCell className='w-1/6 sm:w-auto'>
-                    {' '}
-                    <BadgeDelta deltaType={deltaType} isIncreasePositive={true} size='xs' className='text-sm'>
-                      {`$${formatNumber(priceDifference)}`}{' '}
-                    </BadgeDelta>{' '}
-                  </TableCell>
-                  <TableCell className='text-right'>
-                    <Text>${formatNumber(product.dolarPrice)}</Text>
-                  </TableCell>
-                  <TableCell className='w-1/6 sm:w-auto'>
-                    <div className='flex gap-2'>
-                      <button
-                        className='text-sm text-primary hover:underline focus:outline-none'
-                        onClick={() => window.open(product.url, '_blank')}
-                        aria-label={`Visitar ${product.title}`}
-                      >
-                        Visitar
-                      </button>
-                      <div
-                        className='cursor-pointer text-gray-500 hover:text-blue-500'
-                        onClick={() => copyToClipboard(product.url)}
-                      >
-                        {!copySuccess ? (
-                          <Icon icon={HiClipboard} variant='solid' size='sm' tooltip='Copiar link' />
-                        ) : (
-                          <Icon icon={HiClipboardCheck} variant='solid' size='sm' tooltip='Copiado!' />
-                        )}
+                    <TableCell className='text-right'>
+                      <Text>${formatNumber(itemPrice)}</Text>
+                    </TableCell>
+                    <TableCell className='w-1/6 sm:w-auto'>
+                      {' '}
+                      <BadgeDelta deltaType={deltaType} isIncreasePositive={true} size='xs' className='text-sm'>
+                        {`$${formatNumber(priceDifference)}`}{' '}
+                      </BadgeDelta>{' '}
+                    </TableCell>
+                    <TableCell className='text-right'>
+                      <Text>${formatNumber(product.dolarPrice)}</Text>
+                    </TableCell>
+                    <TableCell className='w-1/6 sm:w-auto'>
+                      <div className='flex gap-2'>
+                        <button
+                          className='text-sm text-primary hover:underline focus:outline-none'
+                          onClick={() => window.open(product.url, '_blank')}
+                          aria-label={`Visitar ${product.title}`}
+                        >
+                          Visitar
+                        </button>
+                        <div
+                          className='cursor-pointer text-gray-500 hover:text-blue-500'
+                          onClick={() => copyToClipboard(product.url)}
+                        >
+                          {!copySuccess ? (
+                            <Icon icon={HiClipboard} variant='solid' size='sm' tooltip='Copiar link' />
+                          ) : (
+                            <Icon icon={HiClipboardCheck} variant='solid' size='sm' tooltip='Copiado!' />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-        <div className='inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-white pt-12 pb-8 absolute rounded-b-lg w-full'>
-          <Button
-            icon={BsArrowBarRight}
-            className='bg-white shadow-md border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'
-            onClick={openModal}
-          >
-            Mostrar Más
-          </Button>
-        </div>
-      </Card>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+
+          <div className='inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-white pt-12 pb-8 absolute rounded-b-lg w-full'>
+            {scrapedData.length > 0 ? (
+              <Button
+                icon={BsArrowBarRight}
+                className='bg-white shadow-md border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'
+                onClick={openModal}
+              >
+                Mostrar Más
+              </Button>
+            ) : null}
+          </div>
+        </Card>
+      ) : null}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as='div' className='relative z-50' onClose={closeModal}>
           <Transition.Child
