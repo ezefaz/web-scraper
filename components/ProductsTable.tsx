@@ -16,7 +16,6 @@ import {
   Title,
 } from '@tremor/react';
 import { formatNumber, formatUSD } from '@/lib/utils';
-import Removal from './Removal';
 
 interface UserProduct {
   url: string;
@@ -65,21 +64,18 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
           <Table className='w-full'>
             <TableHead>
               <TableRow>
-                <TableHeaderCell className='bg-white text-center'></TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Título</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Categoría</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Stock</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Precio ($)</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Precio (USD)</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Seguimiento</TableHeaderCell>
+                <TableHeaderCell className='bg-white text-center'>Acciones</TableHeaderCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {userProducts?.map((product: UserProduct) => (
                 <TableRow key={product.id} className='hover:bg-gray-50 cursor-pointer'>
-                  <TableCell>
-                    <Removal productId={product.id} />
-                  </TableCell>
                   <TableCell>
                     <a
                       className='text-blue-500 hover:underline'
@@ -111,16 +107,14 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
                     </TableCell>
                   </TableCell>
                   <TableCell>
-                    {/* <Badge color='emerald' icon={StatusOnlineIcon}>
- {product.status}
- </Badge> */}
+                    <TableDropdown url={product.url} productId={product.id} isFollowing={product.isFollowing} />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          <div className='inset-x-0 bottom-0 flex justify-center bg-gradient-to-t from-white pt-12 pb-8 absolute rounded-b-lg'>
-            {userProducts.length > 4 ? (
+          <div className='inset-x-0 bottom-0 flex justify-center bg-gradient-to-t mt-4 from-white pt-12 pb-8 absolute rounded-b-lg'>
+            {userProducts.length > 3 ? (
               <Button
                 icon={BsArrowsExpand}
                 className='bg-white shadow-md border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300'

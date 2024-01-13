@@ -38,6 +38,14 @@ export default function TableDropdown({ url, productId, isFollowing }: ProductTa
     }
   };
 
+  const unfollowProduct = (isFollowing: boolean) => {
+    console.log(isFollowing);
+    if (!isFollowing) return;
+
+    isFollowing = false;
+    console.log(isFollowing);
+  };
+
   return (
     <Dropdown backdrop='blur'>
       <DropdownTrigger>
@@ -55,7 +63,12 @@ export default function TableDropdown({ url, productId, isFollowing }: ProductTa
           Copiar Link
         </DropdownItem>
         <DropdownItem key='follow'>Seguir</DropdownItem>
-        <DropdownItem key='unfollow' className='text-warning' color='warning'>
+        <DropdownItem
+          key='unfollow'
+          onClick={() => unfollowProduct(isFollowing)}
+          className='text-warning'
+          color='warning'
+        >
           Dejar de seguir
         </DropdownItem>
         <DropdownItem

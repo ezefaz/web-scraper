@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { addUserEmailToProduct } from '@/lib/actions';
 import { toast } from 'react-hot-toast';
 
-import { BsSearchHeart } from 'react-icons/bs';
 import { useCurrentUser } from '@/hooks/use-current-use';
 
 interface Props {
@@ -18,7 +17,6 @@ const Modal = ({ productId }: Props) => {
 
   if (!currentUser) return;
 
-  // const userEmail = "" user?.emailAddresses[0]?.emailAddress;
   const userEmail = currentUser.email;
 
   let [isOpen, setIsOpen] = useState(true);
@@ -35,7 +33,7 @@ const Modal = ({ productId }: Props) => {
     setIsSubmitting(false);
     setEmail('');
 
-    toast.success('Seguimiento realizado! Porfavor chequee su correo electrónico!');
+    toast.success(`Seguimiento realizado! Porfavor chequee su correo ${userEmail}`);
     closeModal();
   };
 
@@ -100,7 +98,7 @@ const Modal = ({ productId }: Props) => {
                 </div>
 
                 <form className='flex flex-col mt-5' onSubmit={handleSubmit}>
-                  <label htmlFor='email' className='text-sm font-medium text-gray-700'>
+                  {/* <label htmlFor='email' className='text-sm font-medium text-gray-700'>
                     Email
                   </label>
                   <div className='dialog-input_container'>
@@ -114,7 +112,7 @@ const Modal = ({ productId }: Props) => {
                       onChange={(e) => setEmail(e.target.value)}
                       className='dialog-input'
                     />
-                  </div>
+                  </div> */}
                   <button type='submit' className='dialog-btn'>
                     {isSubmitting ? 'Enviando...' : 'Iniciar Seguimiento'}
                   </button>

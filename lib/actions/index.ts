@@ -11,6 +11,7 @@ import { generateEmailBody, sendEmail } from '../nodemailer';
 import { permanentRedirect, redirect } from 'next/navigation';
 import User from '../models/user.model';
 import { auth } from '@/auth';
+import { getUserByEmail } from '@/data/user';
 
 export async function scrapeAndStoreProducts(productUrl: string) {
   if (!productUrl) return;
@@ -244,15 +245,24 @@ export async function getSimilarProducts(productId: string) {
 export async function addUserEmailToProduct(productId: string, userEmail: string) {
   try {
     const product = await getProductById(productId);
+    const user = await getUserByEmail(userEmail);
 
     if (!product) return;
 
     const userExists: boolean = product.users.some((user: UserType) => user.email === userEmail);
+    const userProduct = user.products.find((p: ProductType) => p._id === productId);
 
     if (userExists) {
       product.users.push({ email: userEmail, isFollowing: true });
 
       await product.save();
+
+      console.log(userProduct.isFollowing);
+
+      userProduct.isFollowing = true;
+      console.log(userProduct.isFollowing);
+
+      await user.save();
 
       const emailContent = await generateEmailBody(product, 'WELCOME');
       await sendEmail(emailContent, [userEmail]);

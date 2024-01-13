@@ -59,15 +59,15 @@ const userSchema = new mongoose.Schema({
       isFreeShipping: {
         type: Boolean,
       },
+      isFollowing: {
+        type: Boolean,
+      },
       isFreeReturning: {
         type: Boolean,
       },
       status: { type: String, enum: ['NUEVO', 'USADO', 'REACONDICIONADO'] },
     },
   ],
-  favoriteProducts: {
-    type: [String],
-  },
   subscription: {
     type: String,
     default: 'basic',
