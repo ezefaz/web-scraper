@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Dropdown, Link, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@nextui-org/react';
 import { MdOutlineMoreVert } from 'react-icons/md';
 import { toast } from 'react-hot-toast';
-import { deleteProduct } from '@/lib/actions';
+import { deleteProduct, followProduct, getCurrentUser, unfollowProduct } from '@/lib/actions';
 
 interface ProductTableProps {
   productId: string;
@@ -26,6 +26,8 @@ export default function TableDropdown({ url, productId, isFollowing }: ProductTa
 
   const handleDeleteProduct = async (productId: string) => {
     try {
+      console.log(productId);
+
       const deletedProductId = await deleteProduct(productId);
 
       if (deletedProductId) {
@@ -38,12 +40,22 @@ export default function TableDropdown({ url, productId, isFollowing }: ProductTa
     }
   };
 
-  const unfollowProduct = (isFollowing: boolean) => {
-    console.log(isFollowing);
-    if (!isFollowing) return;
+  const setUnfollowProduct = async (productId: string) => {
+    try {
+      await unfollowProduct(productId);
+      toast.success('Seguimiento cancelado correctamente.');
+    } catch (error) {
+      console.log('[FE_UNFOLLOW_ERROR]', error);
+    }
+  };
 
-    isFollowing = false;
-    console.log(isFollowing);
+  const setFollowProduct = async (productId: string) => {
+    try {
+      await followProduct(productId);
+      toast.success('Seguimiento realizado correctamente.');
+    } catch (error) {
+      console.log('[FE_FOLLOW_ERROR]', error);
+    }
   };
 
   return (
@@ -62,10 +74,12 @@ export default function TableDropdown({ url, productId, isFollowing }: ProductTa
         <DropdownItem key='copy' onClick={() => copyToClipboard(url)}>
           Copiar Link
         </DropdownItem>
-        <DropdownItem key='follow'>Seguir</DropdownItem>
+        <DropdownItem key='follow' onClick={() => setFollowProduct(productId)}>
+          Seguir
+        </DropdownItem>
         <DropdownItem
           key='unfollow'
-          onClick={() => unfollowProduct(isFollowing)}
+          onClick={() => setUnfollowProduct(productId)}
           className='text-warning'
           color='warning'
         >

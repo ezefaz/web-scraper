@@ -103,22 +103,6 @@ export async function getProductById(productId: string) {
   }
 }
 
-export async function deleteProduct(productId: string) {
-  try {
-    await connectToDb();
-
-    const deletedProduct = await Product.findOneAndDelete({ _id: productId });
-
-    if (!deletedProduct) {
-      throw new Error('Product not found');
-    }
-
-    return deletedProduct.id;
-  } catch (error: any) {
-    throw new Error(`Failed to delete product: ${error.message}`);
-  }
-}
-
 export async function getAllProducts() {
   try {
     connectToDb();
@@ -157,12 +141,12 @@ export async function getUsersForDashboard() {
     const users = await User.find();
 
     const dashboardUsers = users.map((user) => ({
-      id: user._id.toString(),
+      id: user._id,
       name: user.name,
       email: user.email,
-      emailVerified: user.emailVerified.toISOString(),
+      emailVerified: user.emailVerified ? user.emailVerified.toISOString() : null,
       products: user.products.length,
-      createdAt: user.createdAt.toISOString(),
+      createdAt: user.createdAt ? user.createdAt.toISOString() : null,
       role: user.role,
     }));
 
@@ -173,28 +157,82 @@ export async function getUsersForDashboard() {
   }
 }
 
-export async function getUserProducts() {
+// export async function getUserProducts() {
+//   try {
+//     const user: any = await getCurrentUser();
+
+//     const products = await getAllProducts();
+//     const userProducts: ProductType[] = [];
+
+//     if (user && products && products.length > 0) {
+//       for (const product of products) {
+//         const productHasUser = product.users?.find((productUser: any) => productUser.email === user.email);
+
+//         if (productHasUser) {
+//           userProducts.push(product);
+//         }
+//       }
+//     }
+
+//     // console.log("User's Products:", userProducts);
+
+//     return userProducts;
+//   } catch (error) {
+//     console.log('El usuario no tiene productos');
+//   }
+// }
+
+export async function deleteProduct(productId: string) {
   try {
+    await connectToDb();
     const user: any = await getCurrentUser();
 
-    const products = await getAllProducts();
-    const userProducts: ProductType[] = [];
+    const productToDelete = user.products.find((product: any) => product._id.toString() === productId);
 
-    if (user && products && products.length > 0) {
-      for (const product of products) {
-        const productHasUser = product.users?.find((productUser: any) => productUser.email === user.email);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id },
+      { $pull: { products: { _id: productId } } },
+      { new: true }
+    );
 
-        if (productHasUser) {
-          userProducts.push(product);
-        }
-      }
+    console.log(updatedUser);
+
+    if (!updatedUser) {
+      throw new Error("User not found or product not present in the user's products array");
     }
 
-    // console.log("User's Products:", userProducts);
+    if (!productToDelete || !productToDelete.url) {
+      throw new Error('Product not found or missing URL');
+    }
 
-    return userProducts;
-  } catch (error) {
-    console.log('El usuario no tiene productos');
+    const deletedProduct = await Product.findOneAndDelete({ url: productToDelete.url });
+
+    if (!deletedProduct) {
+      throw new Error('Product not found');
+    }
+
+    return deletedProduct.id;
+  } catch (error: any) {
+    throw new Error(`Failed to delete product: ${error.message}`);
+  }
+}
+
+export async function getUserProducts() {
+  try {
+    await connectToDb();
+    const user: any = await getCurrentUser();
+
+    if (!user) return;
+
+    const userWithProducts = await User.findOne({ email: user.email }).populate('products');
+
+    if (!userWithProducts) {
+      throw new Error('User not found');
+    }
+
+    return userWithProducts.products;
+  } catch (error: any) {
+    throw new Error(`Failed to fetch user products: ${error.message}`);
   }
 }
 
@@ -250,22 +288,23 @@ export async function addUserEmailToProduct(productId: string, userEmail: string
     if (!product) return;
 
     const userExists: boolean = product.users.some((user: UserType) => user.email === userEmail);
-    const userProduct = user.products.find((p: ProductType) => p._id === productId);
+    const userProduct = user.products.find((p: ProductType) => p.url === product.url);
 
     if (userExists) {
       product.users.push({ email: userEmail, isFollowing: true });
 
       await product.save();
 
-      console.log(userProduct.isFollowing);
+      if (userProduct) {
+        userProduct.isFollowing = true;
 
-      userProduct.isFollowing = true;
-      console.log(userProduct.isFollowing);
+        await user.save();
+      }
 
-      await user.save();
-
-      const emailContent = await generateEmailBody(product, 'WELCOME');
-      await sendEmail(emailContent, [userEmail]);
+      if (userProduct.isFollowing) {
+        const emailContent = await generateEmailBody(product, 'WELCOME');
+        await sendEmail(emailContent, [userEmail]);
+      }
     }
   } catch (error) {
     console.log('[ADD_USER_EMAIL_TO_PRODUCT]', error);
@@ -275,7 +314,7 @@ export async function addUserEmailToProduct(productId: string, userEmail: string
 export async function getCurrentUser() {
   try {
     const session = await auth();
-    // const user = await currentUser();
+
     if (!session) return null;
 
     const currentUserEmail = session.user?.email;
@@ -286,5 +325,59 @@ export async function getCurrentUser() {
   } catch (error) {
     console.log(error);
     throw new Error('[GET_CURRENT_USER] Error retrieving the current user');
+  }
+}
+
+export async function unfollowProduct(productId: string) {
+  const user = await getCurrentUser();
+  // const product = await getProductById(productId);
+
+  try {
+    if (!user) return;
+
+    // const userProduct: ProductType = await product.users.find((userProduct: any) => userProduct.email === user.email);
+    const userProduct = user.products.find((product: any) => product._id.toString() === productId);
+
+    if (userProduct) {
+      userProduct.isFollowing = false;
+
+      await user.save();
+    }
+  } catch (error) {
+    console.log('[UNFOLLOW_PRODUCT_ERROR]', error);
+  }
+}
+
+export async function followProduct(productId: string) {
+  try {
+    const user = await getCurrentUser();
+    // const product = await getProductById(productId);
+
+    if (!user) {
+      console.log('Invalid parameters or missing data.');
+      return;
+    }
+
+    const isAlreadyFollowing = user.products.some(
+      (userProduct: any) => userProduct.email === user.email && userProduct.isFollowing
+    );
+
+    if (isAlreadyFollowing) {
+      console.log('User is already following this product.');
+      return;
+    }
+
+    // const productUser = product.users.find((userProduct: any) => userProduct.email === user.email);
+    const productUser = user.products.find((product: any) => product._id.toString() === productId);
+
+    if (productUser && !productUser.isFollowing) {
+      productUser.isFollowing = true;
+
+      await user.save();
+
+      console.log('Successfully followed the product.');
+    }
+  } catch (error) {
+    console.log('[FOLLOW_PRODUCT_ERROR]', error);
   }
 }

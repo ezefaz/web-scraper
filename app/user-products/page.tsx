@@ -31,7 +31,7 @@ const page = async () => {
     currentDolarValue: product.currentDolar.value || product.currentDolarValue,
     currency: product.currency,
     stock: product.stockAvailable,
-    isFollowing: product.users.some((user: any) => user.isFollowing === true),
+    isFollowing: product.isFollowing,
     category: product.category || '',
   }));
 

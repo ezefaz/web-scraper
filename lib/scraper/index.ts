@@ -151,6 +151,8 @@ export async function scrapeMLProduct(url: string) {
 
     const storeName = store[0];
 
+    let isFollowing = false;
+
     const data = {
       url,
       currency: currency || '$',
@@ -177,6 +179,7 @@ export async function scrapeMLProduct(url: string) {
       status,
       isFreeShipping,
       productReviews,
+      isFollowing,
     };
 
     // console.log('PRODUCTO -->', data);

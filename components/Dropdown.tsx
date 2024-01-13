@@ -100,13 +100,13 @@ const Dropdown = () => {
                   fill='none'
                   xmlns='http://www.w3.org/2000/svg'
                   stroke='#000000'
-                  stroke-width='0.00024000000000000003'
+                  strokeWidth='0.00024000000000000003'
                 >
-                  <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
-                  <g id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'></g>
+                  <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
+                  <g id='SVGRepo_tracerCarrier' strokeLinecap='round' strokeLinejoin='round'></g>
                   <g id='SVGRepo_iconCarrier'>
                     {' '}
-                    <g clip-path='url(#clip0_15_82)'>
+                    <g clipPath='url(#clip0_15_82)'>
                       {' '}
                       <rect width='24' height='24' fill='white'></rect>{' '}
                       <g filter='url(#filter0_d_15_82)'>
@@ -126,10 +126,10 @@ const Dropdown = () => {
                         width='18.8911'
                         height='19'
                         filterUnits='userSpaceOnUse'
-                        color-interpolation-filters='sRGB'
+                        colorInterpolationFilters='sRGB'
                       >
                         {' '}
-                        <feFlood flood-opacity='0' result='BackgroundImageFix'></feFlood>{' '}
+                        <feFlood floodOpacity='0' result='BackgroundImageFix'></feFlood>{' '}
                         <feColorMatrix
                           in='SourceAlpha'
                           type='matrix'
@@ -169,8 +169,8 @@ const Dropdown = () => {
                     xmlns='http://www.w3.org/2000/svg'
                     stroke='#4d4d4d'
                   >
-                    <g id='SVGRepo_bgCarrier' stroke-width='0'></g>
-                    <g id='SVGRepo_tracerCarrier' stroke-linecap='round' stroke-linejoin='round'></g>
+                    <g id='SVGRepo_bgCarrier' strokeWidth='0'></g>
+                    <g id='SVGRepo_tracerCarrier' strokeLinecap='round' strokeLinejoin='round'></g>
                     <g id='SVGRepo_iconCarrier'>
                       {' '}
                       <path

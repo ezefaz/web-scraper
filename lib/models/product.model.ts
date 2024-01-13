@@ -57,7 +57,6 @@ const productSchema = new mongoose.Schema(
         },
         isFollowing: {
           type: Boolean,
-          default: false,
         },
         // products: [
         //   {
