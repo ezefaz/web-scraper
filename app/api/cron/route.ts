@@ -116,7 +116,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       message: 'Ok',
-      data: updatedProducts,
+      // data: updatedProducts,
     });
   } catch (error: any) {
     throw new Error(`Failed to get all products: ${error.message}`);
