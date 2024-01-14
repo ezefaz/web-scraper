@@ -154,7 +154,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <p className='text-[34px] text-secondary font-bold dark:text-white hover:text-primary  '>{`${
                 product.currency
               } ${formatNumber(currentPrice)}`}</p>
-              <p className='text-[21px] text-black opacity-50 line-through '>
+              <p className='text-[21px] text-black opacity-50 line-through dark:text-white'>
                 {product.currentPrice !== product.originalPrice
                   ? `${product.currency} ${formatNumber(product.originalPrice)}`
                   : ''}
