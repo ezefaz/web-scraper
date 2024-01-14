@@ -53,7 +53,7 @@ export default function UserDropdown(props: any) {
       </DropdownTrigger>
       <DropdownMenu
         aria-label='Custom item styles'
-        disabledKeys={[`dashboard`]}
+        disabledKeys={[]}
         className='p-3'
         itemClasses={{
           base: [
@@ -84,7 +84,7 @@ export default function UserDropdown(props: any) {
               }}
             />
           </DropdownItem>
-          <DropdownItem key='dashboard'>Dashboard</DropdownItem>
+          {loggedUser && loggedUser.role === 'ADMIN' && <DropdownItem key='dashboard'>Dashboard</DropdownItem>}
           <DropdownItem key='profile'>
             <Link href='/profile'>Perfil</Link>
           </DropdownItem>
