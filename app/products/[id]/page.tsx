@@ -31,19 +31,15 @@ type Props = {
 
 const ProductDetails = async ({ params: { id } }: Props) => {
   const currentUser = await getCurrentUser();
-  console.log('IDDD', currentUser.products);
 
   const userProduct = currentUser.products.find((product: any) => product._id.toString() === id);
 
   const productUrl = userProduct.url;
 
   const product: ProductType = await getProductByURL(productUrl);
-  // const isFollowing = currentUser
-  //   ? product.users?.some((user) => user.email === currentUser.email && user.isFollowing)
-  //   : null;
 
-  const isFollowing = currentUser.products.some(
-    (user: UserType) => user.email === currentUser.email && user.isFollowing
+  const isFollowing = currentUser.products?.some(
+    (product: ProductType) => product.url === productUrl && product.isFollowing
   );
 
   const { currentDolar, priceHistory, currentPrice, dolarHistory } = product;
