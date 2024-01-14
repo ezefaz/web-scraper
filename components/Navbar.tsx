@@ -24,7 +24,7 @@ const Navbar = () => {
     <header className='w-full fixed top-0 z-50'>
       <nav className='bg-gray-300 dark:bg-black'>
         <div className='container ml-8 flex justify-between items-center'>
-          <Link href='/' className='flex items-center gap-1'>
+          <Link href='/' className='flex items-center gap-1 mt-2'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
 

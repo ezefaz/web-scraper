@@ -53,7 +53,7 @@ export default function UserDropdown(props: any) {
       </DropdownTrigger>
       <DropdownMenu
         aria-label='Custom item styles'
-        disabledKeys={[]}
+        disabledKeys={[`dashboard`]}
         className='p-3'
         itemClasses={{
           base: [
@@ -69,7 +69,7 @@ export default function UserDropdown(props: any) {
           ],
         }}
       >
-        <DropdownSection aria-label='Profile & Actions' showDivider>
+        <DropdownSection aria-label='Preferencias' showDivider>
           <DropdownItem key='profile' className='h-14 gap-2'>
             <User
               name={loggedUser?.name}
@@ -84,7 +84,7 @@ export default function UserDropdown(props: any) {
               }}
             />
           </DropdownItem>
-          {loggedUser && loggedUser.role === 'ADMIN' && <DropdownItem key='dashboard'>Dashboard</DropdownItem>}
+          <DropdownItem key='dashboard'>Dashboard</DropdownItem>
           <DropdownItem key='profile'>
             <Link href='/profile'>Perfil</Link>
           </DropdownItem>
@@ -92,7 +92,6 @@ export default function UserDropdown(props: any) {
             <Link href='/user-products'>Mis Productos</Link>
           </DropdownItem>
         </DropdownSection>
-
         <DropdownSection aria-label='Preferences' showDivider>
           {/* <DropdownItem key='quick_search' shortcut='⌘K'>
             Busqueda Rápida
@@ -121,7 +120,7 @@ export default function UserDropdown(props: any) {
           </DropdownItem>
         </DropdownSection>
 
-        <DropdownSection aria-label='Help & Feedback'>
+        <DropdownSection aria-label='Ayuda & Feedback'>
           <DropdownItem key='help_and_feedback'>Ayuda & Feedback</DropdownItem>
           <DropdownItem key='logout' onClick={handleSignOut}>
             Cerrar Sesión
