@@ -37,7 +37,7 @@ export const ThemeSwitcher = (props: any) => {
   const { Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps } = useSwitch(props);
 
   return (
-    <div className='flex justify-end ml-5'>
+    <div className='flex-col sm:flex-row sm:justify-end sm:items-end ml-5'>
       <Component {...getBaseProps()}>
         <VisuallyHidden>
           <input {...getInputProps()} />
@@ -51,7 +51,6 @@ export const ThemeSwitcher = (props: any) => {
           {isSelected ? <BsSun onClick={() => setTheme('light')} /> : <BsMoon onClick={() => setTheme('dark')} />}
         </div>
       </Component>
-      {/* <p className='text-default-500 select-none'>{isSelected ? setTheme('light') : setTheme('dark')}</p> */}
     </div>
   );
 };

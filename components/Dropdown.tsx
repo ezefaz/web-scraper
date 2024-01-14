@@ -6,6 +6,7 @@ import { signOut } from 'next-auth/react';
 import DropdownItem from './DropdownItem';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/use-current-use';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 const Dropdown = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -47,7 +48,7 @@ const Dropdown = () => {
 
   return (
     <>
-      <div className='relative inline-block text-left p-10 mr-4' ref={dropdownRef}>
+      <div className='relative inline-block text-left p-10' ref={dropdownRef}>
         <button
           id='dropdown-button'
           onClick={toggleDropdown}
@@ -207,6 +208,7 @@ const Dropdown = () => {
             />
           </div>
         </div>
+        <ThemeSwitcher />
       </div>
     </>
   );
