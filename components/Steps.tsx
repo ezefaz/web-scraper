@@ -7,7 +7,7 @@ const StepsComponent: React.FC = () => {
       <div className='max-w-screen-xl px-4 py-8 mx-auto space-y-12 lg:space-y-20 lg:py-24 lg:px-6'>
         <div className='items-center gap-8 lg:grid lg:grid-cols-2 xl:gap-16'>
           <div className='text-gray-500 sm:text-lg dark:text-gray-400'>
-            <h2 className='mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-black'>
+            <h2 className='mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white'>
               Arma tu cartera de productos en una misma plataforma y{' '}
               <span className='relative'>
                 ahorra
@@ -87,7 +87,7 @@ const StepsComponent: React.FC = () => {
             alt='feature image 2'
           />
           <div className='text-gray-500 sm:text-lg dark:text-gray-400'>
-            <h2 className='mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-black'>
+            <h2 className='mb-4 text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white'>
               La prioridad es{' '}
               <span className='relative'>
                 cuidar tu bolsillo

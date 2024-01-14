@@ -129,7 +129,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               <Link
                 href={product.url}
                 target='_blank'
-                className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300'
+                className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300 dark:text-white'
               >
                 Visitar Producto
               </Link>
@@ -151,7 +151,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold hover:text-primary'>{`${
+              <p className='text-[34px] text-secondary font-bold dark:text-white hover:text-primary  '>{`${
                 product.currency
               } ${formatNumber(currentPrice)}`}</p>
               <p className='text-[21px] text-black opacity-50 line-through '>
@@ -228,7 +228,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div className='mx-auto max-w-[510px] text-center mb-2'>
         <div id='comparisson'></div>
         <span className='block text-lg font-semibold text-primary'>Graficos</span>
-        <h1 className=' text-3xl mr-3 font-bold head-text  sm:text-1xl md:text-[40px]'>Historial de Precios</h1>
+        <h1 className=' text-3xl mr-3 font-bold head-text  sm:text-1xl md:text-[40px] dark:text-white'>
+          Historial de Precios
+        </h1>
       </div>
       <div className='flex flex-col lg:flex-row  gap-20 mt-10 w-full'>
         <div className='w-full m-auto lg:w-[50%]'>
@@ -256,7 +258,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div className='mx-auto max-w-[510px] text-center mb-2'>
         <div id='comparisson'></div>
         <span className='block text-lg font-semibold text-primary'>Precios</span>
-        <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px]'>Comparación de Precios</h1>
+        <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
+          Comparación de Precios
+        </h1>
       </div>
       <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
         <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />

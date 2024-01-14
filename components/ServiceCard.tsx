@@ -15,7 +15,7 @@ const ServiceCard = ({ icon, title, details }: Props) => {
           <div className={`mb-8 flex h-[70px] w-[70px] p-3 items-center justify-center rounded-2xl bg-primary`}>
             {icon}
           </div>
-          <h4 className='mb-3 text-xl font-semibold text-dark'>{title}</h4>
+          <h4 className='mb-3 text-xl font-semibold text-dark dark:text-black'>{title}</h4>
           <p className='text-body-color font-regular text-l text-gray-500'>{details}</p>
         </div>
       </div>

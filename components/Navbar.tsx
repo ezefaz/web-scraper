@@ -8,6 +8,7 @@ import Dropdown from './Dropdown';
 import LoginButton from './auth/LoginButton';
 import { useSession } from 'next-auth/react';
 import { useCurrentUser } from '@/hooks/use-current-use';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 const navIcons = [
   { src: '/assets/icons/search.svg', alt: 'Search' },
@@ -26,7 +27,7 @@ const Navbar = () => {
 
   return (
     <header className='w-full fixed top-0 z-50'>
-      <nav className='bg-gray-200 pb-3 pt-2'>
+      <nav className='bg-gray-200 pb-3 pt-2 dark:bg-black'>
         <div className='container ml-8 flex justify-between items-center'>
           <Link href='/' className='flex items-center gap-1'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
@@ -77,20 +78,24 @@ const Navbar = () => {
 						</ul> */}
 
             {!user ? (
-              <div className='p-2 mr-10 mt-2'>
-                <LoginButton>
-                  <a
-                    // href='/sign-up'
-                    className='bg-primary text-white hover:text-gray-300 hover:bg-gray-700 rounded-md py-2 px-4 transition duration-300 ease-in-out'
-                    suppressHydrationWarning={true}
-                  >
-                    Comenzar Ahora
-                  </a>
-                </LoginButton>
-              </div>
+              <>
+                <div className='flex items-center p-2 mr-10 mt-2'>
+                  <LoginButton>
+                    <a
+                      // href='/sign-up'
+                      className='bg-primary text-white hover:text-gray-300 hover:bg-gray-700 rounded-md py-2 px-4 transition duration-300 ease-in-out'
+                      suppressHydrationWarning={true}
+                    >
+                      Comenzar Ahora
+                    </a>
+                  </LoginButton>
+                  <ThemeSwitcher />
+                </div>
+              </>
             ) : (
               <div className='container mx-auto flex justify-between items-center'>
                 <Dropdown />
+                <ThemeSwitcher />
               </div>
             )}
           </div>

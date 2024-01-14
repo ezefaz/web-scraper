@@ -52,7 +52,7 @@ const ProductBadges = ({
           {isFreeReturning ? 'Devolución Gratis' : 'Devolución con Cargo'}
         </Badge>
       </div>
-      <p className='text-sm text-black opacity-50'>
+      <p className='text-sm text-black opacity-50 dark:text-white'>
         <span className='text-primary-green font-semibold'>
           {stars ? ((Number(stars) / 5) * 100).toFixed(2) : '95.00'}%
         </span>{' '}

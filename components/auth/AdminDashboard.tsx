@@ -235,7 +235,7 @@ export default function AdminDashboard() {
   };
   return (
     <main className='pt-20'>
-      <Title>Dashboard</Title>
+      <Title className='dark:text-white text-4xl'>Dashboard</Title>
       <Text>Información global acerca de SaveMelin.</Text>
       <TabGroup className='mt-6'>
         <TabList>

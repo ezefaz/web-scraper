@@ -2,10 +2,10 @@ import React from 'react';
 
 const Stats = () => {
   return (
-    <div className='bg-gray-50 py-16 pt-32'>
+    <div className='bg-gray-50 py-16 pt-32 dark:bg-black'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='max-w-4xl mx-auto text-center'>
-          <h2 className='text-3xl font-extrabold text-gray-900 sm:text-4xl'>
+          <h2 className='text-3xl font-extrabold text-gray-900 sm:text-4xl dark:text-white'>
             La única plataforma que entiende tus necesidades
           </h2>
           <p className='mt-3 text-l text-gray-500 sm:mt-4'>
@@ -16,7 +16,7 @@ const Stats = () => {
       </div>
       <div className='mt-10 pb-1'>
         <div className='relative'>
-          <div className='absolute inset-0 h-1/2 bg-gray-50'></div>
+          <div className='absolute inset-0 h-1/2 bg-gray-50 dark:bg-black'></div>
           <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
             <div className='max-w-4xl mx-auto'>
               <dl className='rounded-lg bg-white shadow-lg sm:grid sm:grid-cols-3'>

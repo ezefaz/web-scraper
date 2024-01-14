@@ -51,7 +51,7 @@ const Modal = ({ productUrl }: Props) => {
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as='div' onClose={closeModal} className='dialog-container'>
+        <Dialog as='div' onClose={closeModal} className='dialog-container '>
           <div className='min-h-screen px-4 text-center'>
             <Transition.Child
               as={Fragment}
@@ -74,7 +74,7 @@ const Modal = ({ productUrl }: Props) => {
               leaveFrom='opacity-100 scale-100'
               leaveTo='opacity-0 scale-95'
             >
-              <div className='dialog-content'>
+              <div className='dialog-content dark:bg-black border border-gray-200'>
                 <div className='flex flex-col'>
                   <div className='flex justify-between'>
                     <div className='p-3 border border-gray-200 rounded-10'>
@@ -89,7 +89,7 @@ const Modal = ({ productUrl }: Props) => {
                       onClick={closeModal}
                     />
                   </div>
-                  <h4 className='dialog-head_text'>
+                  <h4 className='dialog-head_text dark:text-white '>
                     ¡Manténgase actualizado con alertas de precios de productos directamente en su bandeja de entrada!
                   </h4>
                   <p className='text-sm text-gray-600 mt-2'>
@@ -113,7 +113,7 @@ const Modal = ({ productUrl }: Props) => {
                       className='dialog-input'
                     />
                   </div> */}
-                  <button type='submit' className='dialog-btn'>
+                  <button type='submit' className='dialog-btn dark:text-white'>
                     {isSubmitting ? 'Enviando...' : 'Iniciar Seguimiento'}
                   </button>
                 </form>

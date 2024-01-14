@@ -11,7 +11,7 @@ export const StartSteps = () => {
             Facil Usabilidad
           </p>
         </div>
-        <h2 className='max-w-lg mb-6 font-sans text-3xl font-bold leading-none tracking-tight text-gray-900 sm:text-4xl md:mx-auto'>
+        <h2 className='max-w-lg mb-6 font-sans text-3xl font-bold leading-none tracking-tight text-gray-900 sm:text-4xl md:mx-auto dark:text-white'>
           <span className='relative inline-block'>
             <svg
               viewBox='0 0 52 24'
@@ -37,7 +37,7 @@ export const StartSteps = () => {
       <div className='grid gap-10 lg:grid-cols-4 sm:grid-cols-2'>
         <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
-            <p className='text-2xl font-bold'>1. Agregar Producto</p>
+            <p className='text-2xl font-bold dark:text-black'>1. Agregar Producto</p>
             <svg
               className='w-6 text-gray-700 transform rotate-90 sm:rotate-0'
               stroke='currentColor'
@@ -54,7 +54,7 @@ export const StartSteps = () => {
         </Card>
         <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
-            <p className='text-2xl font-bold'>2. Comparar Precios</p>
+            <p className='text-2xl font-bold dark:text-black'>2. Comparar Precios</p>
             <svg
               className='w-6 text-gray-700 transform rotate-90 sm:rotate-0'
               stroke='currentColor'
@@ -74,7 +74,7 @@ export const StartSteps = () => {
         </Card>
         <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
-            <p className='text-2xl font-bold'>3. Seguir Producto</p>
+            <p className='text-2xl font-bold dark:text-black'>3. Seguir Producto</p>
             <svg
               className='w-6 text-gray-700 transform rotate-90 sm:rotate-0'
               stroke='currentColor'
@@ -94,7 +94,7 @@ export const StartSteps = () => {
         </Card>
         <Card className='hover:bg-gray-100'>
           <div className='flex items-center justify-between mb-6'>
-            <p className='text-2xl font-bold'>Ahorro</p>
+            <p className='text-2xl font-bold dark:text-black'>Ahorro</p>
             <svg className='w-8 text-gray-600' stroke='currentColor' viewBox='0 0 24 24'>
               <polyline
                 fill='none'
