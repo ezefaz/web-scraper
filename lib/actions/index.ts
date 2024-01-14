@@ -89,11 +89,11 @@ export async function scrapeAndStoreProducts(productUrl: string) {
   }
 }
 
-export async function getProductById(productId: string) {
+export async function getProductByURL(url: string) {
   try {
     connectToDb();
 
-    const product = await Product.findOne({ _id: productId });
+    const product = await Product.findOne({ url: url });
 
     if (!product) return;
 
@@ -282,7 +282,7 @@ export async function getSimilarProducts(productId: string) {
 
 export async function addUserEmailToProduct(productId: string, userEmail: string) {
   try {
-    const product = await getProductById(productId);
+    const product = await getProductByURL(productId);
     const user = await getUserByEmail(userEmail);
 
     if (!product) return;

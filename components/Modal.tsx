@@ -9,10 +9,10 @@ import { toast } from 'react-hot-toast';
 import { useCurrentUser } from '@/hooks/use-current-use';
 
 interface Props {
-  productId: string;
+  productUrl: string;
 }
 
-const Modal = ({ productId }: Props) => {
+const Modal = ({ productUrl }: Props) => {
   const currentUser = useCurrentUser();
 
   if (!currentUser) return;
@@ -28,7 +28,7 @@ const Modal = ({ productId }: Props) => {
 
     setIsSubmitting(true);
 
-    await addUserEmailToProduct(productId, email);
+    await addUserEmailToProduct(productUrl, email);
 
     setIsSubmitting(false);
     setEmail('');

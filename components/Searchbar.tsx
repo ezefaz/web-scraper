@@ -33,9 +33,9 @@ const Searchbar = () => {
     if (!isValidLink) return toast.error('Porfavor inserte un link de mercadolibre válido.');
     setIsLoading(true);
     try {
-      const product: any = await scrapeAndStoreProducts(searchPrompt);
+      const productId: any = await scrapeAndStoreProducts(searchPrompt);
 
-      router.push(`/products/${product}`);
+      router.push(`/products/${productId}`);
     } catch (error) {
       toast.error('No se ha podido agregar el producto.');
     } finally {

@@ -7,7 +7,7 @@ import PriceInfoCard from '@/components/PriceInfoCard';
 import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
 
-import { getCurrentUser, getProductById, getSimilarProducts } from '@/lib/actions';
+import { getCurrentUser, getProductByURL, getSimilarProducts } from '@/lib/actions';
 import {
   formatNumber,
   formatUSD,
@@ -16,7 +16,7 @@ import {
   getMonthlyData,
   getWeeklyData,
 } from '@/lib/utils';
-import { ProductType } from '@/types';
+import { ProductType, UserType } from '@/types';
 import DolarBasedChart from '@/components/charts/LineChart';
 import { Badge, Card, Tab, TabGroup, TabList } from '@tremor/react';
 import ScraperButton from '@/components/ScraperButton';
@@ -30,13 +30,21 @@ type Props = {
 };
 
 const ProductDetails = async ({ params: { id } }: Props) => {
-  const product: ProductType = await getProductById(id);
-
   const currentUser = await getCurrentUser();
+  console.log('IDDD', currentUser.products);
 
-  const isFollowing = currentUser
-    ? product.users?.some((user) => user.email === currentUser.email && user.isFollowing)
-    : null;
+  const userProduct = currentUser.products.find((product: any) => product._id.toString() === id);
+
+  const productUrl = userProduct.url;
+
+  const product: ProductType = await getProductByURL(productUrl);
+  // const isFollowing = currentUser
+  //   ? product.users?.some((user) => user.email === currentUser.email && user.isFollowing)
+  //   : null;
+
+  const isFollowing = currentUser.products.some(
+    (user: UserType) => user.email === currentUser.email && user.isFollowing
+  );
 
   const { currentDolar, priceHistory, currentPrice, dolarHistory } = product;
 
@@ -217,7 +225,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             </div>
           </div>
 
-          {currentUser && !isFollowing && <Modal productId={id} />}
+          {currentUser && !isFollowing && <Modal productUrl={product.url} />}
         </div>
       </div>
       <div id='history'></div>
