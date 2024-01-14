@@ -18,16 +18,10 @@ const navIcons = [
 ];
 
 const Navbar = () => {
-  const [nav, setNav] = useState(false);
-
   const user = useCurrentUser();
 
-  const handleNav = () => {
-    setNav(!nav);
-  };
-
   return (
-    <header className='w-full fixed top-4 z-50'>
+    <header className='w-full fixed top-0 z-50'>
       <nav className='bg-gray-300 dark:bg-black'>
         <div className='container ml-8 flex justify-between items-center'>
           <Link href='/' className='flex items-center gap-1'>
@@ -52,7 +46,6 @@ const Navbar = () => {
               </>
             ) : (
               <div className='container mx-auto flex justify-between items-center'>
-                {/* <Dropdown /> */}
                 <UserDropdown />
               </div>
             )}

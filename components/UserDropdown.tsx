@@ -94,9 +94,9 @@ export default function UserDropdown(props: any) {
         </DropdownSection>
 
         <DropdownSection aria-label='Preferences' showDivider>
-          <DropdownItem key='quick_search' shortcut='⌘K'>
-            Quick search
-          </DropdownItem>
+          {/* <DropdownItem key='quick_search' shortcut='⌘K'>
+            Busqueda Rápida
+          </DropdownItem> */}
           <DropdownItem
             isReadOnly
             key='theme'
