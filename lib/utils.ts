@@ -295,11 +295,12 @@ export const getCurrentWeekDolarData = (dolarHistory: Array<any>, currentPrice: 
       formattedDolarPrice *= 1000;
     }
 
+    const updatedDolarPrice = Number(currentPrice) / formattedDolarPrice;
     if (diffDays <= 7) {
       currentWeekDolarData.push({
-        date: dolarDate.toISOString(),
-        'Valor Real del Producto': Number(currentPrice) / formattedDolarPrice,
-        'Valor del Dólar': formattedDolarPrice,
+        Date: formatDay(new Date(dolarDate)),
+        'Valor Producto': updatedDolarPrice,
+        'Valor Dólar': formattedDolarPrice,
       });
     }
   }
@@ -317,11 +318,13 @@ export const getCurrentMonthlyDolarData = (dolarHistory: Array<any>, currentPric
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const formattedDolarPrice = dolarHistory[i].value < 9 ? dolarHistory[i].value * 1000 : dolarHistory[i].value;
 
+    const updatedProductValue = Number(currentPrice) / formattedDolarPrice;
+
     if (diffDays <= 30) {
       currentMonthDolarData.push({
-        date: dolarDate.toISOString(),
-        'Valor Real del Producto': Number(currentPrice) / formattedDolarPrice,
-        'Valor del Dólar': formattedDolarPrice,
+        Date: formatDay(new Date(dolarDate)),
+        'Valor Producto': updatedProductValue,
+        'Valor Dólar': formattedDolarPrice,
       });
     }
   }
@@ -364,14 +367,55 @@ export const getDailyDolarData = (
     });
 
     dailyData.push({
-      date: formattedDate,
-      'Valor Real del Producto': productValue,
-      'Valor del Dólar': formattedDolarValue,
-      // 'Máximo Valor del Dólar': maxDolarValue,
-      // 'Mínimo Valor del Dólar': minDolarValue,
+      Date: formatDay(new Date(dolarDate)),
+      'Valor Producto': productValue,
+      'Valor Dólar': formattedDolarValue,
     });
   }
   return dailyData;
+};
+
+interface DolarPriceHistoryItem {
+  value: number;
+  date: Date;
+  _id: any;
+}
+
+export const getAnnualDolarData = (currentPrice: number, dolarPriceHistory: DolarPriceHistoryItem[]) => {
+  const monthlyDataMap = new Map<number, { highestPrice: number }>();
+  let productValue = 0;
+  let annualData: any = [];
+
+  for (const priceItem of dolarPriceHistory) {
+    const currentDate = priceItem.date;
+    const currentDolarValue = priceItem.value;
+    const formattedDolarValue = currentDolarValue < 9 ? currentDolarValue * 1000 : currentDolarValue;
+
+    if (!monthlyDataMap.has(currentDate.getMonth())) {
+      monthlyDataMap.set(currentDate.getMonth(), { highestPrice: -Infinity });
+    }
+
+    const monthData = monthlyDataMap.get(currentDate.getMonth());
+
+    if (monthData) {
+      monthData.highestPrice = Math.max(monthData.highestPrice, formattedDolarValue);
+    }
+
+    productValue = currentPrice / Number(formattedDolarValue);
+
+    const formattedDate = currentDate.toLocaleDateString('es-AR', {
+      year: 'numeric',
+      month: 'long',
+    });
+
+    annualData.push({
+      Date: formattedDate,
+      'Valor Producto': productValue,
+      'Valor Dólar': formattedDolarValue,
+    });
+  }
+
+  return annualData;
 };
 
 export const getCurrentWeekData = (
@@ -396,9 +440,9 @@ export const getCurrentWeekData = (
 
     if (currentDolarDate >= thisSunday && currentDolarDate <= nextSunday) {
       weeklyData.push({
-        date: currentDolarDate.toISOString(),
-        'Valor Real del Producto': realProductValue,
-        'Valor del Dólar': currentDolarValue,
+        Date: currentDolarDate,
+        Producto: realProductValue,
+        Valor: currentDolarValue,
       });
     }
   }
@@ -421,7 +465,7 @@ export const getMonthlyRealData = (dolarDates: Array<Date | string>, dolarValues
 
   monthlyMap.forEach((value, key) => {
     monthlyData.push({
-      date: key,
+      Date: key,
       'Valor Real del Producto': currentPrice / value,
       'Valor del Dólar': value,
     });
@@ -623,7 +667,43 @@ export const getMonthlyData = (priceHistory: PriceHistoryItem[], currency: strin
   return monthlyData;
 };
 
+export const getAnnualMonthlyData = (priceHistory: PriceHistoryItem[], currency: string): MonthlyData[] => {
+  const monthlyDataMap = new Map<number, { lowestPrice: number; highestPrice: number }>();
+
+  for (const priceItem of priceHistory) {
+    const yearMonth = priceItem.date.getMonth() + 1;
+
+    if (!monthlyDataMap.has(yearMonth)) {
+      monthlyDataMap.set(yearMonth, { lowestPrice: Infinity, highestPrice: -Infinity });
+    }
+
+    const monthData = monthlyDataMap.get(yearMonth);
+
+    if (monthData) {
+      monthData.lowestPrice = Math.min(monthData.lowestPrice, priceItem.price);
+      monthData.highestPrice = Math.max(monthData.highestPrice, priceItem.price);
+    }
+  }
+
+  const monthlyData: MonthlyData[] = [];
+
+  monthlyDataMap.forEach((data, month) => {
+    monthlyData.push({
+      Month: formatMonth(new Date(`2024-${month}-01`)),
+      Mayor: data.lowestPrice,
+      Menor: data.highestPrice,
+    });
+  });
+
+  return monthlyData;
+};
+
 const formatDay = (date: Date) => {
   const options: any = { day: 'numeric', month: 'long' };
+  return date.toLocaleDateString('es-AR', options);
+};
+
+const formatMonth = (date: Date) => {
+  const options: any = { month: 'long' };
   return date.toLocaleDateString('es-AR', options);
 };

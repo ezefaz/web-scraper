@@ -29,6 +29,7 @@ interface Props {
   currentPrice: Number;
   originalPrice: Number;
   monthlyData: Array<any>;
+  anualData: Array<any>;
   currency: string;
 }
 
@@ -40,6 +41,7 @@ const LineChartComponent = ({
   originalPrice,
   monthlyData,
   currency,
+  anualData,
 }: Props) => {
   const [selectedTab, setSelectedTab] = useState('mensual');
   const lastThreeMonths = getLastThreeMonths();
@@ -48,8 +50,6 @@ const LineChartComponent = ({
   // const filteredPrices = priceHistory.filter((price, index) => lastThreeMonths.includes(monthsFromDates[index]));
 
   let chartData: any = [];
-
-  console.log(monthlyData);
 
   // if (selectedTab === 'diario') {
   //   chartData = getDailyData(currentPrice, originalPrice);
@@ -91,6 +91,8 @@ const LineChartComponent = ({
 
   if (selectedTab === 'mensual') {
     chartData = monthlyData;
+  } else if (selectedTab === 'anual') {
+    chartData = anualData;
   }
 
   const valueFormatter = (number: number) => {

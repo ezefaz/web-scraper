@@ -11,6 +11,8 @@ import { getCurrentUser, getProductById, getProductByURL, getSimilarProducts } f
 import {
   formatNumber,
   formatUSD,
+  getAnnualDolarData,
+  getAnnualMonthlyData,
   getCurrentMonthlyDolarData,
   getCurrentWeekDolarData,
   getMonthlyData,
@@ -100,8 +102,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     }
   }
 
-  console.log(lastDates);
-
   // const formattedDates = lastDates.map((date) => date.toISOString().slice(0, 10));
   // const uniqueDatesSet = new Set(formattedDates);
 
@@ -112,6 +112,10 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const dolarWeeklyData = getCurrentWeekDolarData(dolarHistory, currentPrice);
   const dolarMonthlyData = getCurrentMonthlyDolarData(dolarHistory, currentPrice);
+
+  const dolarAnualData = getAnnualDolarData(currentPrice, dolarHistory);
+
+  const productAnualData = getAnnualMonthlyData(priceHistory, currency);
 
   if (!product) redirect('/');
 
@@ -246,6 +250,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             currentPrice={currentPrice}
             originalPrice={product.originalPrice}
             monthlyData={monthlyData}
+            anualData={productAnualData}
             currency={currency}
           />
         </div>
@@ -258,6 +263,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             dolarValues={uniqueDolarValue}
             weeklyData={dolarWeeklyData}
             monthlyData={dolarMonthlyData}
+            anualData={dolarAnualData}
           />
         </div>
       </div>
