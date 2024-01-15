@@ -13,9 +13,6 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
   },
-  // countryName: {
-  //   type: String,
-  // },
   emailVerified: {
     type: Date,
   },

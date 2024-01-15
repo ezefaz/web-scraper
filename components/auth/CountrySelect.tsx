@@ -11,8 +11,8 @@ export default function CountrySelect() {
         Argentina
       </SelectItem>
       <SelectItem
-        key='brazil'
-        startContent={<Avatar alt='Brazil' className='w-6 h-6' src='https://flagcdn.com/br.svg' />}
+        key='brasil'
+        startContent={<Avatar alt='Brasil' className='w-6 h-6' src='https://flagcdn.com/br.svg' />}
       >
         Brasil
       </SelectItem>
