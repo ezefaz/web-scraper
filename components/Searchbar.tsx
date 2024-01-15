@@ -12,7 +12,14 @@ const Searchbar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const mercadolibreDomains = ['mercadolibre.com', 'mercadolibre.com.ar'];
+  const mercadolibreDomains = [
+    'mercadolibre.com',
+    'mercadolibre.com.ar',
+    'www.mercadolivre.com.br',
+    'www.mercadolibre.cl',
+    'www.mercadolibre.com.co',
+    'www.mercadolibre.com.uy',
+  ];
 
   const isValidMLProductUrl = (url: string) => {
     try {
@@ -37,7 +44,9 @@ const Searchbar = () => {
 
       router.push(`/products/${productId}`);
     } catch (error) {
-      toast.error('No se ha podido agregar el producto.');
+      toast.error(
+        'No se ha podido agregar el producto. Revisa que el enlace sea correcto o que la publicacion este activa.'
+      );
     } finally {
       setIsLoading(false);
     }

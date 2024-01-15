@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+// import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import Modal from '@/components/Modal';
@@ -24,9 +24,8 @@ import { Badge, Card, Tab, TabGroup, TabList } from '@tremor/react';
 import ScraperButton from '@/components/ScraperButton';
 import ProductTabs from '@/components/ProductTabs';
 
-import { IoIosStarOutline } from 'react-icons/io';
+import { Image } from '@nextui-org/react';
 import ProductBadges from '@/components/ProductBadges';
-import Product from '@/lib/models/product.model';
 
 type Props = {
   params: { id: string };
@@ -128,7 +127,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div className='flex gap-10 sm:cap-5 xl:flex-row flex-col'>
         <div className='flex flex-row flex-col mr-8 h-[max-content]'>
           <Card decoration='bottom' decorationColor='orange'>
-            <Image src={product.image} alt={product.title} width={450} height={450} />
+            <Image src={product.image} isZoomed alt={product.title} width={450} height={450} />
           </Card>
         </div>
         <div className='flex-1 flex flex-col'>
@@ -142,7 +141,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               >
                 Visitar Producto
               </Link>
-              <p>Tienda {product.storeName ? product.storeName : ''}</p>
+              <p>Vendido por: {product.storeName ? product.storeName : ''}</p>
             </div>
 
             {/* <div className='flex items-center gap-3 py-3'>
@@ -247,8 +246,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             productTitle={product.title}
             priceHistory={uniquePrices}
             dateHistory={lastDates}
-            currentPrice={currentPrice}
-            originalPrice={product.originalPrice}
+            lowestPrice={product.lowestPrice}
+            highestPrice={product.highestPrice}
             monthlyData={monthlyData}
             anualData={productAnualData}
             currency={currency}

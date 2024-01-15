@@ -166,7 +166,7 @@ export async function scrapeMLProduct(url: string) {
       discountRate: Number(discountRate),
       category: category || '',
       reviewsCount: reviewsCount || 0,
-      stars: stars || 4.5,
+      stars: stars || 0,
       stockAvailable: stockAvailable && !isOutOfStock ? stockAvailable : '1',
       isOutOfStock,
       description,

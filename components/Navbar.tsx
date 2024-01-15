@@ -31,7 +31,7 @@ const Navbar = () => {
           <div>
             {!user ? (
               <>
-                <div className='flex items-center p-2 mr-10 mt-2'>
+                <div className='flex items-center p-2 mr-3 mt-2'>
                   <LoginButton>
                     <a
                       // href='/sign-up'
@@ -45,7 +45,7 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <div className='container mx-auto flex justify-between items-center'>
+              <div className='container mx-auto flex justify-between items-center mr-10'>
                 <UserDropdown />
               </div>
             )}

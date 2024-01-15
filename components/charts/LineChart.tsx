@@ -57,6 +57,7 @@ const DolarBasedChart = ({ weeklyData, monthlyData, anualData }: Props) => {
           valueFormatter={valueFormatter}
           className='h-72 mt-4 m-auto'
           yAxisWidth={80}
+          noDataText='No hay datos suficientes del producto aún.'
         />
       </Card>
     </>

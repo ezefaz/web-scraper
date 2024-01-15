@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { comparePrices, extractMonthsFromDate, getDailyData, getLastThreeMonths, getMonthlyData } from '@/lib/utils';
+import {
+  comparePrices,
+  extractMonthsFromDate,
+  getDailyData,
+  getLastThreeMonths,
+  getLowestPrice,
+  getMonthlyData,
+} from '@/lib/utils';
 import {
   Card,
   Title,
@@ -25,9 +32,9 @@ const priceFormatter = (number: any) => `$${Intl.NumberFormat('us').format(numbe
 interface Props {
   productTitle: string;
   dateHistory: Array<string | Date>;
-  priceHistory: Array<string | Number>;
-  currentPrice: Number;
-  originalPrice: Number;
+  priceHistory: Array<string | number | Number>;
+  lowestPrice: number;
+  highestPrice: number;
   monthlyData: Array<any>;
   anualData: Array<any>;
   currency: string;
@@ -37,8 +44,8 @@ const LineChartComponent = ({
   productTitle,
   priceHistory,
   dateHistory,
-  currentPrice,
-  originalPrice,
+  lowestPrice,
+  highestPrice,
   monthlyData,
   currency,
   anualData,
@@ -128,11 +135,14 @@ const LineChartComponent = ({
       <AreaChart
         className='mt-4 h-80'
         data={chartData}
-        categories={['Mayor', 'Menor']}
+        categories={['Menor', 'Mayor']}
         index='Month'
-        colors={['red', 'green']}
+        colors={['green', 'red']}
         yAxisWidth={60}
+        minValue={lowestPrice}
+        maxValue={highestPrice}
         valueFormatter={valueFormatter}
+        noDataText='No hay datos suficientes del producto aún.'
       />
     </Card>
   );
