@@ -16,7 +16,7 @@ const ProductTabs = (props: Props) => {
       <TabList className='mt-8'>
         <Tab onClick={() => handleTabClick('information')}>Información</Tab>
         <Tab onClick={() => handleTabClick('history')}>Historial</Tab>
-        <Tab onClick={() => handleTabClick('comparison')}>Comparación</Tab>
+        <Tab onClick={() => handleTabClick('priceCompare')}>Comparación</Tab>
       </TabList>
     </TabGroup>
   );

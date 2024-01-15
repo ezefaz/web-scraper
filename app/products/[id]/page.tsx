@@ -7,7 +7,7 @@ import PriceInfoCard from '@/components/PriceInfoCard';
 import ProductCard from '@/components/ProductCard';
 import BarChart from '@/components/charts/BarChart';
 
-import { getCurrentUser, getProductByURL, getSimilarProducts } from '@/lib/actions';
+import { getCurrentUser, getProductById, getProductByURL, getSimilarProducts } from '@/lib/actions';
 import {
   formatNumber,
   formatUSD,
@@ -24,6 +24,7 @@ import ProductTabs from '@/components/ProductTabs';
 
 import { IoIosStarOutline } from 'react-icons/io';
 import ProductBadges from '@/components/ProductBadges';
+import Product from '@/lib/models/product.model';
 
 type Props = {
   params: { id: string };
@@ -31,18 +32,20 @@ type Props = {
 
 const ProductDetails = async ({ params: { id } }: Props) => {
   const currentUser = await getCurrentUser();
+  const foundedProduct = await getProductById(id);
 
   const userProduct = currentUser.products.find((product: any) => product._id.toString() === id);
 
-  const productUrl = userProduct.url;
+  const productUrl = foundedProduct?.url || userProduct?.url;
 
   const product: ProductType = await getProductByURL(productUrl);
+  // const product: ProductType = await getProductById(id);
 
   const isFollowing = currentUser.products?.some(
     (product: ProductType) => product.url === productUrl && product.isFollowing
   );
 
-  const { currentDolar, priceHistory, currentPrice, dolarHistory } = product;
+  const { currentDolar, priceHistory, currentPrice, dolarHistory, originalPrice, currency } = product;
 
   const dolarValue = Number(currentDolar.value);
   const scrapedDolarDate = currentDolar.date;
@@ -97,13 +100,15 @@ const ProductDetails = async ({ params: { id } }: Props) => {
     }
   }
 
-  const formattedDates = lastDates.map((date) => date.toISOString().slice(0, 10));
-  const uniqueDatesSet = new Set(formattedDates);
+  console.log(lastDates);
 
-  const uniqueDatesArray: Array<string | Date> = Array.from(uniqueDatesSet);
+  // const formattedDates = lastDates.map((date) => date.toISOString().slice(0, 10));
+  // const uniqueDatesSet = new Set(formattedDates);
 
-  const weeklyData = getWeeklyData(priceHistory, currentPrice, product.originalPrice);
-  const monthlyData = getMonthlyData(priceHistory, currentPrice, product.originalPrice);
+  // const uniqueDatesArray: Array<string | Date> = Array.from(uniqueDatesSet);
+
+  // const weeklyData = getWeeklyData(priceHistory, currentPrice, originalPrice);
+  const monthlyData = getMonthlyData(priceHistory, currency);
 
   const dolarWeeklyData = getCurrentWeekDolarData(dolarHistory, currentPrice);
   const dolarMonthlyData = getCurrentMonthlyDolarData(dolarHistory, currentPrice);
@@ -237,10 +242,11 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           <BarChart
             productTitle={product.title}
             priceHistory={uniquePrices}
-            dateHistory={uniqueDatesArray}
+            dateHistory={lastDates}
             currentPrice={currentPrice}
             originalPrice={product.originalPrice}
-            weeklyData={weeklyData}
+            monthlyData={monthlyData}
+            currency={currency}
           />
         </div>
         <div className='w-full lg:w-[50%]'>
@@ -256,7 +262,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </div>
       </div>
       <div className='mx-auto max-w-[510px] text-center mb-2'>
-        <div id='comparisson'></div>
+        <div id='priceCompare'></div>
         <span className='block text-lg font-semibold text-primary'>Precios</span>
         <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
           Comparación de Precios

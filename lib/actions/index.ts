@@ -381,3 +381,13 @@ export async function followProduct(productId: string) {
     console.log('[FOLLOW_PRODUCT_ERROR]', error);
   }
 }
+
+export async function getProductById(productId: string) {
+  const product = await Product.findById({ _id: productId });
+
+  if (!product) {
+    console.log('No se ha encontrado el producto');
+  }
+
+  return product;
+}

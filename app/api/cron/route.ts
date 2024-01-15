@@ -10,8 +10,6 @@ export const maxDuration = 10;
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-const start = performance.now();
-
 export async function GET(request: Request) {
   try {
     connectToDb();
@@ -27,26 +25,48 @@ export async function GET(request: Request) {
 
         if (!scrapedProduct) return;
 
-        const updatedPriceHistory = currentProduct.priceHistory
-          .filter((priceItem: PriceHistoryItem) => priceItem && priceItem.price !== undefined)
-          .map((priceItem: PriceHistoryItem) => {
-            const price = priceItem.price ? parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10) : null;
-            if (price !== null && !isNaN(price)) {
-              return {
-                price,
-                date: priceItem.date,
-                _id: priceItem._id,
-              };
-            }
-            return currentProduct.priceHistory;
-          });
+        console.log('Producto actual --->', currentProduct);
+        console.log('Producto SCRAPED --->', scrapedProduct);
+
+        const currentDate = new Date();
+
+        const updatedPriceHistory: any = [
+          ...currentProduct.priceHistory.map((priceItem: PriceHistoryItem) => ({
+            price: priceItem.price,
+            date: priceItem.date,
+            _id: priceItem._id,
+          })),
+          ...scrapedProduct.priceHistory.map((priceItem: PriceHistoryItem) => ({
+            price: priceItem.price,
+            date: currentDate,
+          })),
+          {
+            price: currentProduct.currentPrice,
+            date: currentProduct.priceHistory.length ? currentProduct.priceHistory[0].date : currentDate,
+          },
+          { price: scrapedProduct.currentPrice, date: currentDate },
+        ];
+
+        // .filter((priceItem: PriceHistoryItem) => priceItem && priceItem.price !== undefined)
+        // .map((priceItem: PriceHistoryItem) => {
+        //   const price = priceItem.price ? parseInt(priceItem.price.toString().replace(/[^0-9]/g, ''), 10) : null;
+        //   if (price !== null && !isNaN(price)) {
+        //     return {
+        //       price,
+        //       date: priceItem.date,
+        //       _id: priceItem._id,
+        //     };
+        //   }
+        //   return null;
+        // })
+        // .filter((priceItem: PriceHistoryItem | null) => priceItem !== null);
 
         const previousDolarHistory = currentProduct.dolarHistory;
 
         const updatedCurrentDolar: CurrentDolar = scrapedProduct.currentDolar;
         const updatedDolarValue = scrapedProduct.currentDolar.value;
 
-        const updatedDolarHistory: any = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
+        const updatedDolarHistory = [...previousDolarHistory, { value: updatedDolarValue, date: new Date() }];
 
         const filteredDolarHistory: any[] = [];
 
@@ -64,6 +84,12 @@ export async function GET(request: Request) {
 
         const existingUsers = currentProduct.users;
 
+        const newUsers = scrapedProduct.users
+          ? scrapedProduct.users.filter(
+              (scrapedUser: any) => !existingUsers.some((existingUser: any) => existingUser.email === scrapedUser.email)
+            )
+          : [];
+
         const product = {
           ...scrapedProduct,
           priceHistory: updatedPriceHistory,
@@ -72,7 +98,7 @@ export async function GET(request: Request) {
           averagePrice: getAveragePrice(updatedPriceHistory),
           currentDolar: updatedCurrentDolar,
           dolarHistory: filteredDolarHistory,
-          users: existingUsers,
+          users: [...existingUsers, ...newUsers],
         };
 
         const updatedProduct = await Product.findOneAndUpdate(
@@ -122,6 +148,3 @@ export async function GET(request: Request) {
     throw new Error(`Failed to get all products: ${error.message}`);
   }
 }
-
-const end = performance.now();
-console.log(`Function execution time: ${end - start} milliseconds`);
