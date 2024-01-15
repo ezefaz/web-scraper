@@ -281,7 +281,9 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         <div className='py-14 flex flex-col gap-2 w-full' id='trending'>
           <div className='mx-auto max-w-[510px] text-center mb-2'>
             {/* <span className='block text-lg font-semibold text-primary'>Graficos</span> */}
-            <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px]'>Otros Productos</h1>
+            <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px] dark:text-white'>
+              Otros Productos
+            </h1>
           </div>
           <div className='flex flex-wrap gap-10 mt-7 w-full'>
             {similarProducts.map((product) => (
