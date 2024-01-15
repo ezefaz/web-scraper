@@ -13,6 +13,9 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
   },
+  // countryName: {
+  //   type: String,
+  // },
   emailVerified: {
     type: Date,
   },
@@ -23,18 +26,8 @@ const userSchema = new mongoose.Schema({
     ref: 'TwoFactorConfirmation',
   },
   country: {
-    type: {
-      name: {
-        type: String,
-        enum: ['Argentina', 'Brasil', 'Uruguay', 'Colombia', 'Venezuela'],
-      },
-      domain: {
-        type: String,
-      },
-      currency: {
-        type: String,
-      },
-    },
+    type: String,
+    enum: ['argentina', 'brasil', 'colombia', 'uruguay', 'venezuela'],
   },
   products: [
     {

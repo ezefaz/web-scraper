@@ -9,6 +9,7 @@ import { generateVerificationToken } from '@/lib/tokens';
 import { sendVerificationEmail } from '@/lib/mail';
 import { connectToDb } from '@/lib/mongoose';
 import mongoose from 'mongoose';
+import Account from '@/lib/models/account.model';
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   const validatedFields = RegisterSchema.safeParse(values);
@@ -17,7 +18,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Campos incorrectos' };
   }
 
-  const { email, name, password } = validatedFields.data;
+  const { email, name, password, country } = validatedFields.data;
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const existingUser = await getUserByEmail(email);
@@ -26,12 +27,15 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Correo en uso' };
   }
 
+  await connectToDb();
+
   await User.collection.dropIndexes();
 
   await User.create({
     name,
     email,
     password: hashedPassword,
+    country,
   });
 
   const verificationToken = await generateVerificationToken(email);

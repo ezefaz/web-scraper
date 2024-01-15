@@ -8,6 +8,7 @@ import clientPromise from '@/lib/mongodb';
 import User from '@/lib/models/user.model';
 import TwoFactorConfirmation from '@/lib/models/TwoFactorConfirmation.model';
 import { getAccountByUserId } from './data/account';
+import Account from './lib/models/account.model';
 
 export const {
   handlers: { GET, POST },
@@ -37,7 +38,8 @@ export const {
   },
   callbacks: {
     async signIn({ user, account }: any) {
-      // Allow OAuth without email verification
+      await Account.collection.dropIndexes();
+
       if (account?.provider !== 'credentials') return true;
 
       const existingUser = await getUserById(user.id);

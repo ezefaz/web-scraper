@@ -25,6 +25,7 @@ export type UserType = {
   id: string;
   name: string;
   email: string;
+  country?: string;
   password?: string;
   products?: ProductType[];
   productsFavoritos?: ProductType[];
