@@ -22,6 +22,20 @@ const userSchema = new mongoose.Schema({
     type: Schema.Types.ObjectId,
     ref: 'TwoFactorConfirmation',
   },
+  country: {
+    type: {
+      name: {
+        type: String,
+        enum: ['Argentina', 'Brasil', 'Uruguay', 'Colombia', 'Venezuela'],
+      },
+      domain: {
+        type: String,
+      },
+      currency: {
+        type: String,
+      },
+    },
+  },
   products: [
     {
       url: { type: String },

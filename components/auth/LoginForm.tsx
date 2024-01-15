@@ -16,10 +16,17 @@ import { login } from '@/app/actions/login';
 import { Social } from './Social';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { Input } from '@nextui-org/react';
+import { TbEyeFilled } from 'react-icons/tb';
+import { IoMdEyeOff } from 'react-icons/io';
 
 type Props = {};
 
 const LoginForm = (props: Props) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
+
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl');
   const urlError =
@@ -78,21 +85,33 @@ const LoginForm = (props: Props) => {
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <div>
-            <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
+            {/* <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
               Email
-            </label>
-            <input
+            </label> */}
+            {/* <input
               id='email'
               type='email'
               disabled={isPending}
               placeholder='john@doe.com'
               {...register('email')}
               className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
+            /> */}
+            <Input
+              isClearable
+              id='email'
+              type='email'
+              label='Email'
+              variant='bordered'
+              disabled={isPending}
+              placeholder='Ingresa tu correo'
+              onClear={() => console.log('input cleared')}
+              {...register('email')}
+              className='max-w-xs'
             />
             {errors.email && <span className='text-red-500'>{errors.email.message}</span>}
           </div>
           <div>
-            <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
+            {/* <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
               Contraseña
             </label>
             <input
@@ -102,6 +121,25 @@ const LoginForm = (props: Props) => {
               placeholder='*******'
               {...register('password')}
               className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
+            /> */}
+            <Input
+              id='password'
+              label='Contraseña'
+              variant='bordered'
+              disabled={isPending}
+              placeholder='******'
+              {...register('password')}
+              endContent={
+                <button className='focus:outline-none' type='button' onClick={toggleVisibility}>
+                  {isVisible ? (
+                    <IoMdEyeOff className='text-2xl text-default-400 pointer-events-none' />
+                  ) : (
+                    <TbEyeFilled className='text-2xl text-default-400 pointer-events-none' />
+                  )}
+                </button>
+              }
+              type={isVisible ? 'text' : 'password'}
+              className='max-w-xs'
             />
             {errors.password && <span className='text-red-500'>{errors.password.message}</span>}
             <button className='block px-0 py-2 mt-2 text-sm font-normal text-gray-600 hover:text-primary focus:outline-none focus:text-blue-500'>
