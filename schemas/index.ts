@@ -1,5 +1,7 @@
 import * as z from 'zod';
 
+const validCountries = ['argentina', 'brasil', 'colombia', 'uruguay', 'venezuela'];
+
 export const LoginSchema = z.object({
   email: z.string().email({
     message: 'El correo es obligatorio',
@@ -29,5 +31,8 @@ export const RegisterSchema = z.object({
   }),
   name: z.string().min(1, {
     message: 'El nombre es obligatorio',
+  }),
+  country: z.string().refine((value) => validCountries.includes(value), {
+    message: 'El país seleccionado no es válido',
   }),
 });

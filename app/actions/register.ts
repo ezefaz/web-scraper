@@ -17,7 +17,10 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Campos incorrectos' };
   }
 
-  const { email, name, password } = validatedFields.data;
+  const { email, name, password, country } = validatedFields.data;
+
+  console.log(country);
+
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const existingUser = await getUserByEmail(email);
@@ -26,13 +29,23 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Correo en uso' };
   }
 
-  await User.collection.dropIndexes();
+  try {
+    await User.collection.dropIndexes();
+  } catch (error) {
+    console.error('Error dropping indexes:', error);
+  }
 
-  await User.create({
-    name,
-    email,
-    password: hashedPassword,
-  });
+  try {
+    await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      country,
+    });
+  } catch (error) {
+    console.error('Error inserting user:', error);
+    return { error: 'Error durante el registro' };
+  }
 
   const verificationToken = await generateVerificationToken(email);
 

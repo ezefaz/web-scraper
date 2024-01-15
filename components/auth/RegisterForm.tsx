@@ -13,7 +13,7 @@ import FormSuccess from './FormSuccess';
 import { Button } from '@tremor/react';
 import { register as registration } from '@/app/actions/register';
 import CountrySelect from './CountrySelect';
-import { Input } from '@nextui-org/react';
+import { Avatar, Input, Select, SelectItem } from '@nextui-org/react';
 import { TbEyeFilled } from 'react-icons/tb';
 import { IoMdEyeOff } from 'react-icons/io';
 
@@ -37,6 +37,7 @@ const RegisterForm = (props: Props) => {
       email: '',
       password: '',
       name: '',
+      country: '',
     },
   });
 
@@ -51,6 +52,7 @@ const RegisterForm = (props: Props) => {
       });
     });
   };
+
   return (
     <div className='flex justify-center items-center h-screen'>
       <CardWrapper
@@ -64,69 +66,32 @@ const RegisterForm = (props: Props) => {
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <div>
-            {/* <label htmlFor='email' className='block text-sm font-medium text-gray-700'>
-              Email
-            </label> */}
-            {/* <input
-              id='email'
-              type='email'
-              disabled={isPending}
-              placeholder='john@doe.com'
-              {...register('email')}
-              className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
-            /> */}
             <Input
-              isClearable
               id='email'
               type='email'
               label='Email'
               variant='bordered'
               disabled={isPending}
               placeholder='Ingresa tu correo'
-              onClear={() => console.log('input cleared')}
               {...register('email')}
               className='max-w-xs'
             />
             {errors.email && <span className='text-red-500'>{errors.email.message}</span>}
           </div>
           <div>
-            {/* <label htmlFor='name' className='block text-sm font-medium text-gray-700'>
-              Nombre
-            </label> */}
-            {/* <input
-              id='name'
-              type='name'
-              disabled={isPending}
-              placeholder='John Doe'
-              {...register('name')}
-              className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
-            /> */}
             <Input
-              isClearable
               id='name'
               type='name'
               label='Nombre'
               variant='bordered'
               disabled={isPending}
               placeholder='Ingresa tu nombre'
-              onClear={() => console.log('input cleared')}
               {...register('name')}
               className='max-w-xs'
             />
             {errors.name && <span className='text-red-500'>{errors.name.message}</span>}
           </div>
           <div>
-            {/* <label htmlFor='password' className='block text-sm font-medium text-gray-700'>
-              Contraseña
-            </label>
-            <input
-              id='password'
-              type='password'
-              disabled={isPending}
-              placeholder='*******'
-              {...register('password')}
-              className='mt-1 p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50'
-            /> */}
             <Input
               id='password'
               label='Contraseña'
@@ -151,7 +116,43 @@ const RegisterForm = (props: Props) => {
           <FormError message={error} />
           <FormSuccess message={success} />
           <div>
-            <CountrySelect />
+            <Select className='max-w-xs' label='Seleccionar País' id='country' {...register('country')}>
+              <SelectItem
+                key='argentina'
+                {...register('country')}
+                startContent={<Avatar alt='Argentina' className='w-6 h-6' src='https://flagcdn.com/ar.svg' />}
+              >
+                Argentina
+              </SelectItem>
+              <SelectItem
+                key='brasil'
+                {...register('country')}
+                startContent={<Avatar alt='Brasil' className='w-6 h-6' src='https://flagcdn.com/br.svg' />}
+              >
+                Brasil
+              </SelectItem>
+              <SelectItem
+                key='colombia'
+                {...register('country')}
+                startContent={<Avatar alt='Colombia' className='w-6 h-6' src='https://flagcdn.com/co.svg' />}
+              >
+                Colombia
+              </SelectItem>
+              <SelectItem
+                key='uruguay'
+                {...register('country')}
+                startContent={<Avatar alt='Uruguay' className='w-6 h-6' src='https://flagcdn.com/uy.svg' />}
+              >
+                Uruguay
+              </SelectItem>
+              <SelectItem
+                key='venezuela'
+                {...register('country')}
+                startContent={<Avatar alt='Venezuela' className='w-6 h-6' src='https://flagcdn.com/ve.svg' />}
+              >
+                Venezuela
+              </SelectItem>
+            </Select>
           </div>
           <div>
             <Button
