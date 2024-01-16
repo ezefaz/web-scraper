@@ -24,8 +24,9 @@ import { Badge, Card, Tab, TabGroup, TabList } from '@tremor/react';
 import ScraperButton from '@/components/ScraperButton';
 import ProductTabs from '@/components/ProductTabs';
 
-import { Image } from '@nextui-org/react';
+import { Image, Skeleton } from '@nextui-org/react';
 import ProductBadges from '@/components/ProductBadges';
+import InternationalScraperButton from '@/components/InternationalScraperButton';
 
 type Props = {
   params: { id: string };
@@ -126,9 +127,16 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <ProductTabs />
       <div className='flex gap-10 sm:cap-5 xl:flex-row flex-col'>
         <div className='flex flex-row flex-col mr-8 h-[max-content]'>
-          <Card decoration='bottom' decorationColor='orange'>
-            <Image src={product.image} isZoomed alt={product.title} width={450} height={450} />
-          </Card>
+          {product.image ? (
+            <Card decoration='bottom' decorationColor='orange'>
+              <Image src={product.image} isZoomed alt={product.title} width={450} height={450} />
+            </Card>
+          ) : (
+            <Skeleton>
+              {' '}
+              <Card decoration='bottom' decorationColor='orange'></Card>
+            </Skeleton>
+          )}
         </div>
         <div className='flex-1 flex flex-col'>
           <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
@@ -275,6 +283,17 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       </div>
       <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
         <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />
+      </div>
+      <div className='mx-auto max-w-[510px] text-center mb-2'>
+        <div id='priceCompare'></div>
+        <span className='block text-lg font-semibold text-primary'>Precios Internacionales</span>
+        <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
+          Comparación de Precios Internacional
+        </h1>
+        <p className='pt-2 text-muted'>Considera tambien el costo de impuestos y envío.</p>
+      </div>
+      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
+        <InternationalScraperButton productTitle={product.title} productPrice={Number(product.currentPrice)} />
       </div>
       {similarProducts && similarProducts?.length > 0 && (
         <div className='py-14 flex flex-col gap-2 w-full' id='trending'>

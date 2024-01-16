@@ -1,23 +1,40 @@
 'use client';
-import { scrapePriceComparissonProducts } from '@/lib/scraper/price-comparisson';
 import React, { useEffect, useState } from 'react';
-import PriceComparisson from './PriceComparisson';
+import { scrapeInternationalValue } from '@/lib/scraper/tiendamia';
+import InternationalPriceComparisson from './InternationalPriceComparisson';
+import { scrapePriceComparissonProducts } from '@/lib/scraper/price-comparisson';
 
 interface ScraperButtonProps {
   productTitle: string;
   productPrice: number;
 }
 
-const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
+const InternationalScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
   const [scrapingInProgress, setScrapingInProgress] = useState(false);
   const [scrapedData, setScrapedData] = useState([]);
+
+  // const handleScrapeClick = async () => {
+  //   setScrapingInProgress(true);
+  //   try {
+  //     console.log(productTitle);
+
+  //     const formattedProductTitle = productTitle.replace(/\s/g, '%20');
+  //     const data: any = await scrapeInternationalValue(formattedProductTitle);
+
+  //     setScrapedData(data);
+  //   } catch (error) {
+  //     console.error('Error Comparing prices:', error);
+  //   } finally {
+  //     setScrapingInProgress(false);
+  //   }
+  // };
 
   useEffect(() => {
     const fetchData = async () => {
       setScrapingInProgress(true);
       try {
         const formattedProductTitle = productTitle.replace(/\s/g, '-');
-        const data = await scrapePriceComparissonProducts(formattedProductTitle);
+        const data: any = await scrapeInternationalValue(formattedProductTitle);
         setScrapedData(data);
       } catch (error) {
         console.error('Error Comparing prices:', error);
@@ -29,20 +46,6 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
     fetchData();
   }, [productTitle]);
 
-  // const handleScrapeClick = async () => {
-  //   setScrapingInProgress(true);
-  //   try {
-  //     const formattedProductTitle = productTitle.replace(/\s/g, '-');
-
-  //     const data = await scrapePriceComparissonProducts(formattedProductTitle);
-  //     setScrapedData(data);
-  //   } catch (error) {
-  //     console.error('Error Comparing prices:', error);
-  //   } finally {
-  //     setScrapingInProgress(false);
-  //   }
-  // };
-
   return (
     <div className='flex flex-col items-center justify-center space-y-4 w-full'>
       {/* <button
@@ -50,7 +53,7 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
         onClick={handleScrapeClick}
         disabled={scrapingInProgress}
       >
-        {scrapingInProgress ? 'Comparando...' : 'Inciar Comparación de Precios'}
+        {scrapingInProgress ? 'Comparando...' : 'Comparación Internacional'}
       </button> */}
       {/* <button
         onClick={handleScrapeClick}
@@ -60,10 +63,10 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
         {scrapingInProgress ? 'Comparando...' : 'Inciar Comparación de Precios'}
       </button> */}
       <div className='w-full'>
-        <PriceComparisson scrapedData={scrapedData} productPrice={productPrice} />
+        <InternationalPriceComparisson scrapedData={scrapedData} productPrice={Number(productPrice)} />
       </div>
     </div>
   );
 };
 
-export default ScraperButton;
+export default InternationalScraperButton;

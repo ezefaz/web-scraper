@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-const validCountries = ['argentina', 'brasil', 'colombia', 'uruguay', 'venezuela'];
+const validCountries = ['argentina', 'brasil', 'colombia', 'uruguay'];
 
 export const LoginSchema = z.object({
   email: z.string().email({

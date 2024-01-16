@@ -113,8 +113,7 @@ const RegisterForm = (props: Props) => {
             />
             {errors.password && <span className='text-red-500'>{errors.password.message}</span>}
           </div>
-          <FormError message={error} />
-          <FormSuccess message={success} />
+
           <div>
             <Select className='max-w-xs' label='Seleccionar País' id='country' {...register('country')}>
               <SelectItem
@@ -149,16 +148,18 @@ const RegisterForm = (props: Props) => {
               >
                 Uruguay
               </SelectItem>
-              <SelectItem
+              {/* <SelectItem
                 key='venezuela'
                 id='country'
                 {...register('country')}
                 startContent={<Avatar alt='Venezuela' className='w-6 h-6' src='https://flagcdn.com/ve.svg' />}
               >
                 Venezuela
-              </SelectItem>
+              </SelectItem> */}
             </Select>
           </div>
+          <FormError message={error} />
+          <FormSuccess message={success} />
           <div>
             <Button
               type='submit'

@@ -33,12 +33,12 @@ export default auth((req) => {
 // Optionally, don't invoke Middleware on some paths
 export const config = {
   unstable_allowDynamic: [
-    './auth.config.ts', // allows a single file
-    '/auth.config.ts', // allows a single file
-    './lib/models/user.model.ts', // allows a single file
-    '/lib/models/user.model.ts', // allows a single file
-    './node_modules/mongoose/dist/browser.umd.js', // use a glob to allow anything in the function-bind 3rd party module
-    '/node_modules/mongoose/dist/browser.umd.js', // use a glob to allow anything in the function-bind 3rd party module
+    './auth.config.ts',
+    '/auth.config.ts',
+    './lib/models/user.model.ts',
+    '/lib/models/user.model.ts',
+    './node_modules/mongoose/dist/browser.umd.js',
+    '/node_modules/mongoose/dist/browser.umd.js',
   ],
   matcher: ['/((?!.+\\.[\\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
 };

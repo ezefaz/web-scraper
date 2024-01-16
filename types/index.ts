@@ -21,11 +21,17 @@ export type CurrentDolar = {
   date: Date;
 };
 
+export type Country = {
+  name: string;
+  tag: string;
+  currency: string;
+};
+
 export type UserType = {
   id: string;
   name: string;
   email: string;
-  country?: string;
+  country?: Country;
   password?: string;
   products?: ProductType[];
   productsFavoritos?: ProductType[];
