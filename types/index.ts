@@ -83,3 +83,19 @@ export type EmailProductInfo = {
   image: string;
   url: string;
 };
+
+export type TiendamiaProduct = {
+  title: string;
+  brand: string;
+  description?: string;
+  currentPrice: string;
+  originalPrice: string;
+  currentDollarPrice: string;
+  originalDollarPrice: string;
+  url: string;
+  image: string;
+  vendorsName?: string;
+  returnMessage: string;
+  availabilityMessage: string;
+  refurbishedMessage: string;
+};

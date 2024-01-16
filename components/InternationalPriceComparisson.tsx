@@ -12,16 +12,13 @@ import {
   TableHeaderCell,
   TableRow,
   Text,
-  Title,
 } from '@tremor/react';
 
 import { Skeleton } from '@nextui-org/react';
 import { formatNumber } from '@/lib/utils';
-import { HiClipboard, HiClipboardCheck } from 'react-icons/hi';
 import Image from 'next/image';
 import { Dialog, Transition } from '@headlessui/react';
 import { BsArrowBarRight } from 'react-icons/bs';
-import Link from 'next/link';
 
 interface Product {
   url: string;
@@ -37,17 +34,10 @@ interface Props {
 }
 
 const InternationalPriceComparisson = ({ scrapedData, productPrice }: Props) => {
-  const [copySuccess, setCopySuccess] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
-
-  const copyToClipboard = (url: string) => {
-    navigator.clipboard.writeText(url);
-    setCopySuccess(true);
-    setTimeout(() => setCopySuccess(false), 2000);
-  };
 
   return (
     <>
@@ -113,7 +103,7 @@ const InternationalPriceComparisson = ({ scrapedData, productPrice }: Props) => 
                                   </TableCell> */}
                         <a
                           className='text-sm text-primary text-center m-auto hover:underline focus:outline-none'
-                          href={product.url}
+                          href={`/products/internacional/1?productUrl=${encodeURIComponent(product.url)}`}
                           target='_blank'
                           rel='noopener noreferrer'
                           aria-label={`Visitar ${product.title}`}
@@ -229,7 +219,7 @@ const InternationalPriceComparisson = ({ scrapedData, productPrice }: Props) => 
                                 <div className='flex gap-2'>
                                   <a
                                     className='text-sm text-primary text-center m-auto hover:underline focus:outline-none'
-                                    href={product.url}
+                                    href={`/products/internacional/1?productUrl=${encodeURIComponent(product.url)}`}
                                     target='_blank'
                                     rel='noopener noreferrer'
                                     aria-label={`Visitar ${product.title}`}
