@@ -41,7 +41,9 @@ const Searchbar = () => {
 
     try {
       if (isValidLink) {
-        window.location.href = searchPrompt;
+        const productId: any = await scrapeAndStoreProducts(searchPrompt);
+
+        router.push(`/products/${productId}`);
       } else {
         const formattedSearchQuery = encodeURIComponent(searchPrompt.replace(/\s+/g, '-'));
         router.push(`/products?search=${formattedSearchQuery}`);
