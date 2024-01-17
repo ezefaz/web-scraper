@@ -12,6 +12,7 @@ const nextConfig = {
       'http2.mlstatic.com',
       'valordolarblue.com.ar',
       'lh3.googleusercontent.com',
+      'media-prod-use-1.mirakl.net',
     ],
   },
   typescript: {

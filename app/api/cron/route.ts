@@ -25,9 +25,6 @@ export async function GET(request: Request) {
 
         if (!scrapedProduct) return;
 
-        console.log('Producto actual --->', currentProduct);
-        console.log('Producto SCRAPED --->', scrapedProduct);
-
         const currentDate = new Date();
 
         const updatedPriceHistory: any = [

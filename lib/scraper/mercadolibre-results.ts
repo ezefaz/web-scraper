@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { scrapeDolarValue } from './dolar';
 
-export async function scrapePriceComparissonProducts(productTitle: string, productPrice: number) {
+export async function scrapeMercadoLibreResults(productTitle: string, pageNumber: number) {
   // bright data proxy configuration
   const username = String(process.env.BRIGHT_DATA_USERNAME);
   const password = String(process.env.BRIGHT_DATA_PASSWORD);
@@ -22,14 +22,9 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
   };
 
   try {
-    // filtramos por un 15% menor al precio del producto.
+    const paginationNumber = getPageMercadoLibre(pageNumber);
 
-    const pricePercentage = productPrice * 0.1;
-    const priceForFilter = Math.round(productPrice - pricePercentage);
-
-    console.log(priceForFilter);
-
-    const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}_PriceRange_0-${priceForFilter}_NoIndex_True`;
+    const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}`;
 
     const response = await axios.get(searchUrl);
 
@@ -65,10 +60,12 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
       productList.push({ url, title, price, image, dolarPrice });
     });
 
-    console.log(productList);
-
     return productList;
   } catch (error: any) {
     throw new Error(`Failed to scrape Google Shopping: ${error.message}`);
   }
+}
+
+function getPageMercadoLibre(pageNumber: number) {
+  return `_Desde_${50 * (pageNumber - 1) + 1}`;
 }

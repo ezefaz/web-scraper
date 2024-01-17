@@ -60,19 +60,6 @@ const InternationalProduct = () => {
                 </Link>
                 <p>Vendido por: {productData[0].brand ? productData[0].brand : ''}</p>
               </div>
-
-              {/* <div className='flex items-center gap-3 py-3'>
-                    <div className='flex items-center gap-1 text-[#D46F77]'>
-                      <Image src='/assets/icons/red-heart.svg' alt='heart' width={20} height={20} />
-                      <p className='text-base font-semibold'>{productData[0].reviewsCount}</p>
-                    </div>
-                    <div className='p-2 bg-white-200 rounded-full'>
-                      <Image src='/assets/icons/bookmark.svg' alt='bookmark' height={20} width={20} />
-                    </div>
-                    <div className='p-2 bg-white-200 rounded-full'>
-                      <Image src='/assets/icons/share.svg' alt='share' height={20} width={20} />
-                    </div>
-                  </div> */}
             </div>
 
             <div className='product-info'>
@@ -153,47 +140,112 @@ const InternationalProduct = () => {
       ) : (
         <div className='flex gap-10  sm:cap-5 xl:flex-row flex-col'>
           <div className='flex flex-row flex-col m-8 h-[max-content]'>
-            <Skeleton>
+            <Skeleton className='rounded-lg'>
               <Card decoration='bottom' decorationColor='orange'>
-                <Image src='#' isZoomed width={400} height={400} />
+                <Image src='' isZoomed width={400} height={400} />
               </Card>
             </Skeleton>
           </div>
           <div className='flex-1 flex flex-col'>
             <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
-              <Skeleton className='w-4/5 rounded-lg'>
-                <div className='flex flex-col gap-3'>
+              <div className='flex flex-col gap-3'>
+                <Skeleton className=' rounded-lg'>
                   <p className='text-[28px] hover:text-primary transition-colors duration-300'></p>
+                </Skeleton>
+                <Skeleton className='rounded-lg'>
                   <Link
-                    href='#'
+                    href={'#'}
                     target='_blank'
                     className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300 dark:text-white'
                   >
                     Visitar Producto
                   </Link>
+                </Skeleton>
+                <Skeleton className=' rounded-lg'>
                   <p></p>
-                </div>
-              </Skeleton>
+                </Skeleton>
+              </div>
             </div>
 
             <div className='product-info'>
               <div className='flex flex-col gap-2'>
-                <Skeleton width={150} height={40} />
-                <Skeleton width={150} height={20} />
+                <Skeleton className=' rounded-lg'>
+                  <p className='text-[34px] text-secondary font-bold dark:text-white hover:text-primary  '></p>
+                </Skeleton>
+                <Skeleton className=' rounded-lg'>
+                  <p className='text-[21px] text-black opacity-50 line-through dark:text-white'></p>
+                </Skeleton>
               </div>
               <div className='flex mr-5 m-auto gap-6 flex-wrap'>
-                <Skeleton width={150} height={30} />
-                <Skeleton width={150} height={30} />
+                <Skeleton className='rounded-lg'>
+                  <Badge icon={MdOutlineProductionQuantityLimits} color='green'></Badge>
+                </Skeleton>
+                <Skeleton className='rounded-lg'>
+                  <Badge icon={PiKeyReturn} color='blue'></Badge>
+                </Skeleton>
               </div>
-              <Skeleton width='70%' height={16} />
+              <Skeleton className='rounded-lg'>
+                <Skeleton className='text-sm md:text-base lg:text-sm w-[70%] m-2'></Skeleton>
+              </Skeleton>
               <div className='flex flex-col gap-10 m-auto'>
-                <Skeleton width={200} height={40} />
+                {/* <div className='flex flex-col gap-5'>
+                      {productData[0].description.length > 2 && (
+                        <>
+                          <h3 className='text-2xl text-secondary font-semibold'>Descripción</h3>
+                          <div className='flex flex-col gap-4'>{product?.description?.split('/n')}</div>
+                        </>
+                      )}
+                    </div> */}
+                {/* <Skeleton className=' rounded-lg'> */}
+                <Skeleton className='btn w-fit m-auto flex items-center justify-center gap-2 min-w-[200px]'>
+                  <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
+                  <Link href='' target='_blank' className='text-base text-white'>
+                    Comprar Ahora
+                  </Link>
+                </Skeleton>
+                {/* </Skeleton> */}
               </div>
             </div>
 
             <div className='my-7 w-full flex flex-col-2 gap-5'>
-              <div className='flex mr-5 m-auto gap-6 flex-wrap'>{/* ... (other skeletons) */}</div>
+              <div className='flex mr-5 m-auto gap-6 flex-wrap'>
+                <Skeleton className=' rounded-lg'>
+                  <PriceInfoCard
+                    title='Precio Mayor'
+                    iconSrc='/assets/icons/arrow-up.svg'
+                    value={''}
+                    borderColor='red'
+                  />
+                </Skeleton>
+                <Skeleton className=' rounded-lg'>
+                  <PriceInfoCard
+                    title='Precio Mayor'
+                    iconSrc='/assets/icons/arrow-up.svg'
+                    value={''}
+                    borderColor='red'
+                  />
+                </Skeleton>
+
+                <Skeleton className=' rounded-lg'>
+                  <PriceInfoCard
+                    title='Precio Mayor'
+                    iconSrc='/assets/icons/arrow-up.svg'
+                    value={''}
+                    borderColor='red'
+                  />
+                </Skeleton>
+                <Skeleton className=' rounded-lg'>
+                  <PriceInfoCard
+                    title='Precio Mayor'
+                    iconSrc='/assets/icons/arrow-up.svg'
+                    value={''}
+                    borderColor='red'
+                  />
+                </Skeleton>
+              </div>
             </div>
+
+            {/* {currentUser && !isFollowing && <Modal productUrl={productData[0].url} />} */}
           </div>
         </div>
       )}

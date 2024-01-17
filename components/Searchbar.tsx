@@ -37,16 +37,17 @@ const Searchbar = () => {
 
     const isValidLink = isValidMLProductUrl(searchPrompt);
 
-    if (!isValidLink) return toast.error('Porfavor inserte un link de mercadolibre válido.');
     setIsLoading(true);
-    try {
-      const productId: any = await scrapeAndStoreProducts(searchPrompt);
 
-      router.push(`/products/${productId}`);
+    try {
+      if (isValidLink) {
+        window.location.href = searchPrompt;
+      } else {
+        const formattedSearchQuery = encodeURIComponent(searchPrompt.replace(/\s+/g, '-'));
+        router.push(`/products?search=${formattedSearchQuery}`);
+      }
     } catch (error) {
-      toast.error(
-        'No se ha podido agregar el producto. Revisa que el enlace sea correcto o que la publicacion este activa.'
-      );
+      toast.error('Ha ocurrido un error.');
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +60,7 @@ const Searchbar = () => {
           type='text'
           value={searchPrompt}
           onChange={(e) => setSearchPrompt(e.target.value)}
-          placeholder='Ingrese link del producto y comience a seguirlo!'
+          placeholder='Busque un producto o ingrese link del producto y comience a seguirlo!'
           className='searchbar-input'
         />
         <button type='submit' className='searchbar-btn ml-3 md:w-auto px-4 py-2 ' disabled={searchPrompt === ''}>

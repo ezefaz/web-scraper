@@ -46,8 +46,8 @@ const Services = () => {
             }
           />
           <ServiceCard
-            title='Comparación de Precios con Productos Similares'
-            details='A partir del producto seleccionado, te ofrecemos una comparación de ese mismo producto en otros mercados, de manera que puedas comprar el producto mas barato del mercado.'
+            title='Comparación de Precios Mercado Local e Internacional'
+            details='A partir del producto seleccionado, te ofrecemos una comparación de ese mismo producto en otras tiendas del país y tambien proveemos información acerca de tiendas internacionales, de manera que puedas comprar el producto mas barato del mercado.'
             icon={
               <svg width='39' height='22' viewBox='0 0 39 22' fill='none' xmlns='http://www.w3.org/2000/svg'>
                 <path

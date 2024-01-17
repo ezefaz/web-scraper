@@ -24,9 +24,10 @@ import { Badge, Card, Tab, TabGroup, TabList } from '@tremor/react';
 import ScraperButton from '@/components/ScraperButton';
 import ProductTabs from '@/components/ProductTabs';
 
-import { Image, Skeleton } from '@nextui-org/react';
+import { Image, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@nextui-org/react';
 import ProductBadges from '@/components/ProductBadges';
 import InternationalScraperButton from '@/components/InternationalScraperButton';
+import { IoMdInformationCircleOutline } from 'react-icons/io';
 
 type Props = {
   params: { id: string };
@@ -280,6 +281,8 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
           Comparación de Precios
         </h1>
+
+        <p className='pt-2 text-muted'>Te mostramos productos de al menos un 10% menor al valor.</p>
       </div>
       <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
         <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />
@@ -287,10 +290,24 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       <div className='mx-auto max-w-[510px] text-center mb-2'>
         <div id='priceCompare'></div>
         <span className='block text-lg font-semibold text-primary'>Precios Internacionales</span>
-        <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
+        <h1 className=' text-3xl mb-3 font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
           Comparación de Precios Internacional
         </h1>
-        <p className='pt-2 text-muted'>Considera tambien el costo de impuestos y envío.</p>
+        <Popover placement='bottom'>
+          <PopoverTrigger className='m-auto'>
+            <IoMdInformationCircleOutline clasName='flex justify-center m-auto' />
+          </PopoverTrigger>
+          <PopoverContent>
+            <div className='px-0 py-1 w-30'>
+              <div className='text-small font-bold'>Importante!</div>
+              <div className='text-tiny'>
+                Ten en consideración las distintas normativas de aduana en tu país. Además considera gastos de envío e
+                impuestos.
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+        {/* <p className='pt-2 text-muted'>Considera tambien el costo de impuestos y envío.</p> */}
       </div>
       <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
         <InternationalScraperButton productTitle={product.title} productPrice={Number(product.currentPrice)} />

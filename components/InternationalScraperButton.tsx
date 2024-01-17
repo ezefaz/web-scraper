@@ -16,8 +16,10 @@ const InternationalScraperButton = ({ productTitle, productPrice }: ScraperButto
     const fetchData = async () => {
       setScrapingInProgress(true);
       try {
-        const formattedProductTitle = productTitle.replace(/\s/g, '-');
-        const data: any = await scrapeInternationalValue(formattedProductTitle);
+        const formattedProductTitle = productTitle.replace(/['"]/g, '').replace(/\s/g, '-');
+        const limitedTitle = formattedProductTitle.slice(0, 30);
+
+        const data: any = await scrapeInternationalValue(limitedTitle);
         setScrapedData(data);
       } catch (error) {
         console.error('Error Comparing prices:', error);

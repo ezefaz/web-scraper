@@ -52,7 +52,7 @@ export async function scrapeTiendamiaProduct(productUrl: any) {
           originalPrice,
           currentDollarPrice,
           originalDollarPrice,
-          url: url + productLink,
+          url: productLink,
           image: productImage,
           // vendorsName,
           returnMessage,
@@ -61,6 +61,8 @@ export async function scrapeTiendamiaProduct(productUrl: any) {
         };
       })
       .get();
+
+    console.log(products);
 
     return products;
   } catch (error: any) {

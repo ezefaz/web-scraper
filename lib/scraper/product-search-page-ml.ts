@@ -4,7 +4,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { scrapeDolarValue } from './dolar';
 
-export async function scrapePriceComparissonProducts(productTitle: string, productPrice: number) {
+export async function scrapeProductSearchPageML(productTitle: any) {
   // bright data proxy configuration
   const username = String(process.env.BRIGHT_DATA_USERNAME);
   const password = String(process.env.BRIGHT_DATA_PASSWORD);
@@ -22,14 +22,7 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
   };
 
   try {
-    // filtramos por un 15% menor al precio del producto.
-
-    const pricePercentage = productPrice * 0.1;
-    const priceForFilter = Math.round(productPrice - pricePercentage);
-
-    console.log(priceForFilter);
-
-    const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}_PriceRange_0-${priceForFilter}_NoIndex_True`;
+    const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}`;
 
     const response = await axios.get(searchUrl);
 
@@ -45,7 +38,6 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
       const url = product.find('a.ui-search-link').attr('href') || '';
       let priceLabel = product.find('.andes-money-amount').attr('aria-label');
 
-      // Remove 'Antes' if it exists in the priceLabel
       if (priceLabel && priceLabel.includes('Antes')) {
         priceLabel = priceLabel.replace('Antes: ', '');
       }
@@ -58,11 +50,17 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
         price = priceElement.attr('aria-label') || '';
       }
 
+      // const price = product.find('.andes-money-amount__fraction').text();
+
+      const currency = product.find('.andes-money-amount__currency-symbol').first().text();
+
+      const freeShipping = product.find('.ui-search-item__shipping.ui-search-item__shipping--free').text();
+
       const image = product.find('.ui-search-result-image__element').attr('data-src');
 
       const dolarPrice = Number(price) / Number(scrapedDolarValue);
 
-      productList.push({ url, title, price, image, dolarPrice });
+      productList.push({ url, title, price, image, dolarPrice, freeShipping, currency });
     });
 
     console.log(productList);
