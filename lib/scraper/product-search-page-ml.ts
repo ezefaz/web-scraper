@@ -50,7 +50,32 @@ export async function scrapeProductSearchPageML(productTitle: any) {
         price = priceElement.attr('aria-label') || '';
       }
 
-      // const price = product.find('.andes-money-amount__fraction').text();
+      const pricesLabel = product.find('.andes-money-amount__fraction');
+
+      // Extract and parse prices
+      const pricesArray: number[] = [];
+      pricesLabel.each((idx, fractionElement) => {
+        const priceText = $(fractionElement).text().replace(/\./g, '').replace(',', '.');
+        const numericPrice = parseFloat(priceText);
+        pricesArray.push(numericPrice);
+      });
+
+      let currentPrice = 0;
+      let originalPrice = 0;
+
+      console.log('ARRAT DE PRECIO', pricesArray);
+
+      if (pricesArray.length === 2) {
+        currentPrice = pricesArray[0];
+      } else if (pricesArray.length === 3) {
+        originalPrice = pricesArray[0];
+        currentPrice = pricesArray[1];
+      } else if (pricesArray.length === 1) {
+        currentPrice = pricesArray[0];
+      }
+
+      console.log('CURRENT', currentPrice);
+      console.log('ORIGINAL', originalPrice);
 
       const currency = product.find('.andes-money-amount__currency-symbol').first().text();
 
@@ -60,7 +85,7 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 
       const dolarPrice = Number(price) / Number(scrapedDolarValue);
 
-      productList.push({ url, title, price, image, dolarPrice, freeShipping, currency });
+      productList.push({ url, title, currentPrice, originalPrice, image, dolarPrice, freeShipping, currency });
     });
 
     console.log(productList);

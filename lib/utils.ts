@@ -707,3 +707,10 @@ const formatMonth = (date: Date) => {
   const options: any = { month: 'long' };
   return date.toLocaleDateString('es-AR', options);
 };
+
+export const getDiscountPercentage = (currentPrice: number, originalPrice: number) => {
+  const discountAmount = originalPrice - currentPrice;
+  const discountPercentage = (discountAmount / originalPrice) * 100;
+
+  return discountPercentage.toFixed(2);
+};

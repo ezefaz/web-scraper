@@ -1,78 +1,136 @@
 'use client';
 
-import { formatNumber } from '@/lib/utils';
-
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
-*/
-const products = [
-  {
-    id: 1,
-    name: 'Earthen Bottle',
-    href: '#',
-    price: '$48',
-    imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg',
-    imageAlt: 'Tall slender porcelain bottle with natural clay textured body and cork stopper.',
-  },
-  {
-    id: 2,
-    name: 'Nomad Tumbler',
-    href: '#',
-    price: '$35',
-    imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-02.jpg',
-    imageAlt: 'Olive drab green insulated bottle with flared screw lid and flat top.',
-  },
-  {
-    id: 3,
-    name: 'Focus Paper Refill',
-    href: '#',
-    price: '$89',
-    imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-03.jpg',
-    imageAlt: 'Person using a pen to cross a task off a productivity paper card.',
-  },
-  {
-    id: 4,
-    name: 'Machined Mechanical Pencil',
-    href: '#',
-    price: '$35',
-    imageSrc: 'https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-04.jpg',
-    imageAlt: 'Hand holding black machined steel mechanical pencil with brass tip and top.',
-  },
-  // More products...
-];
+import { formatNumber, getDiscountPercentage } from '@/lib/utils';
+import { Button, Card, CardBody, CardFooter, CardHeader } from '@nextui-org/react';
+import Image from 'next/image';
 
 export default function ProductResults({ data }: any) {
   return (
     <div className='bg-white'>
-      <div className='mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8'>
+      <div className='mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-12xl lg:px-8'>
         <h2 className='sr-only'>Products</h2>
-
-        <div className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'>
-          {data.map((product: any) => (
-            <a key={product.id} href={product.href} className='group'>
-              <div className='aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7'>
-                <img
-                  src={product.image}
-                  alt={product.title}
-                  className='h-full w-full object-cover object-center group-hover:opacity-75'
-                />
+        {/* <div className='grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8'> */}
+        <div className='gap-2 grid grid-cols-2 sm:grid-cols-3'>
+          {data.map((product: any, index: number) => (
+            // <Card
+            //   shadow='sm'
+            //   key={index}
+            //   isPressable
+            //   onPress={() => console.log('product pressed')}
+            //   className='w-[15rem]'
+            // >
+            //   <CardBody className='overflow-visible p-0'>
+            //     <Image
+            //       shadow='sm'
+            //       radius='sm'
+            //       // width='100%'
+            //       // height='100%'
+            //       alt={product.title}
+            //       className='w-full object-cover h-[350px] w-[500px] p-8'
+            //       src={product.image}
+            //     />
+            //   </CardBody>
+            //   <CardFooter className='text-small justify-between'>
+            //     <b>{product.title}</b>
+            //     <p className='text-default-500'>{product.price}</p>
+            //   </CardFooter>
+            // </Card>
+            <div className='relative m-10 flex w-full max-w-xs flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-md'>
+              <a className='relative mx-3 mt-3 flex h-60 overflow-hidden rounded-xl' href='#'>
+                <img className='object-cover m-auto' src={product.image} alt='product image' />
+                {product.originalPrice > product.currentPrice ? (
+                  <span className='absolute top-0 left-0 m-2 rounded-full bg-green-600 px-2 text-center text-sm font-medium text-white'>
+                    {getDiscountPercentage(product.currentPrice, product.originalPrice)}%
+                  </span>
+                ) : null}
+              </a>
+              <div className='mt-4 px-5 pb-5'>
+                <a href='#'>
+                  <h5 className='text-xl tracking-tight text-slate-900'>{product.title}</h5>
+                </a>
+                <div className='mt-2 mb-5 flex items-center justify-between'>
+                  <p>
+                    <span className='text-1xl font-bold text-slate-900'>
+                      {' '}
+                      {product.currency} {new Intl.NumberFormat('es-AR').format(Number(product.currentPrice))}
+                    </span>
+                    {product.originalPrice ? (
+                      <span className='text-sm p-1 text-slate-900 line-through'>
+                        {product.currency} {new Intl.NumberFormat('es-AR').format(Number(product.originalPrice))}
+                      </span>
+                    ) : null}
+                  </p>
+                  {/* <div className='flex items-center'>
+                    <svg
+                      aria-hidden='true'
+                      className='h-5 w-5 text-yellow-300'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z'></path>
+                    </svg>
+                    <svg
+                      aria-hidden='true'
+                      className='h-5 w-5 text-yellow-300'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z'></path>
+                    </svg>
+                    <svg
+                      aria-hidden='true'
+                      className='h-5 w-5 text-yellow-300'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z'></path>
+                    </svg>
+                    <svg
+                      aria-hidden='true'
+                      className='h-5 w-5 text-yellow-300'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z'></path>
+                    </svg>
+                    <svg
+                      aria-hidden='true'
+                      className='h-5 w-5 text-yellow-300'
+                      fill='currentColor'
+                      viewBox='0 0 20 20'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path d='M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z'></path>
+                    </svg>
+                    <span className='mr-2 ml-3 rounded bg-yellow-200 px-2.5 py-0.5 text-xs font-semibold'>5.0</span>
+                  </div> */}
+                </div>
+                <a
+                  href='#'
+                  className='flex items-center justify-center rounded-md bg-slate-900 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-300'
+                >
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='mr-2 h-6 w-6'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                    stroke-width='2'
+                  >
+                    <path
+                      stroke-linecap='round'
+                      stroke-linejoin='round'
+                      d='M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z'
+                    />
+                  </svg>
+                  Add to cart
+                </a>
               </div>
-              <h3 className='mt-4 text-sm text-gray-700'>{product.title}</h3>
-              <p className='mt-1 text-lg font-medium text-gray-900'>
-                {product.currency} {new Intl.NumberFormat('es-AR').format(Number(product.price))}
-              </p>
-            </a>
+            </div>
           ))}
         </div>
       </div>
