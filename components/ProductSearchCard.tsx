@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { ProductType } from '@/types';
 import Link from 'next/link';
@@ -10,7 +12,7 @@ interface Props {
   product: ProductType;
 }
 
-const ProductCard = ({ product }: Props) => {
+const ProductSearchCard = ({ product }: Props) => {
   return (
     <>
       <Link href={`/products/${product._id}`} className='product-card '>
@@ -49,4 +51,4 @@ const ProductCard = ({ product }: Props) => {
   );
 };
 
-export default ProductCard;
+export default ProductSearchCard;

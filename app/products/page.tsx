@@ -6,7 +6,7 @@ type Props = {};
 
 const ProductSearchResultsPage = (props: Props) => {
   return (
-    <div>
+    <div className='dark:bg-black'>
       <ResultsCategory />
     </div>
   );

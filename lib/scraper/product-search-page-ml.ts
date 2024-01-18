@@ -74,9 +74,6 @@ export async function scrapeProductSearchPageML(productTitle: any) {
         currentPrice = pricesArray[0];
       }
 
-      console.log('CURRENT', currentPrice);
-      console.log('ORIGINAL', originalPrice);
-
       const currency = product.find('.andes-money-amount__currency-symbol').first().text();
 
       const freeShipping = product.find('.ui-search-item__shipping.ui-search-item__shipping--free').text();
@@ -87,8 +84,6 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 
       productList.push({ url, title, currentPrice, originalPrice, image, dolarPrice, freeShipping, currency });
     });
-
-    console.log(productList);
 
     return productList;
   } catch (error: any) {

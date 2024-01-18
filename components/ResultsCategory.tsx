@@ -111,8 +111,8 @@ export default function ResultsCategory() {
   }, [formattedProduct]);
 
   return (
-    <div className='bg-white'>
-      <div>
+    <div className='bg-white dark:bg-black'>
+      <div className=''>
         {/* Mobile filter dialog */}
         <Transition.Root show={mobileFiltersOpen} as={Fragment}>
           <Dialog as='div' className='relative z-40 lg:hidden' onClose={setMobileFiltersOpen}>
@@ -138,7 +138,7 @@ export default function ResultsCategory() {
                 leaveFrom='translate-x-0'
                 leaveTo='translate-x-full'
               >
-                <Dialog.Panel className='relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl'>
+                <Dialog.Panel className='relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-12 shadow-xl dark:bg-black'>
                   <div className='flex items-center justify-between px-4'>
                     <h2 className='text-lg font-medium text-gray-900'>Filters</h2>
                     <button
@@ -213,14 +213,16 @@ export default function ResultsCategory() {
           </Dialog>
         </Transition.Root>
 
-        <main className='mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8'>
-          <div className='flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24'>
-            <h1 className='text-4xl font-bold tracking-tight text-gray-900'>Resultados para: {formattedProduct}</h1>
+        <main className='mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8 dark:bg-black'>
+          <div className='flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24 dark:bg-black'>
+            <h1 className='text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-200'>
+              Resultados para: {formattedProduct}
+            </h1>
 
             <div className='flex items-center'>
               <Menu as='div' className='relative inline-block text-left'>
                 <div>
-                  <Menu.Button className='group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900'>
+                  <Menu.Button className='group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-200'>
                     Sort
                     <IoArrowDownCircleOutline
                       className='-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500'
@@ -284,11 +286,16 @@ export default function ResultsCategory() {
             <div className='grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4'>
               {/* Filters */}
               <form className='hidden lg:block'>
-                <h3 className='sr-only'>Categories</h3>
-                <ul role='list' className='space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900'>
+                <h3 className='sr-only dark:text-gray-200'>Categories</h3>
+                <ul
+                  role='list'
+                  className='space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900 dark:text-gray-200'
+                >
                   {subCategories.map((category) => (
                     <li key={category.name}>
-                      <a href={category.href}>{category.name}</a>
+                      <a href={category.href} className='dark:text-gray-200'>
+                        {category.name}
+                      </a>
                     </li>
                   ))}
                 </ul>
