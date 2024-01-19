@@ -10,6 +10,8 @@ import { useSession } from 'next-auth/react';
 import { useCurrentUser } from '@/hooks/use-current-use';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import UserDropdown from './UserDropdown';
+import Searchbar from './Searchbar';
+import { usePathname } from 'next/navigation';
 
 const navIcons = [
   { src: '/assets/icons/search.svg', alt: 'Search' },
@@ -18,6 +20,8 @@ const navIcons = [
 ];
 
 const Navbar = () => {
+  const pathname = usePathname();
+
   const user = useCurrentUser();
 
   return (
@@ -27,7 +31,11 @@ const Navbar = () => {
           <Link href='/' className='flex items-center gap-1 mt-2'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
-
+          {pathname == '/' ? null : (
+            <div className='w-[55%] ml-7'>
+              <Searchbar />
+            </div>
+          )}
           <div>
             {!user ? (
               <>
@@ -45,7 +53,7 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <div className='container mx-auto flex justify-between items-center mr-10'>
+              <div className='mx-auto flex justify-end mt-5 items-center'>
                 <UserDropdown />
               </div>
             )}
