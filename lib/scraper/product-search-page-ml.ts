@@ -63,8 +63,6 @@ export async function scrapeProductSearchPageML(productTitle: any) {
       let currentPrice = 0;
       let originalPrice = 0;
 
-      console.log('ARRAT DE PRECIO', pricesArray);
-
       if (pricesArray.length === 2) {
         currentPrice = pricesArray[0];
       } else if (pricesArray.length === 3) {
@@ -82,7 +80,22 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 
       const dolarPrice = Number(price) / Number(scrapedDolarValue);
 
-      productList.push({ url, title, currentPrice, originalPrice, image, dolarPrice, freeShipping, currency });
+      const features = product.find('.ui-search-item__group__element.ui-search-item__variations-text').text();
+
+      const isBestSeller = product.find('.ui-search-styled-label.ui-search-item__highlight-label__text').text();
+
+      productList.push({
+        url,
+        title,
+        currentPrice,
+        originalPrice,
+        image,
+        dolarPrice,
+        freeShipping,
+        currency,
+        features,
+        isBestSeller,
+      });
     });
 
     return productList;

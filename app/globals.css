@@ -159,6 +159,7 @@
 	}
 
 	.searchbar-btn {
-		@apply w-full bg-gray-900 border border-gray-900 rounded-lg px-5 flex flex-col  py-3 text-white text-base font-semibold hover:opacity-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40;
+		@apply w-full bg-gray-900 border border-gray-900 rounded-lg px-2 px-5 flex flex-col py-3 text-white text-base font-semibold hover:opacity-90 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-40 md:block mx-auto max-w-md;
+
 	}
 }

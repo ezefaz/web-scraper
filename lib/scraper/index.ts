@@ -153,6 +153,17 @@ export async function scrapeMLProduct(url: string) {
 
     let isFollowing = false;
 
+    const productDetails = $('#buybox-form')
+      .map((index, element) => {
+        const oficialStore = $(element).find('.ui-pdp-color--BLUE.ui-pdp-family--REGULAR').text();
+        const warranty = $(element).find('.ui-pdp-family--REGULAR.ui-pdp-media__title').text();
+
+        return {
+          oficialStore,
+        };
+      })
+      .get();
+
     const data = {
       url,
       currency: currency || '$',
@@ -173,16 +184,15 @@ export async function scrapeMLProduct(url: string) {
       lowestPrice: Number(currentPrice) || Number(originalPrice),
       highestPrice: Number(originalPrice) || Number(currentPrice),
       averagePrice: Number(currentPrice) || Number(originalPrice),
-      users: user ? [user] : [],
       isFreeReturning,
-      storeName,
+      storeName: productDetails[0].oficialStore,
       status,
       isFreeShipping,
       productReviews,
       isFollowing,
     };
 
-    // console.log('PRODUCTO -->', data);
+    console.log('PRODUCTO -->', data);
 
     return data;
   } catch (error: any) {

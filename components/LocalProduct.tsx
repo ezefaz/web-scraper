@@ -7,22 +7,27 @@ import PriceInfoCard from './PriceInfoCard';
 import Link from 'next/link';
 import { Image, Skeleton } from '@nextui-org/react';
 import { Badge, Card } from '@tremor/react';
-import { TiendamiaProduct } from '@/types';
+import { ProductType, TiendamiaProduct } from '@/types';
 import { PiKeyReturn } from 'react-icons/pi';
 import { MdOutlineProductionQuantityLimits } from 'react-icons/md';
+import { scrapePriceComparissonProducts } from '@/lib/scraper/price-comparisson';
+import { scrapeMLProductDetail } from '@/lib/scraper/mercadolibre-product-detail';
+import { scrapeMLProduct } from '@/lib/scraper';
+import { formatNumber } from '@/lib/utils';
+import ProductBadges from './ProductBadges';
 
-const InternationalProduct = () => {
+const LocalProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const productURL = searchParams.get('productUrl');
-  const [productData, setProductData] = useState<TiendamiaProduct[]>([]);
+  const [productData, setProductData] = useState<any>();
 
   useEffect(() => {
     setIsLoading(true);
     const fetchData = async () => {
       try {
         const url = productURL?.trim();
-        const data: any = await scrapeTiendamiaProduct(url);
+        const data: any = await scrapeMLProduct(url);
 
         setProductData(data);
       } catch (error) {
@@ -38,17 +43,17 @@ const InternationalProduct = () => {
 
   return (
     <div className='mt-20'>
-      {productData[0] ? (
+      {productData ? (
         <div className='flex gap-10  sm:cap-5 xl:flex-row flex-col'>
           <div className='flex flex-row flex-col m-8 h-[max-content]'>
             <Card decoration='bottom' decorationColor='orange'>
-              <Image src={productData[0].image} isZoomed alt={productData[0].title} width={400} height={400} />
+              <Image src={productData.image} isZoomed alt={productData.title} width={400} height={400} />
             </Card>
           </div>
           <div className='flex-1 flex flex-col'>
             <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
               <div className='flex flex-col gap-3'>
-                <p className='text-[28px] hover:text-primary transition-colors duration-300'>{productData[0].title}</p>
+                <p className='text-[28px] hover:text-primary transition-colors duration-300'>{productData.title}</p>
                 <Link
                   href={productURL}
                   target='_blank'
@@ -56,28 +61,31 @@ const InternationalProduct = () => {
                 >
                   Visitar Producto
                 </Link>
-                <p>Vendido por: {productData[0].brand ? productData[0].brand : ''}</p>
+                <p>Vendido por: {productData.storeName ? productData.storeName : ''}</p>
               </div>
             </div>
 
             <div className='product-info'>
               <div className='flex flex-col gap-2'>
                 <p className='text-[34px] text-secondary font-bold dark:text-white hover:text-primary  '>
-                  {productData[0].currentPrice}
+                  {productData.currency} {formatNumber(productData.currentPrice)}
                 </p>
                 <p className='text-[21px] text-black opacity-50 line-through dark:text-white'>
-                  {productData[0].currentPrice !== productData[0].originalPrice ? productData[0].originalPrice : ''}
+                  {productData.currency}{' '}
+                  {productData.currentPrice !== productData.originalPrice
+                    ? formatNumber(productData.originalPrice)
+                    : ''}
                 </p>
               </div>
-              <div className='flex mr-5 m-auto gap-6 flex-wrap'>
-                <Badge icon={MdOutlineProductionQuantityLimits} color='green'>
-                  {productData[0].availabilityMessage}
-                </Badge>
-                <Badge icon={PiKeyReturn} color='blue'>
-                  {productData[0].returnMessage}
-                </Badge>
-              </div>
-              <p className='text-sm md:text-base lg:text-sm w-[70%] m-2'>{productData[0].refurbishedMessage}</p>
+              <ProductBadges
+                stars={productData.stars}
+                reviewsCount={productData.reviewsCount}
+                stockAvailable={productData.stockAvailable}
+                isFreeReturning={productData.isFreeReturning}
+                isFreeShipping={productData.isFreeShipping}
+                status={productData.status}
+              />
+              <p className='text-sm md:text-base lg:text-sm w-[70%] m-2'>{productData.refurbishedMessage}</p>
               <div className='flex flex-col gap-10 m-auto'>
                 {/* <div className='flex flex-col gap-5'>
                       {productData[0].description.length > 2 && (
@@ -96,7 +104,7 @@ const InternationalProduct = () => {
               </div>
             </div>
 
-            <div className='my-7 w-full flex flex-col-2 gap-5'>
+            {/* <div className='my-7 w-full flex flex-col-2 gap-5'>
               <div className='flex mr-5 m-auto gap-6 flex-wrap'>
                 <PriceInfoCard
                   title='Precio Actual'
@@ -123,14 +131,8 @@ const InternationalProduct = () => {
                   value={productData[0].originalDollarPrice}
                   borderColor='blue'
                 />
-                {/* <PriceInfoCard
-                  title='Precio Menor'
-                  iconSrc='/assets/icons/arrow-down.svg'
-                  value={productData[0].lowestPrice}
-                  borderColor='green'
-                /> */}
               </div>
-            </div>
+            </div> */}
 
             {/* {currentUser && !isFollowing && <Modal productUrl={productData[0].url} />} */}
           </div>
@@ -251,4 +253,4 @@ const InternationalProduct = () => {
   );
 };
 
-export default InternationalProduct;
+export default LocalProduct;

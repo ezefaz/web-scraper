@@ -1,4 +1,3 @@
-import ProductResults from '@/components/ProductResults';
 import ResultsCategory from '@/components/ResultsCategory';
 import React from 'react';
 

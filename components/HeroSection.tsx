@@ -44,7 +44,7 @@ const HeroSection = (props: Props) => {
         Experience the future of insurance with our cutting-edge AI tool. From underwriting to claims processing, our
         intelligent system streamlines and enhances every aspect of your insurance operations.
       </h2> */}
-      <div className='w-[50%]'>
+      <div className='w-[100%] lg:w-[50%]'>
         <Searchbar />
       </div>
       {/* <a

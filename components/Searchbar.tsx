@@ -65,7 +65,7 @@ const Searchbar = () => {
           placeholder='Busque un producto o ingrese link del producto y comience a seguirlo!'
           className='searchbar-input'
         />
-        <button type='submit' className='searchbar-btn ml-3 md:w-auto px-4 py-2 ' disabled={searchPrompt === ''}>
+        <button type='submit' className='searchbar-btn   lg:ml-3 md:w-auto px-4 py-2 ' disabled={searchPrompt === ''}>
           {isLoading ? <SyncLoader color='white' size={3} /> : <AiOutlineSearch size={20} />}
         </button>
       </div>
