@@ -70,7 +70,7 @@ export default function UserDropdown(props: any) {
         }}
       >
         <DropdownSection aria-label='Preferencias' showDivider>
-          <DropdownItem key='profile' className='h-14 gap-2'>
+          <DropdownItem key='profile' className='h-14 gap-4'>
             <User
               name={loggedUser?.name}
               description={loggedUser?.email}

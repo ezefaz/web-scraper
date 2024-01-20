@@ -27,12 +27,12 @@ const Navbar = () => {
   return (
     <header className='w-full fixed top-0 z-50'>
       <nav className='bg-gray-300 dark:bg-black'>
-        <div className='container ml-8 flex justify-between items-center'>
+        <div className='container ml-3 flex justify-between items-center'>
           <Link href='/' className='flex items-center gap-1 mt-2'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
           {pathname == '/' ? null : (
-            <div className='w-[55%] ml-7'>
+            <div className='w-[55%] m-auto ml-7'>
               <Searchbar />
             </div>
           )}
@@ -53,7 +53,7 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <div className='mx-auto flex justify-end mt-5 items-center'>
+              <div className='mr-8 ml-3  lg:mx-auto flex justify-end mt-5 items-center '>
                 <UserDropdown />
               </div>
             )}
