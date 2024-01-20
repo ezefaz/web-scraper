@@ -27,8 +27,6 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
     const pricePercentage = productPrice * 0.1;
     const priceForFilter = Math.round(productPrice - pricePercentage);
 
-    console.log(priceForFilter);
-
     const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}_PriceRange_0-${priceForFilter}_NoIndex_True`;
 
     const response = await axios.get(searchUrl);
@@ -64,8 +62,6 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
 
       productList.push({ url, title, price, image, dolarPrice });
     });
-
-    console.log(productList);
 
     return productList;
   } catch (error: any) {

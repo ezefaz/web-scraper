@@ -58,8 +58,6 @@ export async function scrapeTiendamiaProduct(productUrl: any) {
       })
       .get();
 
-    console.log(products);
-
     return products;
   } catch (error: any) {
     throw new Error(`Failed to scrape internacional product value: ${error.message}`);

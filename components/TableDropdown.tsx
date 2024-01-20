@@ -26,8 +26,6 @@ export default function TableDropdown({ url, productId, isFollowing }: ProductTa
 
   const handleDeleteProduct = async (productId: string) => {
     try {
-      console.log(productId);
-
       const deletedProductId = await deleteProduct(productId);
 
       if (deletedProductId) {

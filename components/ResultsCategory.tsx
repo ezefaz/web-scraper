@@ -26,55 +26,50 @@ import { scrapeProductSearchPageML } from '@/lib/scraper/product-search-page-ml'
 // import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
 
 const sortOptions = [
-  { name: 'Most Popular', href: '#', current: true },
-  { name: 'Best Rating', href: '#', current: false },
-  { name: 'Newest', href: '#', current: false },
-  { name: 'Price: Low to High', href: '#', current: false },
-  { name: 'Price: High to Low', href: '#', current: false },
+  { name: 'Más Popular', href: '#', current: true },
+  { name: 'Precio: Menor a Mayor', href: '#', current: false },
+  { name: 'Price: Mayor a Menor', href: '#', current: false },
 ];
+
 const subCategories = [
-  { name: 'Totes', href: '#' },
-  { name: 'Backpacks', href: '#' },
-  { name: 'Travel Bags', href: '#' },
-  { name: 'Hip Bags', href: '#' },
-  { name: 'Laptop Sleeves', href: '#' },
+  { name: 'Envío Gratis', href: '#' },
+  { name: 'Tiendas Oficiales', href: '#' },
+  { name: 'Solo con descuento', href: '#' },
 ];
+
 const filters = [
   {
-    id: 'color',
-    name: 'Color',
+    id: 'condition',
+    name: 'Condición',
     options: [
-      { value: 'white', label: 'White', checked: false },
-      { value: 'beige', label: 'Beige', checked: false },
-      { value: 'blue', label: 'Blue', checked: true },
-      { value: 'brown', label: 'Brown', checked: false },
-      { value: 'green', label: 'Green', checked: false },
-      { value: 'purple', label: 'Purple', checked: false },
+      { value: 'Nuevo', label: 'Nuevo', checked: false },
+      { value: 'Reacondicionado', label: 'Reacondicionado', checked: false },
+      { value: 'Usado', label: 'Usado', checked: false },
     ],
   },
-  {
-    id: 'category',
-    name: 'Category',
-    options: [
-      { value: 'new-arrivals', label: 'New Arrivals', checked: false },
-      { value: 'sale', label: 'Sale', checked: false },
-      { value: 'travel', label: 'Travel', checked: true },
-      { value: 'organization', label: 'Organization', checked: false },
-      { value: 'accessories', label: 'Accessories', checked: false },
-    ],
-  },
-  {
-    id: 'size',
-    name: 'Size',
-    options: [
-      { value: '2l', label: '2L', checked: false },
-      { value: '6l', label: '6L', checked: false },
-      { value: '12l', label: '12L', checked: false },
-      { value: '18l', label: '18L', checked: false },
-      { value: '20l', label: '20L', checked: false },
-      { value: '40l', label: '40L', checked: true },
-    ],
-  },
+  // {
+  //   id: 'category',
+  //   name: 'Category',
+  //   options: [
+  //     { value: 'new-arrivals', label: 'New Arrivals', checked: false },
+  //     { value: 'sale', label: 'Sale', checked: false },
+  //     { value: 'travel', label: 'Travel', checked: true },
+  //     { value: 'organization', label: 'Organization', checked: false },
+  //     { value: 'accessories', label: 'Accessories', checked: false },
+  //   ],
+  // },
+  // {
+  //   id: 'size',
+  //   name: 'Size',
+  //   options: [
+  //     { value: '2l', label: '2L', checked: false },
+  //     { value: '6l', label: '6L', checked: false },
+  //     { value: '12l', label: '12L', checked: false },
+  //     { value: '18l', label: '18L', checked: false },
+  //     { value: '20l', label: '20L', checked: false },
+  //     { value: '40l', label: '40L', checked: true },
+  //   ],
+  // },
 ];
 
 function classNames(...classes: any) {
@@ -223,7 +218,7 @@ export default function ResultsCategory() {
               <Menu as='div' className='relative inline-block text-left'>
                 <div>
                   <Menu.Button className='group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-200'>
-                    Sort
+                    Ordenar Por:
                     <IoArrowDownCircleOutline
                       className='-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500'
                       aria-hidden='true'
@@ -262,11 +257,6 @@ export default function ResultsCategory() {
                   </Menu.Items>
                 </Transition>
               </Menu>
-
-              <button type='button' className='-m-2 ml-5 p-2 text-gray-400 hover:text-gray-500 sm:ml-7'>
-                <span className='sr-only'>View grid</span>
-                <BsSquareFill className='h-5 w-5' aria-hidden='true' />
-              </button>
               <button
                 type='button'
                 className='-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden'
@@ -286,7 +276,7 @@ export default function ResultsCategory() {
             <div className='grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4'>
               {/* Filters */}
               <form className='hidden lg:block'>
-                <h3 className='sr-only dark:text-gray-200'>Categories</h3>
+                <h3 className='sr-only dark:text-gray-200'>Categorías</h3>
                 <ul
                   role='list'
                   className='space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900 dark:text-gray-200'

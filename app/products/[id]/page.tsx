@@ -152,19 +152,6 @@ const ProductDetails = async ({ params: { id } }: Props) => {
               </Link>
               <p>Vendido por: {product.storeName ? product.storeName : ''}</p>
             </div>
-
-            {/* <div className='flex items-center gap-3 py-3'>
-              <div className='flex items-center gap-1 text-[#D46F77]'>
-                <Image src='/assets/icons/red-heart.svg' alt='heart' width={20} height={20} />
-                <p className='text-base font-semibold'>{product.reviewsCount}</p>
-              </div>
-              <div className='p-2 bg-white-200 rounded-full'>
-                <Image src='/assets/icons/bookmark.svg' alt='bookmark' height={20} width={20} />
-              </div>
-              <div className='p-2 bg-white-200 rounded-full'>
-                <Image src='/assets/icons/share.svg' alt='share' height={20} width={20} />
-              </div>
-            </div> */}
           </div>
           <div className='product-info'>
             <div className='flex flex-col gap-2'>
@@ -295,7 +282,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </h1>
         <Popover placement='bottom'>
           <PopoverTrigger className='m-auto'>
-            <IoMdInformationCircleOutline clasName='flex justify-center m-auto' />
+            <IoMdInformationCircleOutline clasName='flex justify-center m-auto' size={30} />
           </PopoverTrigger>
           <PopoverContent>
             <div className='px-0 py-1 w-30'>

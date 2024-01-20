@@ -192,7 +192,7 @@ export async function scrapeMLProduct(url: string) {
       isFollowing,
     };
 
-    console.log('PRODUCTO -->', data);
+    // console.log('PRODUCTO -->', data);
 
     return data;
   } catch (error: any) {

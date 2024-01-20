@@ -103,7 +103,9 @@ const ProductSearchCard = ({ product }: Props) => {
                       {`${product.currency} ${formatNumber(product.originalPrice)}`}
                     </span>
                   ) : null}
-                  <span className='ml-2'>{`${product.currency} ${formatNumber(product.currentPrice)}`}</span>
+                  {product.currentPrice ? (
+                    <span className='ml-2'>{`${product.currency} ${formatNumber(product.currentPrice)}`}</span>
+                  ) : null}
                 </Text>
               </div>{' '}
               {product.freeShipping ? (

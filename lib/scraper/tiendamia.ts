@@ -48,12 +48,8 @@ export async function scrapeInternationalValue(product: string) {
         break;
     }
 
-    console.log('ORIGINAL', product);
-
     const response = await axios.get(`${link}search?amzs=${product}`, options);
     const $ = cheerio.load(response.data);
-
-    console.log('LINK', `${link}search?amzs=${product}`);
 
     const products = $('.body-result .item.button-border')
       .map((index, element) => {

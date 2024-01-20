@@ -6,7 +6,7 @@ type Props = {};
 const HeroSection = (props: Props) => {
   return (
     <div
-      className='flex flex-1 w-full py-24 flex-col items-center justify-center text-center px-4 py-20 bg-gradient-to-r from-green-50/50 via-teal-50 to-green-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 relative'
+      className='flex flex-1 w-full flex-col items-center justify-center text-center px-4 py-20 bg-gradient-to-r from-green-50/50 via-teal-50 to-green-50/50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 relative'
       style={{
         backgroundImage: "url('/assets/images/hero2.png')",
         backgroundSize: 'cover',
