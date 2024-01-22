@@ -23,7 +23,7 @@ const HeroSection = (props: Props) => {
         Tu plataforma ideal de ahorro a largo plazo.
       </a> */}
 
-      <h1 className='mx-auto max-w-8xl font-display pb-8 text-3xl sm:text-7xl md:text-7xl lg:text-8xl text-center text-white-300 dark:text-black font-bold tracking-normal mb-8 capitalize'>
+      <h1 className='mx-auto max-w-5xl font-display pb-8 text-3xl sm:text-7xl md:text-7xl lg:text-8xl text-center text-white-300 dark:text-black font-bold tracking-normal mb-8 capitalize'>
         Optimiza tus Compras
         <span className='relative whitespace-nowrap text-primary dark:text-primary'>
           <svg
