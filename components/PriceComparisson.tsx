@@ -48,9 +48,11 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
+  const sortedData = scrapedData.sort((a, b) => Number(a.price) - Number(b.price));
+
   return (
     <>
-      {scrapedData.length > 0 ? (
+      {sortedData.length > 0 ? (
         <Card className='relative  mx-auto h-96 overflow-hidden w-full'>
           <Table>
             <TableHead>
@@ -64,7 +66,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {scrapedData.map((product, index) => {
+              {sortedData.map((product, index) => {
                 const itemPrice = Number(product.price);
 
                 const deltaType =

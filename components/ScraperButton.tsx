@@ -18,7 +18,10 @@ const ScraperButton = ({ productTitle, productPrice }: ScraperButtonProps) => {
       try {
         const formattedProductTitle = productTitle.replace(/\s/g, '-');
         const data = await scrapePriceComparissonProducts(formattedProductTitle, productPrice);
-        setScrapedData(data);
+
+        const sortedData = data.sort((a: any, b: any) => a.currentPrice - b.currentPrice);
+
+        setScrapedData(sortedData);
       } catch (error) {
         console.error('Error Comparing prices:', error);
       } finally {
