@@ -74,7 +74,7 @@ const Searchbar = () => {
           type='text'
           value={searchPrompt}
           onChange={(e) => setSearchPrompt(e.target.value)}
-          placeholder='Busque un producto o ingrese link del producto y comience a seguirlo!'
+          placeholder='Ingrese un producto o link, y comience a seguirlo!'
           radius='lg'
           classNames={{
             label: 'text-black/50 dark:text-white/90',

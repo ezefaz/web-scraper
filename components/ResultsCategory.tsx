@@ -26,13 +26,13 @@ import { scrapeProductSearchPageML } from '@/lib/scraper/product-search-page-ml'
 // import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
 
 const sortOptions = [
-  { name: 'Más Popular', href: '#', current: true },
-  { name: 'Precio: Menor a Mayor', href: '#', current: false },
-  { name: 'Price: Mayor a Menor', href: '#', current: false },
+  // { name: 'Más Popular', href: '#', current: true },
+  { name: 'Precio: Menor a Mayor', href: '#', current: false, key: 'desc' },
+  { name: 'Precio: Mayor a Menor', href: '#', current: false, key: 'asc' },
 ];
 
 const subCategories = [
-  { name: 'Envío Gratis', href: '#' },
+  { name: 'Envío Gratis', href: '#', key: 'freeShipping' },
   { name: 'Tiendas Oficiales', href: '#' },
   { name: 'Solo con descuento', href: '#' },
 ];
@@ -78,12 +78,14 @@ function classNames(...classes: any) {
 
 export default function ResultsCategory() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [currentSortOption, setCurrentSortOption] = useState(sortOrder);
+
   const searchParams = useSearchParams();
 
   const product = searchParams.get('search');
 
   const formattedProduct = product?.replace(/-/g, ' ');
-  console.log(formattedProduct);
 
   const [scrapingInProgress, setScrapingInProgress] = useState(false);
   const [scrapedData, setScrapedData] = useState([]);
@@ -93,8 +95,18 @@ export default function ResultsCategory() {
       setScrapingInProgress(true);
       try {
         // const formattedProductTitle = formattedProduct.replace(/\s/g, '-');
-        const data = await scrapeProductSearchPageML(formattedProduct);
-        setScrapedData(data);
+        const data = await scrapeProductSearchPageML(product);
+
+        const sortedData = data.sort((a: any, b: any) => {
+          if (sortOrder === 'asc') {
+            return b.currentPrice - a.currentPrice;
+          }
+          if (sortOrder === 'desc') {
+            return a.currentPrice - b.currentPrice;
+          }
+        });
+
+        setScrapedData(sortedData);
       } catch (error) {
         console.error('Error Comparing prices:', error);
       } finally {
@@ -103,7 +115,7 @@ export default function ResultsCategory() {
     };
 
     fetchData();
-  }, [formattedProduct]);
+  }, [product, sortOrder]);
 
   return (
     <div className='bg-white dark:bg-black'>
@@ -238,7 +250,7 @@ export default function ResultsCategory() {
                   <Menu.Items className='absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none'>
                     <div className='py-1'>
                       {sortOptions.map((option) => (
-                        <Menu.Item key={option.name}>
+                        <Menu.Item key={option.key}>
                           {({ active }) => (
                             <a
                               href={option.href}
@@ -247,6 +259,7 @@ export default function ResultsCategory() {
                                 active ? 'bg-gray-100' : '',
                                 'block px-4 py-2 text-sm'
                               )}
+                              onClick={() => setSortOrder(option.key.toLowerCase())}
                             >
                               {option.name}
                             </a>

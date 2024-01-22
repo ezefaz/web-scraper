@@ -24,16 +24,18 @@ export async function scrapeProductSearchPageML(productTitle: any) {
   try {
     const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}`;
 
+    console.log(searchUrl);
+
     const response = await axios.get(searchUrl);
 
     const html = response.data;
     const $ = cheerio.load(html);
 
-    const scrapedDolarValue = await scrapeDolarValue();
-
     const productList: any = [];
-    $('.ui-search-layout.ui-search-layout--stack .ui-search-layout__item').each((index, element) => {
+    $('.ui-search-layout .ui-search-layout__item').each((index, element) => {
       const product = $(element);
+      console.log('product', product);
+
       const title = product.find('.ui-search-item__title').text().trim();
       const url = product.find('a.ui-search-link').attr('href') || '';
       let priceLabel = product.find('.andes-money-amount').attr('aria-label');
@@ -41,6 +43,8 @@ export async function scrapeProductSearchPageML(productTitle: any) {
       if (priceLabel && priceLabel.includes('Antes')) {
         priceLabel = priceLabel.replace('Antes: ', '');
       }
+
+      console.log('listado', productList);
 
       let price = '';
       if (priceLabel) {
@@ -52,7 +56,6 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 
       const pricesLabel = product.find('.andes-money-amount__fraction');
 
-      // Extract and parse prices
       const pricesArray: number[] = [];
       pricesLabel.each((idx, fractionElement) => {
         const priceText = $(fractionElement).text().replace(/\./g, '').replace(',', '.');
@@ -78,8 +81,6 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 
       const image = product.find('.ui-search-result-image__element').attr('data-src');
 
-      const dolarPrice = Number(price) / Number(scrapedDolarValue);
-
       const features = product.find('.ui-search-item__group__element.ui-search-item__variations-text').text();
 
       const isBestSeller = product.find('.ui-search-styled-label.ui-search-item__highlight-label__text').text();
@@ -90,13 +91,14 @@ export async function scrapeProductSearchPageML(productTitle: any) {
         currentPrice,
         originalPrice,
         image,
-        dolarPrice,
         freeShipping,
         currency,
         features,
         isBestSeller,
       });
     });
+
+    console.log('data', productList);
 
     return productList;
   } catch (error: any) {

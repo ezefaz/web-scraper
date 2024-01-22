@@ -110,7 +110,7 @@ export default function UserDropdown(props: any) {
                 <option value='light' selected={isSelected}>
                   Light
                 </option>
-                <option value='dark' selected={!isSelected}>
+                <option value='dark' selected={isSelected}>
                   Dark
                 </option>
               </select>
