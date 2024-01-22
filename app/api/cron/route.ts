@@ -4,7 +4,7 @@ import { connectToDb } from '@/lib/mongoose';
 import Product from '@/lib/models/product.model';
 import { scrapeMLProduct } from '@/lib/scraper';
 import { generateEmailBody, sendEmail } from '@/lib/nodemailer';
-import { CurrentDolar, PriceHistoryItem } from '@/types';
+import { CurrentDolar, PriceHistoryItem, ProductType, UserType } from '@/types';
 
 export const maxDuration = 10;
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
     // ======================== 1 SCRAPE LATEST PRODUCT DETAILS & UPDATE DB
     const updatedProducts = await Promise.all(
       products.map(async (currentProduct) => {
-        const scrapedProduct = await scrapeMLProduct(currentProduct.url);
+        const scrapedProduct: any = await scrapeMLProduct(currentProduct.url);
 
         if (!scrapedProduct) return;
 
@@ -123,9 +123,9 @@ export async function GET(request: Request) {
           let userEmails = [];
 
           if (scrapedProduct.users && scrapedProduct.users.length > 0) {
-            userEmails = scrapedProduct.users.map((user) => user.email);
+            userEmails = scrapedProduct.users.map((user: UserType) => user.email);
           } else if (currentProduct.users && currentProduct.users.length > 0) {
-            userEmails = currentProduct.users.map((user: any) => user.email);
+            userEmails = currentProduct.users.map((user: UserType) => user.email);
           }
 
           if (userEmails.length > 0) {

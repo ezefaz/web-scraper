@@ -62,12 +62,12 @@ export type ProductType = {
   stars: number;
   stockAvailable?: string;
   isOutOfStock: Boolean;
-  users?: UserType[];
+  users?: UserType[] | undefined;
   storeName?: String;
   isFreeReturning?: boolean;
   isFreeShipping?: boolean;
-  status: string;
-  productReviews: Array<string>;
+  status?: string;
+  productReviews?: Array<string>;
   isFollowing?: boolean;
 };
 

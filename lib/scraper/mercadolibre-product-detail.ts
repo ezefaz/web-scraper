@@ -148,9 +148,22 @@ export async function scrapeMLProductDetail(productUrl: any) {
 
     let isFollowing = false;
 
-    const productDetails = $('#buybox-form')
+    // const productDetails = $('#buybox-form')
+    //   .map((index, element) => {
+    //     const oficialStore = $(element).find('.ui-pdp-color--BLUE.ui-pdp-family--REGULAR').text();
+    //     console.log(oficialStore);
+    //     const warranty = $(element).find('.ui-pdp-family--REGULAR.ui-pdp-media__title').text();
+
+    //     return {
+    //       oficialStore,
+    //     };
+    //   })
+    //   .get();
+
+    const productDetails = $('.ui-pdp-container__col.col-2.ui-vip-core-container--short-description')
       .map((index, element) => {
-        const oficialStore = $(element).find('.ui-pdp-color--BLUE.ui-pdp-family--REGULAR').text();
+        const oficialStore = $(element).find('.ui-pdp-seller__header .ui-pdp-seller__header__title').text();
+        console.log(oficialStore);
         const warranty = $(element).find('.ui-pdp-family--REGULAR.ui-pdp-media__title').text();
 
         return {

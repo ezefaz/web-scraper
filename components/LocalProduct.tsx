@@ -64,7 +64,7 @@ const LocalProduct = () => {
                   >
                     Visitar Producto
                   </Link>
-                  <p>Vendido por: {productData.storeName ? productData.storeName : ''}</p>
+                  <span className='font-bold dark:text-gray-200'>{extractSellerName(productData.storeName)}</span>
                 </div>
               </div>
 
@@ -301,3 +301,14 @@ const LocalProduct = () => {
 };
 
 export default LocalProduct;
+
+function extractSellerName(fullSellerInfo: string) {
+  const startIdx = fullSellerInfo.indexOf('(');
+  const endIdx = fullSellerInfo.indexOf(')');
+
+  if (startIdx !== -1 && endIdx !== -1) {
+    return fullSellerInfo.substring(startIdx + 1, endIdx);
+  } else {
+    return fullSellerInfo;
+  }
+}

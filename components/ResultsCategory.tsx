@@ -32,9 +32,9 @@ const sortOptions = [
 ];
 
 const subCategories = [
-  { name: 'Envío Gratis', href: '#', key: 'freeShipping' },
-  { name: 'Tiendas Oficiales', href: '#' },
-  { name: 'Solo con descuento', href: '#' },
+  { name: 'Envío Gratis', href: '#' },
+  // { name: 'Tiendas Oficiales', href: '#' },
+  // { name: 'Solo con descuento', href: '#' },
 ];
 
 const filters = [
@@ -89,6 +89,7 @@ export default function ResultsCategory() {
 
   const [scrapingInProgress, setScrapingInProgress] = useState(false);
   const [scrapedData, setScrapedData] = useState([]);
+  const [freeShipping, setFreeShipping] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,7 +98,9 @@ export default function ResultsCategory() {
         // const formattedProductTitle = formattedProduct.replace(/\s/g, '-');
         const data = await scrapeProductSearchPageML(product);
 
-        const sortedData = data.sort((a: any, b: any) => {
+        const filteredData = freeShipping ? data.filter((item: any) => item.freeShipping !== '') : data;
+
+        const sortedData = filteredData.sort((a: any, b: any) => {
           if (sortOrder === 'asc') {
             return b.currentPrice - a.currentPrice;
           }
@@ -115,7 +118,7 @@ export default function ResultsCategory() {
     };
 
     fetchData();
-  }, [product, sortOrder]);
+  }, [product, sortOrder, freeShipping]);
 
   return (
     <div className='bg-white dark:bg-black'>
@@ -164,7 +167,11 @@ export default function ResultsCategory() {
                     <ul role='list' className='px-2 py-3 font-medium text-gray-900'>
                       {subCategories.map((category) => (
                         <li key={category.name}>
-                          <a href={category.href} className='block px-2 py-3'>
+                          <a
+                            href={category.href}
+                            onClick={() => setFreeShipping(!freeShipping)}
+                            className='block px-2 py-3'
+                          >
                             {category.name}
                           </a>
                         </li>
@@ -296,7 +303,13 @@ export default function ResultsCategory() {
                 >
                   {subCategories.map((category) => (
                     <li key={category.name}>
-                      <a href={category.href} className='dark:text-gray-200'>
+                      <a
+                        href={category.href}
+                        className={`block px-2 py-3 ${
+                          freeShipping ? 'font-bold dark:text-gray-200' : 'dark:text-gray-200'
+                        }`}
+                        onClick={() => setFreeShipping(!freeShipping)}
+                      >
                         {category.name}
                       </a>
                     </li>

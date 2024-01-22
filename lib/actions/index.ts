@@ -19,7 +19,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
   try {
     connectToDb();
 
-    const scrapedProduct = await scrapeMLProduct(productUrl);
+    const scrapedProduct: any = await scrapeMLProduct(productUrl);
     const currentUser = await getCurrentUser();
 
     if (!scrapedProduct) return;
@@ -29,7 +29,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
     const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
     const userProducts =
-      scrapedProduct.users.length > 0
+      scrapedProduct.users?.length > 0
         ? scrapedProduct.users.map((user: any) => {
             user.products.push(scrapedProduct);
             return user.products;
@@ -65,10 +65,14 @@ export async function scrapeAndStoreProducts(productUrl: string) {
       };
     }
 
+    console.log('NO existe');
+
     const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
       upsert: true,
       new: true,
     });
+
+    console.log(newProduct);
 
     if (currentUser) {
       const user = await User.findOne({ email: currentUser.email });
@@ -391,3 +395,9 @@ export async function getProductById(productId: string) {
 
   return product;
 }
+
+// export async function addProductToDB(productUrl: string) {
+//   const user = await getCurrentUser();
+
+//   const foundedProduct = await user.products?.map((product: ProductType) => productUrl === product.url);
+// }
