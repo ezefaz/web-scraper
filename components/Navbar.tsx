@@ -31,7 +31,11 @@ const Navbar = () => {
           <Link href='/' className='flex items-center gap-1 mt-2'>
             <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
           </Link>
-          {pathname == '/' ? null : (
+          {pathname == '/' ||
+          pathname == '/sign-in' ||
+          pathname == '/sign-up' ||
+          pathname == '/reset' ||
+          pathname == '/new-verification' ? null : (
             <div className='w-[55%] m-auto ml-7'>
               <Searchbar />
             </div>
