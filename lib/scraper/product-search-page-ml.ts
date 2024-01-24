@@ -44,8 +44,6 @@ export async function scrapeProductSearchPageML(productTitle: any) {
         priceLabel = priceLabel.replace('Antes: ', '');
       }
 
-      console.log('listado', productList);
-
       let price = '';
       if (priceLabel) {
         price = priceLabel.replace(' pesos', '');
@@ -98,10 +96,8 @@ export async function scrapeProductSearchPageML(productTitle: any) {
       });
     });
 
-    console.log('data', productList);
-
     return productList;
   } catch (error: any) {
-    throw new Error(`Failed to scrape Google Shopping: ${error.message}`);
+    throw new Error(`Failed to scrape Tiendamia International product: ${error.message}`);
   }
 }

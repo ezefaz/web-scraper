@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio';
 import { extractCategory, extractCurrency, extractDescription, extractStars } from '../utils';
 import { scrapeDolarValue } from './dolar';
 
-export async function scrapeMLProductDetail(productUrl: any) {
+export async function scrapeMLProductDetail(productUrl: string) {
   // bright data proxy configuration
   const username = String(process.env.BRIGHT_DATA_USERNAME);
   const password = String(process.env.BRIGHT_DATA_PASSWORD);
@@ -23,6 +23,8 @@ export async function scrapeMLProductDetail(productUrl: any) {
   };
 
   try {
+    console.log('URL', productUrl);
+
     const response = await axios.get(productUrl, options);
     const $ = cheerio.load(response.data);
 
@@ -106,7 +108,7 @@ export async function scrapeMLProductDetail(productUrl: any) {
 
     const statusElement = $('.ui-pdp-subtitle');
     const statusText = statusElement.text().trim();
-    const status = statusText.split(' ')[0];
+    const status = statusText.split(' ')[0] || $('.andes-badge__content').text();
 
     // CATEGORIES
 
@@ -148,22 +150,11 @@ export async function scrapeMLProductDetail(productUrl: any) {
 
     let isFollowing = false;
 
-    // const productDetails = $('#buybox-form')
-    //   .map((index, element) => {
-    //     const oficialStore = $(element).find('.ui-pdp-color--BLUE.ui-pdp-family--REGULAR').text();
-    //     console.log(oficialStore);
-    //     const warranty = $(element).find('.ui-pdp-family--REGULAR.ui-pdp-media__title').text();
-
-    //     return {
-    //       oficialStore,
-    //     };
-    //   })
-    //   .get();
-
-    const productDetails = $('.ui-pdp-container__col.col-2.ui-vip-core-container--short-description')
+    const productDetails = $('.ui-pdp-seller__header')
       .map((index, element) => {
-        const oficialStore = $(element).find('.ui-pdp-seller__header .ui-pdp-seller__header__title').text();
-        console.log(oficialStore);
+        const oficialStore = $(element).find('.ui-pdp-color--BLUE.ui-pdp-family--REGULAR').text();
+        // $(element).find('.ui-pdp-seller__header .ui-pdp-seller__header__title').text();
+
         const warranty = $(element).find('.ui-pdp-family--REGULAR.ui-pdp-media__title').text();
 
         return {
@@ -194,7 +185,7 @@ export async function scrapeMLProductDetail(productUrl: any) {
       averagePrice: Number(currentPrice) || Number(originalPrice),
       isFreeReturning,
       storeName: productDetails[0].oficialStore,
-      status,
+      status: status || 'Refurbished',
       isFreeShipping,
       productReviews,
       isFollowing,

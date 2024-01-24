@@ -1,15 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Badge, Card } from '@tremor/react';
 import { Image, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@nextui-org/react';
 import { PiKeyReturn } from 'react-icons/pi';
 import { MdOutlineProductionQuantityLimits } from 'react-icons/md';
 
-import { scrapeMLProduct } from '@/lib/scraper';
 import PriceInfoCard from './PriceInfoCard';
 import { formatNumber } from '@/lib/utils';
 import ProductBadges from './ProductBadges';
@@ -17,15 +16,41 @@ import { scrapeMLProductDetail } from '@/lib/scraper/mercadolibre-product-detail
 import InternationalScraperButton from './InternationalScraperButton';
 import { IoMdInformationCircleOutline } from 'react-icons/io';
 import ScraperButton from './ScraperButton';
+import { ProductType } from '@/types';
+import { createProduct } from '@/app/actions/create-product';
+import { toast } from 'react-hot-toast';
+
+const mercadolibreDomains = [
+  'mercadolibre.com',
+  'mercadolibre.com.ar',
+  'www.mercadolivre.com.br',
+  'www.mercadolibre.cl',
+  'www.mercadolibre.com.co',
+  'www.mercadolibre.com.uy',
+];
+
+const isValidMLProductUrl = (url: string) => {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname;
+
+    return mercadolibreDomains.some((domain: string) => hostname.includes(domain));
+  } catch (error) {
+    return false;
+  }
+};
 
 const LocalProduct = () => {
+  const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
-  const productURL = searchParams.get('productUrl');
+  const productURL: any = searchParams.get('productUrl');
   const [productData, setProductData] = useState<any>();
 
   useEffect(() => {
     setIsLoading(true);
+
     const fetchData = async () => {
       try {
         const url = productURL?.trim();
@@ -43,6 +68,15 @@ const LocalProduct = () => {
     setIsLoading(false);
   }, [productURL]);
 
+  const handleSubmit = useCallback(
+    async (productUrl: string) => {
+      const product = await createProduct(productUrl);
+
+      router.push('/user-products');
+    },
+    [productData]
+  );
+
   return (
     <div className='mt-40'>
       {productData ? (
@@ -52,7 +86,15 @@ const LocalProduct = () => {
               <Card decoration='bottom' decorationColor='orange'>
                 <Image src={productData.image} isZoomed alt={productData.title} width={400} height={400} />
               </Card>
+              <button
+                className='btn w-fit mt-4 flex items-center justify-center gap-2 min-w-[200px] text-base text-white m-auto'
+                onClick={() => handleSubmit(productData.url)}
+              >
+                <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
+                Agregar Producto
+              </button>
             </div>
+
             <div className='flex-1 flex flex-col'>
               <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
                 <div className='flex flex-col gap-3'>
@@ -64,7 +106,9 @@ const LocalProduct = () => {
                   >
                     Visitar Producto
                   </Link>
-                  <span className='font-bold dark:text-gray-200'>{extractSellerName(productData.storeName)}</span>
+                  <span className='font-bold dark:text-gray-200'>
+                    Vendido por: {extractSellerName(productData.storeName)}
+                  </span>
                 </div>
               </div>
 
@@ -143,7 +187,7 @@ const LocalProduct = () => {
               {/* {currentUser && !isFollowing && <Modal productUrl={productData[0].url} />} */}
             </div>
           </div>
-          <div className='mx-auto max-w-[510px] text-center mb-2'>
+          <div className='mx-auto max-w-[510px] text-center mb-2 mt-40'>
             <div id='priceCompare'></div>
             <span className='block text-lg font-semibold text-primary'>Precios</span>
             <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
@@ -155,7 +199,7 @@ const LocalProduct = () => {
           <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
             <ScraperButton productTitle={productData.title} productPrice={productData.currentPrice} />
           </div>
-          <div className='mx-auto max-w-[510px] text-center mb-2'>
+          <div className='mx-auto max-w-[510px] text-center mb-2 mt-40'>
             <div id='priceCompare'></div>
             <span className='block text-lg font-semibold text-primary'>Precios Internacionales</span>
             <h1 className=' text-3xl mb-3 font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>

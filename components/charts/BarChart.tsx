@@ -96,7 +96,7 @@ const LineChartComponent = ({
   //   // chartData = getMonthlyData(filteredPrices, monthsFromDates, originalPrice, currentPrice);
   // }
 
-  if (selectedTab === 'mensual') {
+  if (selectedTab === 'semanal') {
     chartData = monthlyData;
   } else if (selectedTab === 'anual') {
     chartData = anualData;
@@ -111,7 +111,7 @@ const LineChartComponent = ({
       <TabGroup>
         <TabList className='mt-8'>
           {/* <Tab onClick={() => setSelectedTab('diario')}>Diario</Tab> */}
-          <Tab onClick={() => setSelectedTab('mensual')}>Mensual</Tab>
+          <Tab onClick={() => setSelectedTab('semanal')}>Semanal</Tab>
           <Tab onClick={() => setSelectedTab('semanal')}>Anual</Tab>
         </TabList>
       </TabGroup>

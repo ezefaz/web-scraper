@@ -14,6 +14,8 @@ import { auth } from '@/auth';
 import { getUserByEmail } from '@/data/user';
 
 export async function scrapeAndStoreProducts(productUrl: string) {
+  console.log('URL --->', productUrl);
+
   if (!productUrl) return;
 
   try {
@@ -65,14 +67,10 @@ export async function scrapeAndStoreProducts(productUrl: string) {
       };
     }
 
-    console.log('NO existe');
-
     const newProduct = await Product.findOneAndUpdate({ url: scrapedProduct.url }, product, {
       upsert: true,
       new: true,
     });
-
-    console.log(newProduct);
 
     if (currentUser) {
       const user = await User.findOne({ email: currentUser.email });

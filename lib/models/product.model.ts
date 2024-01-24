@@ -40,7 +40,7 @@ const productSchema = new mongoose.Schema(
     isFreeShipping: {
       type: Boolean,
     },
-    status: { type: String, enum: ['Nuevo', 'Usado', 'Reacondicionado'] },
+    status: { type: String },
     storeName: { type: String },
     productReviews: { type: Array },
     users: [

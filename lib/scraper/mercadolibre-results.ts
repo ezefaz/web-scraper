@@ -62,7 +62,7 @@ export async function scrapeMercadoLibreResults(productTitle: string, pageNumber
 
     return productList;
   } catch (error: any) {
-    throw new Error(`Failed to scrape Google Shopping: ${error.message}`);
+    throw new Error(`Failed to scrape ML results page: ${error.message}`);
   }
 }
 

@@ -43,7 +43,6 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
       const url = product.find('a.ui-search-link').attr('href') || '';
       let priceLabel = product.find('.andes-money-amount').attr('aria-label');
 
-      // Remove 'Antes' if it exists in the priceLabel
       if (priceLabel && priceLabel.includes('Antes')) {
         priceLabel = priceLabel.replace('Antes: ', '');
       }
@@ -65,6 +64,6 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
 
     return productList;
   } catch (error: any) {
-    throw new Error(`Failed to scrape Google Shopping: ${error.message}`);
+    throw new Error(`Failed to scrape local price compare: ${error.message}`);
   }
 }

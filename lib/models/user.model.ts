@@ -81,7 +81,7 @@ const userSchema = new mongoose.Schema({
       isFreeReturning: {
         type: Boolean,
       },
-      status: { type: String, enum: ['Nuevo', 'Usado', 'Reacondicionado'] },
+      status: { type: String },
     },
   ],
   subscription: {

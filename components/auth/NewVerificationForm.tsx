@@ -32,7 +32,7 @@ const NewVerificationForm = (props: Props) => {
         setError(data.error);
       })
       .catch(() => {
-        setError('Something went wrong!');
+        setError('Algo salio mal!');
       });
   }, [token, success, error]);
 
