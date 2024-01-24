@@ -28,12 +28,6 @@ export default function CountrySelect() {
       >
         Uruguay
       </SelectItem>
-      {/* <SelectItem
-        key='venezuela'
-        startContent={<Avatar alt='Venezuela' className='w-6 h-6' src='https://flagcdn.com/ve.svg' />}
-      >
-        Venezuela
-      </SelectItem> */}
     </Select>
   );
 }

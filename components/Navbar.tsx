@@ -7,7 +7,7 @@ import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import Dropdown from './Dropdown';
 import LoginButton from './auth/LoginButton';
 import { useSession } from 'next-auth/react';
-import { useCurrentUser } from '@/hooks/use-current-use';
+import { useCurrentUser } from '@/hooks/use-current-user';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import UserDropdown from './UserDropdown';
 import Searchbar from './Searchbar';

@@ -25,24 +25,24 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     return { error: 'Correo en uso' };
   }
 
-  let tag: string = '';
-  let currency: string = '';
+  // let tag: string = '';
+  // let currency: string = '';
 
-  switch (country.toLowerCase()) {
-    case 'argentina':
-      tag = 'ar';
-      currency = 'ARS';
-      break;
-    case 'brazil':
-      tag = 'br';
-      currency = 'BRL';
-    case 'colombia':
-      tag = 'co';
-      currency = 'COP';
-    case 'uruguay':
-      tag = 'uy';
-      currency = 'UYU';
-  }
+  // switch (country.toLowerCase()) {
+  //   case 'argentina':
+  //     tag = 'ar';
+  //     currency = 'ARS';
+  //     break;
+  //   case 'brazil':
+  //     tag = 'br';
+  //     currency = 'BRL';
+  //   case 'colombia':
+  //     tag = 'co';
+  //     currency = 'COP';
+  //   case 'uruguay':
+  //     tag = 'uy';
+  //     currency = 'UYU';
+  // }
 
   await connectToDb();
 
@@ -52,11 +52,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     name,
     email,
     password: hashedPassword,
-    country: {
-      name: country,
-      tag,
-      currency,
-    },
+    country,
   });
 
   const verificationToken = await generateVerificationToken(email);

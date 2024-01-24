@@ -16,7 +16,7 @@ import {
 import { PiPlusCircleDuotone } from 'react-icons/pi';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/hooks/use-current-use';
+import { useCurrentUser } from '@/hooks/use-current-user';
 import Link from 'next/link';
 import { useTheme } from 'next-themes';
 

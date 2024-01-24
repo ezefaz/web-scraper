@@ -249,18 +249,20 @@ const ProductDetails = async ({ params: { id } }: Props) => {
             currency={currency}
           />
         </div>
-        <div className='w-full lg:w-[50%]'>
-          <DolarBasedChart
-            currentPrice={currentPrice}
-            dolarValue={dolarValue}
-            dolarDate={scrapedDolarDate}
-            dolarDates={uniqueDolarDatesArray}
-            dolarValues={uniqueDolarValue}
-            weeklyData={dolarWeeklyData}
-            monthlyData={dolarMonthlyData}
-            anualData={dolarAnualData}
-          />
-        </div>
+        {currentUser?.country === 'argentina' ? (
+          <div className='w-full lg:w-[50%]'>
+            <DolarBasedChart
+              currentPrice={currentPrice}
+              dolarValue={dolarValue}
+              dolarDate={scrapedDolarDate}
+              dolarDates={uniqueDolarDatesArray}
+              dolarValues={uniqueDolarValue}
+              weeklyData={dolarWeeklyData}
+              monthlyData={dolarMonthlyData}
+              anualData={dolarAnualData}
+            />
+          </div>
+        ) : null}
       </div>
       <div className='mx-auto max-w-[510px] text-center mb-2'>
         <div id='priceCompare'></div>

@@ -20,6 +20,7 @@ import { formatNumber, formatUSD } from '@/lib/utils';
 interface UserProduct {
   url: string;
   id: string;
+  image: string;
   title: string;
   currentPrice: number;
   currentDolarValue: number;
@@ -47,6 +48,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Button } from '@tremor/react';
 import { BsArrowsExpand } from 'react-icons/bs';
 import TableDropdown from './TableDropdown';
+import Image from 'next/image';
 
 const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,6 +66,7 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
           <Table className='w-full'>
             <TableHead>
               <TableRow>
+                <TableHeaderCell className='bg-white text-center'>Imagen</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Título</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Categoría</TableHeaderCell>
                 <TableHeaderCell className='bg-white text-center'>Stock</TableHeaderCell>
@@ -76,6 +79,7 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
             <TableBody>
               {userProducts?.map((product: UserProduct) => (
                 <TableRow key={product.id} className='hover:bg-gray-50 cursor-pointer'>
+                  <Image src={product.image} alt={product.title} height={200} width={200} />
                   <TableCell>
                     <a
                       className='text-blue-500 hover:underline'
@@ -158,6 +162,7 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
                     <Table className='h-[450px]'>
                       <TableHead>
                         <TableRow>
+                          <TableHeaderCell className='bg-white text-center'>Imagen</TableHeaderCell>
                           <TableHeaderCell className='bg-white text-center'>Título</TableHeaderCell>
                           <TableHeaderCell className='bg-white text-center'>Categoría</TableHeaderCell>
                           <TableHeaderCell className='bg-white text-center'>Stock</TableHeaderCell>
@@ -171,6 +176,9 @@ const ProductsTable = ({ user, userProducts }: ProductTableProps) => {
                         {userProducts?.map((product: UserProduct) => (
                           <>
                             <TableRow key={product.id} className='w-full hover:bg-gray-50 cursor-pointer'>
+                              <TableCell>
+                                <Image src={product.image} alt={product.title} height={200} width={200} />
+                              </TableCell>
                               <TableCell>
                                 <a
                                   className='text-blue-500 hover:underline'

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { signOut } from 'next-auth/react';
 import DropdownItem from './DropdownItem';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/hooks/use-current-use';
+import { useCurrentUser } from '@/hooks/use-current-user';
 import { ThemeSwitcher } from './ThemeSwitcher';
 
 const Dropdown = () => {

@@ -28,15 +28,6 @@ const userSchema = new mongoose.Schema({
       enum: ['argentina', 'brasil', 'colombia', 'uruguay'],
       default: 'argentina',
     },
-    tag: {
-      type: String,
-      enum: ['ar', 'br', 'co', 'uy'],
-      default: '',
-    },
-    currency: {
-      type: String,
-      default: '',
-    },
   },
   products: [
     {

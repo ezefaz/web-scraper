@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { addUserEmailToProduct } from '@/lib/actions';
 import { toast } from 'react-hot-toast';
 
-import { useCurrentUser } from '@/hooks/use-current-use';
+import { useCurrentUser } from '@/hooks/use-current-user';
 
 interface Props {
   productUrl: string;

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -47,6 +47,7 @@ const LocalProduct = () => {
   const searchParams = useSearchParams();
   const productURL: any = searchParams.get('productUrl');
   const [productData, setProductData] = useState<any>();
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     setIsLoading(true);
@@ -70,8 +71,9 @@ const LocalProduct = () => {
 
   const handleSubmit = useCallback(
     async (productUrl: string) => {
-      const product = await createProduct(productUrl);
-
+      startTransition(async () => {
+        await createProduct(productUrl);
+      });
       router.push('/user-products');
     },
     [productData]

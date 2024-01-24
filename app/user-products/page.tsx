@@ -25,6 +25,7 @@ const page = async () => {
 
   const extractedData: any = userProducts?.map((product: any) => ({
     id: product._id,
+    image: product.image,
     url: product.url,
     title: product.title,
     currentPrice: product.currentPrice,
