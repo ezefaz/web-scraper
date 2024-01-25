@@ -23,13 +23,11 @@ const ProfilePage = () => {
   const { update } = useSession();
   const [isPending, startTransition] = useTransition();
 
-  console.log('pineda', user);
-
   const {
     handleSubmit,
     register,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
@@ -83,31 +81,40 @@ const ProfilePage = () => {
                 <div>
                   <label>Email</label>
                   <Input defaultValue={user.email} {...register('email')} type='email' disabled={isPending} />
+                  {errors.email && <span className='text-red-500'>{errors.email.message}</span>}
                 </div>
                 <div>
                   <label>Contraseña</label>
                   <Input {...register('password')} placeholder='******' type='password' disabled={isPending} />
+                  {errors.password && <span className='text-red-500'>{errors.password.message}</span>}
                 </div>
                 <div>
                   <label>Nueva Contraseña</label>
                   <Input {...register('newPassword')} placeholder='******' type='password' disabled={isPending} />
                 </div>
+                {errors.newPassword && <span className='text-red-500'>{errors.newPassword.message}</span>}
               </>
             )}
             <div>
               <label>País</label>
-              <Select {...register('country')} disabled={isPending} label='Seleccionar País'>
+              <Select
+                {...register('country')}
+                defaultSelectedKeys={[user?.country]}
+                disabled={isPending}
+                label='Seleccionar País'
+              >
                 {validCountries.map((country) => (
                   <SelectItem key={country} value={country}>
                     {country.charAt(0).toUpperCase() + country.slice(1)}
                   </SelectItem>
                 ))}
               </Select>
+              {errors.country && <span className='text-red-500'>{errors.country.message}</span>}
             </div>
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />
-          <Button disabled={isPending} type='submit'>
+          <Button disabled={isPending || !isDirty} type='submit'>
             Guardar
           </Button>
         </form>
