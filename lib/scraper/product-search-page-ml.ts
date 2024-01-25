@@ -3,6 +3,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { scrapeDolarValue } from './dolar';
+import { getCurrentUser } from '../actions';
 
 export async function scrapeProductSearchPageML(productTitle: any) {
   // bright data proxy configuration
@@ -21,10 +22,28 @@ export async function scrapeProductSearchPageML(productTitle: any) {
     rejectUnathorized: false,
   };
 
+  const user = await getCurrentUser();
   try {
-    const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}`;
+    const defaultCountry = 'argentina';
 
-    console.log(searchUrl);
+    const country: string = user?.country || defaultCountry;
+
+    let link = '';
+
+    const countryName = country;
+
+    if (countryName == 'argentina') {
+      link = 'https://www.mercadolibre.com.ar';
+    } else if (countryName == 'uruguay') {
+      link = 'https://listado.mercadolibre.com.uy';
+    } else if (countryName == 'brasil') {
+      link = 'https://lista.mercadolivre.com.br';
+    } else if (countryName == 'colombia') {
+      link = 'https://listado.mercadolibre.com.co';
+    }
+
+    const searchUrl = `${link}/${productTitle}`;
+    console.log('enlace', searchUrl);
 
     const response = await axios.get(searchUrl);
 
@@ -98,6 +117,6 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 
     return productList;
   } catch (error: any) {
-    throw new Error(`Failed to scrape Tiendamia International product: ${error.message}`);
+    throw new Error(`Failed to scrape ML search product: ${error.message}`);
   }
 }

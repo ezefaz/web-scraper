@@ -26,11 +26,11 @@ export async function scrapeInternationalValue(product: string) {
 
     const defaultCountry = 'argentina';
 
-    const country = user?.country?.name || defaultCountry;
+    const country = user?.country || defaultCountry;
 
     let link = '';
 
-    switch (country.toLowerCase()) {
+    switch (country) {
       case 'argentina':
         link = 'https://tiendamia.com/ar/';
         break;
