@@ -36,7 +36,7 @@ const StepsComponent: React.FC = () => {
 										clipRule='evenodd'></path>
 								</svg>
 								<span className='text-base font-medium leading-tight text-gray-500 font-light'>
-									Insertar el link del producto
+									Buscar o Insertar link del producto
 								</span>
 							</li>
 							<li className='flex space-x-3'>
@@ -83,7 +83,7 @@ const StepsComponent: React.FC = () => {
 						// className='hidden w-full mb-4 rounded-lg lg:mb-0 lg:flex'
 						width={600}
 						height={600}
-						src='/assets/images/feature-2.png'
+						src='/assets/images/feature2.png'
 						alt='feature image 2'
 					/>
 					<div className='text-gray-500 sm:text-lg dark:text-gray-400'>
