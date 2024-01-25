@@ -33,7 +33,7 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 		const countryName = country;
 
 		if (countryName == "argentina") {
-			link = "https://www.mercadolibre.com.ar";
+			link = "https://listado.mercadolibre.com.ar";
 		} else if (countryName == "uruguay") {
 			link = "https://listado.mercadolibre.com.uy";
 		} else if (countryName == "brasil") {
