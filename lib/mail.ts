@@ -6,7 +6,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   const developmentBaseURL = 'http://localhost:3000';
-  const productionBaseURL = 'https://savemelin.vercel.app';
+  const productionBaseURL = 'https://savemelin.com';
 
   const confirmLink = isDevelopment
     ? `${developmentBaseURL}/new-verification?token=${token}`
@@ -42,7 +42,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   const developmentBaseURL = 'http://localhost:3000';
-  const productionBaseURL = 'https://savemelin.vercel.app';
+  const productionBaseURL = 'https://savemelin.com';
 
   const resetLink = isDevelopment
     ? `${developmentBaseURL}/new-verification?token=${token}`
