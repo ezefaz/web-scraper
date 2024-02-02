@@ -131,7 +131,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 	// const weeklyData = getWeeklyData(priceHistory, currentPrice, originalPrice);
 	const monthlyData = getMonthlyData(priceHistory, currency);
 
-	const weeklyData = getWeeklyData(priceHistory, currency);
+	const weeklyData = getWeeklyData(priceHistory);
 
 	const dolarWeeklyData = getCurrentWeekDolarData(dolarHistory, currentPrice);
 	const dolarMonthlyData = getCurrentMonthlyDolarData(
@@ -152,7 +152,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 			{" "}
 			<ProductTabs />
 			<div className='flex gap-10 sm:cap-5 xl:flex-row flex-col'>
-				<div className='flex flex-row flex-col mr-8 h-[max-content]'>
+				<div className='flex flex-row mr-8 h-[max-content]'>
 					{product.image ? (
 						<Card
 							decoration='bottom'
@@ -329,7 +329,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 					Te mostramos productos de al menos un 10% menor al valor.
 				</p>
 			</div>
-			<div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
+			<div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-full'>
 				<ScraperButton
 					productTitle={product.title}
 					productPrice={product.currentPrice}
@@ -362,7 +362,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 				</Popover>
 				{/* <p className='pt-2 text-muted'>Considera tambien el costo de impuestos y envío.</p> */}
 			</div>
-			<div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
+			<div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-full'>
 				<InternationalScraperButton
 					productTitle={product.title}
 					productPrice={Number(product.currentPrice)}
