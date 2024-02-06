@@ -27,7 +27,8 @@ const ProductCard = ({ product }: Props) => {
           </div>
 
           <div className='product-card_img-container'>
-            <Image src={product.image} alt={product.title} width={200} height={200} className='product-card_img' />
+            {/* <Image src={product.image} alt={product.title} width={200} height={200} className='product-card_img' /> */}
+            <img src={product.image} alt={product.title} width={200} height={200} className='product-card_img' />
           </div>
 
           <div className='flex flex-col gap-3'>

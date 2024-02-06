@@ -37,6 +37,11 @@ export default function UserDropdown(props: any) {
     router.push('/');
   };
 
+  const handleThemeChange = (selectedTheme: string) => {
+    setTheme(selectedTheme);
+    localStorage.setItem('theme', selectedTheme);
+  };
+
   return (
     <Dropdown
       showArrow
@@ -93,9 +98,6 @@ export default function UserDropdown(props: any) {
           </DropdownItem>
         </DropdownSection>
         <DropdownSection aria-label='Preferences' showDivider>
-          {/* <DropdownItem key='quick_search' shortcut='⌘K'>
-            Busqueda Rápida
-          </DropdownItem> */}
           <DropdownItem
             isReadOnly
             key='theme'
@@ -105,21 +107,17 @@ export default function UserDropdown(props: any) {
                 className='z-10 outline-none w-16 py-0.5 rounded-md text-tiny group-data-[hover=true]:border-default-500 border-small border-default-300 dark:border-default-200 bg-transparent text-default-500'
                 id='theme'
                 name='theme'
-                onChange={(e) => setTheme(e.target.value)}
+                value={theme}
+                onChange={(e) => handleThemeChange(e.target.value)}
               >
-                <option value='light' selected={isSelected}>
-                  Light
-                </option>
-                <option value='dark' selected={isSelected}>
-                  Dark
-                </option>
+                <option value='light'>Light</option>
+                <option value='dark'>Dark</option>
               </select>
             }
           >
             Tema
           </DropdownItem>
         </DropdownSection>
-
         <DropdownSection aria-label='Ayuda & Feedback'>
           <DropdownItem key='help_and_feedback'>Ayuda & Feedback</DropdownItem>
           <DropdownItem key='logout' onClick={handleSignOut}>

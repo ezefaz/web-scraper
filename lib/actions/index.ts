@@ -7,8 +7,6 @@ import { scrapeMLProduct } from '../scraper';
 import { getAveragePrice, getHighestPrice, getLowestPrice } from '../utils';
 import { revalidatePath } from 'next/cache';
 import { generateEmailBody, sendEmail } from '../nodemailer';
-// import { getServerSession } from "next-auth";
-import { permanentRedirect, redirect } from 'next/navigation';
 import User from '../models/user.model';
 import { auth } from '@/auth';
 import { getUserByEmail } from '@/data/user';

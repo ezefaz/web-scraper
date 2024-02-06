@@ -47,7 +47,7 @@ const Modal = ({ productUrl }: Props) => {
     <>
       <button type='button' className='btn text-white mr-8' onClick={openModal}>
         {/* <Image src='/assets/icons/search-plus.svg' alt='check' width={22} height={22} className='m-auto' /> */}
-        Inciar Seguimiento
+        Iniciar Seguimiento
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>

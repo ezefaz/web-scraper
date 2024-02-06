@@ -1,8 +1,5 @@
 'use client';
 
-import { formatNumber, getDiscountPercentage } from '@/lib/utils';
-import { Button, Card, CardBody, CardFooter, CardHeader } from '@nextui-org/react';
-import Image from 'next/image';
 import ProductSearchCard from './ProductSearchCard';
 
 export default function ProductResults({ data }: any) {
