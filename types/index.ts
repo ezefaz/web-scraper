@@ -31,13 +31,17 @@ export type UserType = {
 	id: string;
 	name: string;
 	email: string;
-	country?: Country;
+	image?: string;
+	country?: string;
 	password?: string;
 	products?: ProductType[];
 	productsFavoritos?: ProductType[];
 	subscription: string;
 	isFollowing?: boolean;
 	role?: string;
+	isTwoFactorEnabled?: boolean;
+	emailVerified: Date;
+	suscription?: string;
 };
 
 export type ProductType = {
@@ -103,3 +107,20 @@ export type TiendamiaProduct = {
 	availabilityMessage: string;
 	refurbishedMessage: string;
 };
+
+export type GoogleAccount = {
+	access_token: string;
+	expires_in: number;
+	scope: string;
+	token_type: string;
+	id_token: string;
+	expires_at: number;
+	provider: string;
+	type: string;
+	providerAccountId: string;
+};
+
+export const enum UserRole {
+	ADMIN = "ADMIN",
+	USER = "USER",
+}

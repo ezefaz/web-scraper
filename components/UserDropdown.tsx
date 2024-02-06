@@ -89,7 +89,11 @@ export default function UserDropdown(props: any) {
               }}
             />
           </DropdownItem>
-          {loggedUser && loggedUser.role === 'ADMIN' && <DropdownItem key='dashboard'>Dashboard</DropdownItem>}
+          {loggedUser && loggedUser.role === 'ADMIN' && (
+            <DropdownItem key='dashboard'>
+              <Link href='/admin'>Dashboard</Link>
+            </DropdownItem>
+          )}
           <DropdownItem key='profile'>
             <Link href='/profile'>Perfil</Link>
           </DropdownItem>

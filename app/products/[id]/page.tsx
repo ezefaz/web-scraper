@@ -129,15 +129,14 @@ const ProductDetails = async ({ params: { id } }: Props) => {
       {' '}
       <ProductTabs />
       <div className='flex gap-10 sm:cap-5 xl:flex-row flex-col'>
-        <div className='flex flex-row flex-col mr-8 h-[max-content]'>
+        <div className='flex flex-row mr-8 h-[max-content]'>
           {product.image ? (
             <Card
               decoration='bottom'
               decorationColor='orange'
               className='md:w-[50%] flex justify-center m-auto ml-4 lg:w-full'
             >
-              {/* <Image src={product.image} isZoomed alt={product.title} width={450} height={450} /> */}
-              <img src={product.image} alt={product.title} width={450} height={450} />
+              <Image src={product.image} isZoomed alt={product.title} width={450} height={450} />
             </Card>
           ) : (
             <Skeleton>
@@ -281,7 +280,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
         <p className='pt-2 text-muted'>Te mostramos productos de al menos un 10% menor al valor.</p>
       </div>
-      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
+      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-full'>
         <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />
       </div>
       <div className='mx-auto max-w-[510px] text-center mb-2'>
@@ -306,7 +305,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
         </Popover>
         {/* <p className='pt-2 text-muted'>Considera tambien el costo de impuestos y envío.</p> */}
       </div>
-      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
+      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-full'>
         <InternationalScraperButton productTitle={product.title} productPrice={Number(product.currentPrice)} />
       </div>
       {similarProducts && similarProducts?.length > 0 && (
