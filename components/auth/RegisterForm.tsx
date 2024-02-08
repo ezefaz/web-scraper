@@ -16,8 +16,12 @@ import CountrySelect from './CountrySelect';
 import { Avatar, Input, Select, SelectItem } from '@nextui-org/react';
 import { TbEyeFilled } from 'react-icons/tb';
 import { IoMdEyeOff } from 'react-icons/io';
+import Link from 'next/link';
 
 type Props = {};
+
+const mercadolibreAuthUrl: string =
+  'https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://savemelin.com/';
 
 const RegisterForm = (props: Props) => {
   const [error, setError] = useState<string | undefined>('');
@@ -172,7 +176,20 @@ const RegisterForm = (props: Props) => {
           </div>
         </form>
         <div className='mt-4 flex justify-between items-center'>
-          <span className='text-sm text-gray-700'>O inicia sesión con:</span>
+          <div>
+            {mercadolibreAuthUrl && (
+              <Link href={mercadolibreAuthUrl}>
+                <Button
+                  type='submit'
+                  size='md'
+                  disabled={isPending}
+                  className='w-full bg-primary hover:bg-secondary text-white font-semibold py-2 px-4 rounded-md transition duration-300'
+                >
+                  Eres Vendedor?
+                </Button>
+              </Link>
+            )}
+          </div>
           <div className='flex items-center space-x-3'>
             <button className='rounded-full bg-red-600 text-white p-2 hover:bg-red-700'>
               <FaGoogle size={20} />
