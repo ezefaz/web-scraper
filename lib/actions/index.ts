@@ -12,8 +12,6 @@ import { auth } from '@/auth';
 import { getUserByEmail } from '@/data/user';
 
 export async function scrapeAndStoreProducts(productUrl: string) {
-  console.log('URL --->', productUrl);
-
   if (!productUrl) return;
 
   try {

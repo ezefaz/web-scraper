@@ -9,7 +9,6 @@ import HeroSection from '@/components/HeroSection';
 
 const Home = async () => {
   const allProducts = await getAllProducts();
-  const user = await getCurrentUser();
   const userProducts = await getUserProducts();
 
   return (
