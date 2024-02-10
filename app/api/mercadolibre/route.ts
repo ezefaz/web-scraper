@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 const CLIENT_ID = process.env.MERCADOLIBRE_CLIENT_ID || "";
 const CLIENT_SECRET = process.env.MERCADOLIBRE_CLIENT_SECRET || "";
 const BACKEND_URL =
-	"https://66f9-2800-40-3c-a31-fc5d-9941-575e-436.ngrok-free.app/profile/business";
+	"https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business";
 
 const REDIRECT_URL =
-	"https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://66f9-2800-40-3c-a31-fc5d-9941-575e-436.ngrok-free.app/profile/business";
+	"https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business";
 
 export async function GET(req, res) {
 	console.log("REQQQQQ", req.body);
@@ -19,14 +19,12 @@ export async function GET(req, res) {
 		return res.status(400).json({ error: "Code not found in the URL" });
 	}
 
-	console.log(code);
-
 	const body = new URLSearchParams({
 		grant_type: "authorization_code",
 		client_id: "7423381817150989",
 		client_secret: "ueOGFqfmUl1CGxl4dHHx5BIkU1AdbeC2",
 		redirect_uri:
-			"https://66f9-2800-40-3c-a31-fc5d-9941-575e-436.ngrok-free.app/profile/business",
+			"https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business",
 		code: code,
 	});
 

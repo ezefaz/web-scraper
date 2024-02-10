@@ -1,7 +1,6 @@
 "use server";
 
 import axios from "axios";
-import { NextResponse } from "next/server";
 
 export async function getMLUserCode(code: string | null) {
 	if (!code) {
@@ -10,10 +9,12 @@ export async function getMLUserCode(code: string | null) {
 
 	const body = new URLSearchParams({
 		grant_type: "authorization_code",
-		client_id: "7423381817150989",
-		client_secret: "ueOGFqfmUl1CGxl4dHHx5BIkU1AdbeC2",
+		client_id: String(process.env.MERCADOLIBRE_CLIENT_ID),
+		// client_id: "7423381817150989",
+		client_secret: String(process.env.MERCADOLIBRE_CLIENT_SECRET),
+		// client_secret: "ueOGFqfmUl1CGxl4dHHx5BIkU1AdbeC2",
 		redirect_uri:
-			"https://66f9-2800-40-3c-a31-fc5d-9941-575e-436.ngrok-free.app/profile/business",
+			"https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business",
 		code,
 	});
 
@@ -36,6 +37,8 @@ export async function getMLUserCode(code: string | null) {
 			return { error: "No hay token de acceso." };
 		}
 
+		// Get the user data with the token
+
 		const userResponse = await axios.get(
 			"https://api.mercadolibre.com/users/me",
 			{
@@ -46,6 +49,8 @@ export async function getMLUserCode(code: string | null) {
 		);
 
 		// const userData = userResponse.data.json();
+
+		console.log("RESPONSE DATA", userResponse.data);
 
 		const {
 			id,
@@ -68,6 +73,8 @@ export async function getMLUserCode(code: string | null) {
 			country_id,
 			email,
 		};
+
+		// Create seller on DB
 
 		return data;
 	} catch (error) {

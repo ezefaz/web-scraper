@@ -1,23 +1,34 @@
 import mongoose, { Schema } from "mongoose";
 
-const userSchema = new mongoose.Schema({
-	name: {
+const sellerSchema = new mongoose.Schema({
+	userId: {
+		type: String,
+	},
+	firstName: {
+		type: String,
+	},
+	lastName: {
+		type: String,
+	},
+	nickname: {
 		type: String,
 	},
 	email: {
 		type: String,
 	},
-	image: {
-		type: String,
-	},
-	password: {
-		type: String,
-	},
-	emailVerified: {
+	registration_date: {
 		type: Date,
 	},
+	logo: {
+		type: String,
+	},
+
+	country_id: {
+		type: String,
+	},
+	identification: {},
 	role: { type: String, enum: ["ADMIN", "USER"], default: "USER" },
-	isTwoFactorEnabled: { type: Boolean, default: false },
+	gender: { type: String },
 	twoFactorConfirmation: {
 		type: Schema.Types.ObjectId,
 		ref: "TwoFactorConfirmation",
@@ -83,4 +94,5 @@ const userSchema = new mongoose.Schema({
 	},
 });
 
-export default mongoose.models?.User || mongoose.model("User", userSchema);
+export default mongoose.models?.Seller ||
+	mongoose.model("Seller", sellerSchema);
