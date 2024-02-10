@@ -17,12 +17,10 @@ import { Fragment, useEffect, useState } from 'react';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
 import { PiMinusCircleBold, PiPlusCircleBold } from 'react-icons/pi';
 import { IoArrowDownCircleOutline } from 'react-icons/io5';
-import { BsFunnelFill, BsSquareFill } from 'react-icons/bs';
+import { BsFunnelFill } from 'react-icons/bs';
 import ProductResults from './ProductResults';
 import { useSearchParams } from 'next/navigation';
-import { scrapePriceComparissonProducts } from '@/lib/scraper/price-comparisson';
 import { scrapeProductSearchPageML } from '@/lib/scraper/product-search-page-ml';
-import { Skeleton } from '@nextui-org/react';
 import { SyncLoader } from 'react-spinners';
 // import { XMarkIcon } from '@heroicons/react/24/outline';
 // import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
@@ -375,9 +373,15 @@ export default function ResultsCategory() {
         </div>
       ) : (
         <div className='flex justify-center m-auto items-center pt-20'>
-          <div className='mt-80 h-[50%]'>
-            <SyncLoader color='#e29656' />
-          </div>
+          <main className='mx-auto max-w-7xl px-4 pt-4 sm:px-6 lg:px-8 dark:bg-black'>
+            <div className='flex items-baseline justify-between border-b border-gray-200 pb-6 pt-24 dark:bg-black'>
+              <div className='flex justify-center align-center'>
+                <h1 className='text-4xl font-bold tracking-tight text-gray-900 dark:text-gray-200'>
+                  Buscando producto...
+                </h1>
+              </div>
+            </div>
+          </main>
         </div>
       )}
     </>

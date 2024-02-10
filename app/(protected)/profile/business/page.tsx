@@ -1,54 +1,51 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 type UserProfile = {
-	// Define the types for the user profile data
-	// (you can modify this based on the actual structure of your data)
-	id: number;
-	nickname: string;
-	registration_date: string;
-	// ... other fields
+  id: number;
+  nickname: string;
+  registration_date: string;
+  // ... other fields
 };
 
 type Props = {};
 
 const BusinessProfilePage = (props: Props) => {
-	const [userData, setUserData] = useState<UserProfile | null>(null);
+  const [userData, setUserData] = useState<UserProfile | null>(null);
 
-	useEffect(() => {
-		// Fetch user data from the Express server
-		const fetchData = async () => {
-			try {
-				const response = await axios.get("/api/mercadolibre");
-				console.log(response.data);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/mercadolibre');
+        console.log(response.data);
 
-				setUserData(response.data.data);
-			} catch (error) {
-				console.error("Error fetching user data:", error);
-			}
-		};
+        setUserData(response.data.data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
 
-		fetchData();
-	}, []);
+    fetchData();
+  }, []);
 
-	return (
-		<div>
-			<h1>Business Profile Page</h1>
-			{userData ? (
-				<div>
-					{/* Display user profile information here */}
-					<p>ID: {userData.id}</p>
-					<p>Nickname: {userData.nickname}</p>
-					<p>Registration Date: {userData.registration_date}</p>
-					{/* ... other fields */}
-				</div>
-			) : (
-				<p>Loading user data...</p>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      <h1>Business Profile Page</h1>
+      {userData ? (
+        <div>
+          {/* Display user profile information here */}
+          <p>ID: {userData.id}</p>
+          <p>Nickname: {userData.nickname}</p>
+          <p>Registration Date: {userData.registration_date}</p>
+          {/* ... other fields */}
+        </div>
+      ) : (
+        <p>Loading user data...</p>
+      )}
+    </div>
+  );
 };
 
 export default BusinessProfilePage;
