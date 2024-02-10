@@ -1,31 +1,33 @@
-'use client';
+"use client";
 
-import * as z from 'zod';
-import { useState, useTransition } from 'react';
-import { FaGoogle, FaGithub } from 'react-icons/fa';
-import { useForm } from 'react-hook-form';
-import Image from 'next/image';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { RegisterSchema } from '@/schemas';
-import CardWrapper from '../CardWrapper';
-import FormError from './FormError';
-import FormSuccess from './FormSuccess';
-import { Button } from '@tremor/react';
-import { register as registration } from '@/app/actions/register';
-import CountrySelect from './CountrySelect';
-import { Avatar, Input, Select, SelectItem } from '@nextui-org/react';
-import { TbEyeFilled } from 'react-icons/tb';
-import { IoMdEyeOff } from 'react-icons/io';
-import Link from 'next/link';
+import * as z from "zod";
+import { useState, useTransition } from "react";
+import { FaGoogle, FaGithub } from "react-icons/fa";
+import { useForm } from "react-hook-form";
+import Image from "next/image";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { RegisterSchema } from "@/schemas";
+import CardWrapper from "../CardWrapper";
+import FormError from "./FormError";
+import FormSuccess from "./FormSuccess";
+import { Button, Divider } from "@tremor/react";
+import { register as registration } from "@/app/actions/register";
+import CountrySelect from "./CountrySelect";
+import { Avatar, Input, Select, SelectItem } from "@nextui-org/react";
+import { TbEyeFilled } from "react-icons/tb";
+import { IoMdEyeOff } from "react-icons/io";
+import Link from "next/link";
+import { Social } from "./Social";
+import { BsCart } from "react-icons/bs";
 
 type Props = {};
 
 const mercadolibreAuthUrl: string =
-  'https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://savemelin.com/';
+  "https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://savemelin.com/";
 
 const RegisterForm = (props: Props) => {
-  const [error, setError] = useState<string | undefined>('');
-  const [success, setSuccess] = useState<string | undefined>('');
+  const [error, setError] = useState<string | undefined>("");
+  const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
   const [isVisible, setIsVisible] = useState(false);
 
@@ -38,16 +40,16 @@ const RegisterForm = (props: Props) => {
   } = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      name: '',
-      country: '',
+      email: "",
+      password: "",
+      name: "",
+      country: "",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     startTransition(() => {
       registration(values).then((data) => {
@@ -58,97 +60,133 @@ const RegisterForm = (props: Props) => {
   };
 
   return (
-    <div className='flex justify-center items-center h-screen'>
+    <div className="flex justify-center items-center h-screen">
       <CardWrapper
-        HeaderLabel='Crea una cuenta!'
-        backButtonHref='/sign-in'
-        backButtonLabel='Ya tienes una cuenta?'
+        HeaderLabel="Crea una cuenta!"
+        backButtonHref="/sign-in"
+        backButtonLabel="Ya tienes una cuenta?"
         showSocial
       >
-        <div className='flex justify-center mb-6'>
-          <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
-        </div>
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             <Input
-              id='email'
-              type='email'
-              label='Email'
-              variant='bordered'
+              id="email"
+              type="email"
+              label="Email"
+              variant="bordered"
               disabled={isPending}
-              placeholder='Ingresa tu correo'
-              {...register('email')}
-              className='max-w-xs'
+              placeholder="Ingresa tu correo"
+              {...register("email")}
+              className="max-w-xs"
             />
-            {errors.email && <span className='text-red-500'>{errors.email.message}</span>}
+            {errors.email && (
+              <span className="text-red-500">{errors.email.message}</span>
+            )}
           </div>
           <div>
             <Input
-              id='name'
-              type='name'
-              label='Nombre'
-              variant='bordered'
+              id="name"
+              type="name"
+              label="Nombre"
+              variant="bordered"
               disabled={isPending}
-              placeholder='Ingresa tu nombre'
-              {...register('name')}
-              className='max-w-xs'
+              placeholder="Ingresa tu nombre"
+              {...register("name")}
+              className="max-w-xs"
             />
-            {errors.name && <span className='text-red-500'>{errors.name.message}</span>}
+            {errors.name && (
+              <span className="text-red-500">{errors.name.message}</span>
+            )}
           </div>
           <div>
             <Input
-              id='password'
-              label='Contraseña'
-              variant='bordered'
+              id="password"
+              label="Contraseña"
+              variant="bordered"
               disabled={isPending}
-              placeholder='******'
-              {...register('password')}
+              placeholder="******"
+              {...register("password")}
               endContent={
-                <button className='focus:outline-none' type='button' onClick={toggleVisibility}>
+                <button
+                  className="focus:outline-none"
+                  type="button"
+                  onClick={toggleVisibility}
+                >
                   {isVisible ? (
-                    <IoMdEyeOff className='text-2xl text-default-400 pointer-events-none' />
+                    <IoMdEyeOff className="text-2xl text-default-400 pointer-events-none" />
                   ) : (
-                    <TbEyeFilled className='text-2xl text-default-400 pointer-events-none' />
+                    <TbEyeFilled className="text-2xl text-default-400 pointer-events-none" />
                   )}
                 </button>
               }
-              type={isVisible ? 'text' : 'password'}
-              className='max-w-xs'
+              type={isVisible ? "text" : "password"}
+              className="max-w-xs"
             />
-            {errors.password && <span className='text-red-500'>{errors.password.message}</span>}
+            {errors.password && (
+              <span className="text-red-500">{errors.password.message}</span>
+            )}
           </div>
 
           <div>
-            <Select className='max-w-xs' label='Seleccionar País' id='country' {...register('country')}>
+            <Select
+              className="max-w-xs"
+              label="Seleccionar País"
+              id="country"
+              {...register("country")}
+            >
               <SelectItem
-                key='argentina'
-                id='country'
-                {...register('country')}
-                startContent={<Avatar alt='Argentina' className='w-6 h-6' src='https://flagcdn.com/ar.svg' />}
+                key="argentina"
+                id="country"
+                {...register("country")}
+                startContent={
+                  <Avatar
+                    alt="Argentina"
+                    className="w-6 h-6"
+                    src="https://flagcdn.com/ar.svg"
+                  />
+                }
               >
                 Argentina
               </SelectItem>
               <SelectItem
-                key='brazil'
-                id='country'
-                {...register('country')}
-                startContent={<Avatar alt='Brazil' className='w-6 h-6' src='https://flagcdn.com/br.svg' />}
+                key="brazil"
+                id="country"
+                {...register("country")}
+                startContent={
+                  <Avatar
+                    alt="Brazil"
+                    className="w-6 h-6"
+                    src="https://flagcdn.com/br.svg"
+                  />
+                }
               >
                 Brasil
               </SelectItem>
               <SelectItem
-                key='colombia'
-                id='country'
-                {...register('country')}
-                startContent={<Avatar alt='Colombia' className='w-6 h-6' src='https://flagcdn.com/co.svg' />}
+                key="colombia"
+                id="country"
+                {...register("country")}
+                startContent={
+                  <Avatar
+                    alt="Colombia"
+                    className="w-6 h-6"
+                    src="https://flagcdn.com/co.svg"
+                  />
+                }
               >
                 Colombia
               </SelectItem>
               <SelectItem
-                key='uruguay'
-                id='country'
-                {...register('country')}
-                startContent={<Avatar alt='Uruguay' className='w-6 h-6' src='https://flagcdn.com/uy.svg' />}
+                key="uruguay"
+                id="country"
+                {...register("country")}
+                startContent={
+                  <Avatar
+                    alt="Uruguay"
+                    className="w-6 h-6"
+                    src="https://flagcdn.com/uy.svg"
+                  />
+                }
               >
                 Uruguay
               </SelectItem>
@@ -166,39 +204,41 @@ const RegisterForm = (props: Props) => {
           <FormSuccess message={success} />
           <div>
             <Button
-              type='submit'
-              size='md'
+              type="submit"
+              size="md"
               disabled={isPending}
-              className='w-full bg-primary hover:bg-secondary text-white font-semibold py-2 px-4 rounded-md transition duration-300'
+              className="inline-flex w-full mt-4 items-center justify-center space-x-2 rounded-tremor-default border border-tremor-border bg-primary py-2 text-tremor-content-strong shadow-tremor-input hover:bg-tremor-background-subtle dark:border-dark-tremor-border dark:bg-dark-tremor-background text-white hover:text-black dark:text-dark-tremor-content-strong dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-background-subtle"
             >
               Crear Cuenta
             </Button>
           </div>
         </form>
-        <div className='mt-4 flex justify-between items-center'>
-          <div>
-            {mercadolibreAuthUrl && (
-              <Link href={mercadolibreAuthUrl}>
-                <Button
-                  type='submit'
-                  size='md'
-                  disabled={isPending}
-                  className='w-full bg-primary hover:bg-secondary text-white font-semibold py-2 px-4 rounded-md transition duration-300'
-                >
-                  Eres Vendedor?
-                </Button>
-              </Link>
-            )}
-          </div>
-          <div className='flex items-center space-x-3'>
-            <button className='rounded-full bg-red-600 text-white p-2 hover:bg-red-700'>
-              <FaGoogle size={20} />
-            </button>
-            <button className='rounded-full bg-black text-white p-2 hover:bg-gray-800'>
-              <FaGithub size={20} />
-            </button>
-          </div>
-        </div>
+        <Divider className="block px-0 text-sm text-center font-normal text-gray-600 hover:text-primary focus:outline-none focus:text-blue-500"></Divider>
+        <Social />
+        <a
+          href={mercadolibreAuthUrl}
+          className="inline-flex w-full mt-2 items-center justify-center space-x-2 rounded-tremor-default border border-tremor-border bg-primary py-2 text-tremor-content-strong shadow-tremor-input hover:bg-tremor-background-subtle dark:border-dark-tremor-border dark:bg-dark-tremor-background text-white hover:text-black dark:text-dark-tremor-content-strong dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-background-subtle"
+        >
+          <BsCart className="h-5 w-5" aria-hidden={true} />
+          <span className="text-tremor-default font-medium">
+            Iniciar como vendedor
+          </span>
+        </a>
+        <p className="mt-4 text-tremor-label text-tremor-content dark:text-dark-tremor-content">
+          Al iniciar sesión, estas aceptando nuestros politicas de{" "}
+          {/* <a href="#" className="underline underline-offset-4">
+            terms of service
+          </a>{" "} */}
+          {/* and{" "} */}
+          <a
+            href="/privacy-policy"
+            className="underline underline-offset-4"
+            target="_blank"
+          >
+            privacidad
+          </a>
+          .
+        </p>
       </CardWrapper>
     </div>
   );
