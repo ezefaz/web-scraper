@@ -1,98 +1,223 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose";
+
+const identificationSchema = new mongoose.Schema({
+  type: {
+    type: String,
+  },
+  number: {
+    type: String,
+  },
+});
+
+const addressSchema = new mongoose.Schema({
+  state: {
+    type: String,
+  },
+  city: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
+  zip_code: {
+    type: String,
+  },
+});
+
+const phoneSchema = new mongoose.Schema({
+  area_code: {
+    type: String,
+  },
+  number: {
+    type: String,
+  },
+  extension: {
+    type: String,
+  },
+  verified: {
+    type: Boolean,
+  },
+});
+
+const alternativePhoneSchema = new mongoose.Schema({
+  area_code: {
+    type: String,
+  },
+  number: {
+    type: String,
+  },
+  extension: {
+    type: String,
+  },
+});
+
+const transactionsSchema = new mongoose.Schema({
+  period: {
+    type: String,
+  },
+  total: {
+    type: Number,
+  },
+  completed: {
+    type: Number,
+  },
+  canceled: {
+    type: Number,
+  },
+  ratings: {
+    positive: {
+      type: Number,
+    },
+    negative: {
+      type: Number,
+    },
+    neutral: {
+      type: Number,
+    },
+  },
+});
+
+const reputationSchema = new mongoose.Schema({
+  level_id: {
+    type: String,
+  },
+  power_seller_status: {
+    type: String,
+  },
+  transactions: transactionsSchema,
+});
+
+const statusSchema = new mongoose.Schema({
+  site_status: {
+    type: String,
+  },
+  list: {
+    allow: {
+      type: Boolean,
+    },
+    codes: [String],
+    immediate_payment: {
+      required: {
+        type: Boolean,
+      },
+      reasons: [String],
+    },
+  },
+  buy: {
+    allow: {
+      type: Boolean,
+    },
+    codes: [String],
+    immediate_payment: {
+      required: {
+        type: Boolean,
+      },
+      reasons: [String],
+    },
+  },
+  sell: {
+    allow: {
+      type: Boolean,
+    },
+    codes: [String],
+    immediate_payment: {
+      required: {
+        type: Boolean,
+      },
+      reasons: [String],
+    },
+  },
+  billing: {
+    allow: {
+      type: Boolean,
+    },
+    codes: [String],
+  },
+  mercadopago_tc_accepted: {
+    type: Boolean,
+  },
+  mercadoenvios: {
+    type: String,
+  },
+  immediate_payment: {
+    type: Boolean,
+  },
+  confirmed_email: {
+    type: Boolean,
+  },
+  user_type: {
+    type: String,
+  },
+  required_action: {
+    type: String,
+  },
+});
+
+const creditSchema = new mongoose.Schema({
+  consumed: {
+    type: Number,
+  },
+  credit_level_id: {
+    type: String,
+  },
+});
 
 const sellerSchema = new mongoose.Schema({
-	userId: {
-		type: String,
-	},
-	firstName: {
-		type: String,
-	},
-	lastName: {
-		type: String,
-	},
-	nickname: {
-		type: String,
-	},
-	email: {
-		type: String,
-	},
-	registration_date: {
-		type: Date,
-	},
-	logo: {
-		type: String,
-	},
-
-	country_id: {
-		type: String,
-	},
-	identification: {},
-	role: { type: String, enum: ["ADMIN", "USER"], default: "USER" },
-	gender: { type: String },
-	twoFactorConfirmation: {
-		type: Schema.Types.ObjectId,
-		ref: "TwoFactorConfirmation",
-	},
-	country: {
-		type: String,
-		enum: ["argentina", "brasil", "colombia", "uruguay"],
-		default: "argentina",
-	},
-	products: [
-		{
-			url: { type: String },
-			currency: { type: String },
-			image: { type: String },
-			title: { type: String },
-			currentPrice: { type: Number },
-			originalPrice: { type: Number },
-			currentDolar: {
-				value: { type: Number },
-				date: { type: Date, default: Date.now },
-			},
-			priceHistory: [
-				{
-					price: { type: Number },
-					date: { type: Date, default: Date.now },
-				},
-			],
-			dolarHistory: [
-				{
-					value: { type: Number },
-					date: { type: Date, default: Date.now },
-				},
-			],
-			lowestPrice: { type: Number },
-			highestPrice: { type: Number },
-			averagePrice: { type: Number },
-			discountRate: { type: Number },
-			description: { type: String },
-			category: { type: String },
-			reviewsCount: { type: Number },
-			stockAvailable: { type: String },
-			stars: { type: String },
-			isOutOfStock: { type: Boolean, default: false },
-			isFreeShipping: {
-				type: Boolean,
-			},
-			isFollowing: {
-				type: Boolean,
-			},
-			isFreeReturning: {
-				type: Boolean,
-			},
-			status: { type: String },
-		},
-	],
-	subscription: {
-		type: String,
-		default: "basic",
-	},
-	createdAt: {
-		type: Date,
-		default: Date.now,
-	},
+  id: {
+    type: Number,
+  },
+  nickname: {
+    type: String,
+  },
+  registration_date: {
+    type: Date,
+  },
+  first_name: {
+    type: String,
+  },
+  last_name: {
+    type: String,
+  },
+  country_id: {
+    type: String,
+  },
+  email: {
+    type: String,
+  },
+  identification: identificationSchema,
+  address: addressSchema,
+  phone: phoneSchema,
+  alternative_phone: alternativePhoneSchema,
+  user_type: {
+    type: String,
+  },
+  tags: [String],
+  logo: {
+    type: String,
+  },
+  points: {
+    type: Number,
+  },
+  site_id: {
+    type: String,
+  },
+  permalink: {
+    type: String,
+  },
+  seller_experience: {
+    type: String,
+  },
+  seller_reputation: reputationSchema,
+  buyer_reputation: {
+    canceled_transactions: {
+      type: Number,
+    },
+    transactions: transactionsSchema,
+    tags: [String],
+  },
+  status: statusSchema,
+  credit: creditSchema,
 });
 
 export default mongoose.models?.Seller ||
-	mongoose.model("Seller", sellerSchema);
+  mongoose.model("Seller", sellerSchema);
