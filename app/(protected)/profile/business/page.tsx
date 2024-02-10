@@ -1,51 +1,64 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useSearchParams } from "next/navigation";
+import { getMLUserCode } from "@/app/actions/get-ml-user-code";
 
 type UserProfile = {
-  id: number;
-  nickname: string;
-  registration_date: string;
-  // ... other fields
+	id: number;
+	first_name: string;
+	last_name: string;
+	nickname: string;
+	registration_date: string;
+	gender: string;
+	country_id: string;
+	email: string;
+	// ... other fields
 };
 
 type Props = {};
 
 const BusinessProfilePage = (props: Props) => {
-  const [userData, setUserData] = useState<UserProfile | null>(null);
+	const [userData, setUserData] = useState<UserProfile | null>(null);
+	const searchParams = useSearchParams();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('/api/mercadolibre');
-        console.log(response.data);
+	const code = searchParams.get("code");
 
-        setUserData(response.data.data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				// const response = await axios.get(`/api/mercadolibre?code0${code}`);
 
-    fetchData();
-  }, []);
+				const response: any = await getMLUserCode(code);
 
-  return (
-    <div>
-      <h1>Business Profile Page</h1>
-      {userData ? (
-        <div>
-          {/* Display user profile information here */}
-          <p>ID: {userData.id}</p>
-          <p>Nickname: {userData.nickname}</p>
-          <p>Registration Date: {userData.registration_date}</p>
-          {/* ... other fields */}
-        </div>
-      ) : (
-        <p>Loading user data...</p>
-      )}
-    </div>
-  );
+				setUserData(response);
+			} catch (error) {
+				console.error("Error fetching user data:", error);
+			}
+		};
+
+		fetchData();
+	}, []);
+
+	console.log("DATUUUN", userData);
+
+	return (
+		<div>
+			<h1>Business Profile Page</h1>
+			{userData ? (
+				<div>
+					{/* Display user profile information here */}
+					<p>Primer Nombre: {userData.first_name}</p>
+					<p>Nickname: {userData.nickname}</p>
+					<p>Registration Date: {userData.registration_date}</p>
+					{/* ... other fields */}
+				</div>
+			) : (
+				<p>Loading user data...</p>
+			)}
+		</div>
+	);
 };
 
 export default BusinessProfilePage;

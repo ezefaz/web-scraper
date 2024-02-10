@@ -27,6 +27,8 @@ export const authRoutes = [
 	"/error",
 	"/reset",
 	"/new-password",
+	"/api/mercadolibre",
+	"/profile/business",
 ];
 
 /**
