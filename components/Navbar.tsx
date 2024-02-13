@@ -30,6 +30,7 @@ const Navbar = () => {
         <div className="container ml-3 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-1 mt-2">
             {pathname == "/business" ||
+            pathname == "/business/products" ||
             pathname == "/business/settings" ? null : (
               <Image
                 src="/assets/icons/savemelin3.svg"
@@ -45,6 +46,7 @@ const Navbar = () => {
           pathname == "/business" ||
           pathname == "/business/settings" ||
           pathname == "/reset" ||
+          pathname == "/business/products" ||
           pathname == "/new-verification" ? null : (
             <div className="w-[55%] m-auto ml-7">
               <Searchbar />
