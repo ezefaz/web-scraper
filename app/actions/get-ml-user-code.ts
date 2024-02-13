@@ -9,7 +9,7 @@ const BACKEND_URL =
 	"https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business";
 
 const REDIRECT_URL =
-	"https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business";
+	"https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://4737-2800-40-3c-a31-fd2d-d9d1-b96e-62e4.ngrok-free.app/profile/business";
 
 export async function getMLUserCode(code: string | null) {
 	if (!code) {
@@ -23,7 +23,7 @@ export async function getMLUserCode(code: string | null) {
 		client_secret: String(process.env.MERCADOLIBRE_CLIENT_SECRET),
 		// client_secret: "ueOGFqfmUl1CGxl4dHHx5BIkU1AdbeC2",
 		redirect_uri:
-			"https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business",
+			"https://4737-2800-40-3c-a31-fd2d-d9d1-b96e-62e4.ngrok-free.app/profile/business",
 		code,
 	});
 
@@ -66,11 +66,12 @@ export async function getMLUserCode(code: string | null) {
 			email: sellerData.email,
 		});
 
-		console.log("EXISTE???", existingSeller);
-
 		if (existingSeller) {
-			console.log("Seller already exists:", existingSeller);
-			return { message: "Seller already exists." };
+			console.log("Seller already exists");
+			return {
+				error: "Cuenta vendedor ya existe! Porfavor inicie sesión.",
+				existingSeller,
+			};
 		}
 
 		// 4. Create seller on DB
@@ -97,16 +98,15 @@ export async function getMLUserCode(code: string | null) {
 			// buyer_reputation: sellerData.buyer_reputation,
 			// company: sellerData.company,
 		});
-		const savedSeller = await seller.save();
 
-		console.log("Seller saved:", savedSeller);
+		await seller.save();
 
-		return savedSeller;
+		return {
+			success: "La cuenta de vendedor fue creada correctamente!",
+		};
 	} catch (error) {
 		return {
 			error: "No se pudo obtener los datos de la cuenta de Mercadolibre.",
 		};
 	}
-
-	return code;
 }
