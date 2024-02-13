@@ -13,27 +13,6 @@ export async function getProductPage(userId: string) {
     return;
   }
 
-  // Get the current date
-  const currentDate = new Date();
-
-  // Set the first day of the current month
-  const firstDayOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    1
-  );
-
-  // Set the last day of the current month
-  const lastDayOfMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0
-  );
-
-  // Format dates to ISO strings
-  const dateFrom = firstDayOfMonth.toISOString();
-  const dateTo = lastDayOfMonth.toISOString();
-
   try {
     const response = await axios(
       `https://api.mercadolibre.com/users/${userId}/items/search`,

@@ -1,3 +1,5 @@
+import { getSeller } from "@/lib/actions";
+import { SellerProfile } from "@/types";
 import axios from "axios";
 
 // interface UserViewsResponse {
@@ -8,35 +10,72 @@ import axios from "axios";
 // 	visits_detail: any[];
 // }
 
-export async function getUserProducts(userId: string) {
-	if (!userId) {
-		return;
-	}
+export async function getUserProducts() {
+  const seller: SellerProfile = await getSeller();
+  const { access_token, id } = seller;
 
-	console.log("USUARIARA", userId);
+  try {
+    const response = await axios(
+      `https://api.mercadolibre.com/users/${id}/items/search`,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          accept: "application/json",
+          authorization: `Bearer ${access_token}`,
+        },
+      }
+    );
 
-	try {
-		const response = await axios(
-			`https://api.mercadolibre.com/users/${userId}/items/search`,
-			{
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded",
-					accept: "application/json",
+    let productsIds = await response.data;
 
-					Authorization: `Bearer ${accessToken}`,
-				},
-			}
-		);
+    if (!productsIds) {
+      return { error: "No se pudieron obtener los productos del usuario." };
+    }
 
-		let userProducts = await response.data;
+    const itemsQueryString = productsIds.results.slice(0, 2).join(",");
 
-		if (!userProducts) {
-			return { error: "No se pudieron obtener los productos del usuario." };
-		}
+    const itemsResponse = await axios.get(
+      `https://api.mercadolibre.com/items?ids=${itemsQueryString}`,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          accept: "application/json",
+          authorization: `Bearer ${seller.access_token}`,
+        },
+      }
+    );
 
-		return userProducts;
-	} catch (error) {
-		console.error("[ERROR_GETTING_USER_PRODUCTS]", error);
-		return { error: "Error al obtener los productos del usuario." };
-	}
+    const userProducts = itemsResponse.data;
+
+    if (!userProducts) {
+      return {
+        error:
+          "No se pudieron obtener los detalles de los productos del usuario.",
+      };
+    }
+
+    const simplifiedProducts = userProducts.map((product: any) => ({
+      id: product.body.id,
+      title: product.body.title,
+      category_id: product.body.category_id,
+      price: product.body.price,
+      base_price: product.body.base_price,
+      original_price: product.body.original_price,
+      currency_id: product.body.currency_id,
+      initial_quantity: product.body.initial_quantity,
+      available_quantity: product.body.available_quantity,
+      sold_quantity: product.body.sold_quantity,
+      listing_type_id: product.body.listing_type_id,
+      condition: product.body.condition,
+      permalink: product.body.permalink,
+      status: product.body.status,
+      warranty: product.body.warranty,
+      date_created: product.body.date_created,
+    }));
+
+    return simplifiedProducts;
+  } catch (error) {
+    console.error("[ERROR_GETTING_USER_PRODUCTS]", error);
+    return { error: "Error al obtener los productos del usuario." };
+  }
 }

@@ -1,132 +1,346 @@
-// 'use client';
+"use client";
+
+import { getUserProducts } from "@/app/actions/mercadolibre/get-user-products";
+import { getSeller } from "@/lib/actions";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeaderCell,
-	TableRow,
+  BadgeDelta,
+  Button,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+  Text,
 } from "@tremor/react";
+import { Fragment, useEffect, useState } from "react";
+import { BsArrowsExpand } from "react-icons/bs";
+import TableDropdown from "../TableDropdown";
+import { Dialog, Transition } from "@headlessui/react";
 
-const data = [
-	{
-		workspace: "sales_by_day_api",
-		owner: "John Doe",
-		status: "Live",
-		costs: "$3,509.00",
-		region: "US-West 1",
-		capacity: "99%",
-		lastEdited: "23/09/2023 13:00",
-	},
-	{
-		workspace: "marketing_campaign",
-		owner: "Jane Smith",
-		status: "Live",
-		costs: "$5,720.00",
-		region: "US-East 2",
-		capacity: "80%",
-		lastEdited: "22/09/2023 10:45",
-	},
-	{
-		workspace: "test_environment",
-		owner: "David Clark",
-		status: "Inactive",
-		costs: "$800.00",
-		region: "EU-Central 1",
-		capacity: "40%",
-		lastEdited: "25/09/2023 16:20",
-	},
-	{
-		workspace: "sales_campaign",
-		owner: "Jane Smith",
-		status: "Live",
-		costs: "$5,720.00",
-		region: "US-East 2",
-		capacity: "80%",
-		lastEdited: "22/09/2023 10:45",
-	},
-	{
-		workspace: "development_env",
-		owner: "Mike Johnson",
-		status: "Inactive",
-		costs: "$4,200.00",
-		region: "EU-West 1",
-		capacity: "60%",
-		lastEdited: "21/09/2023 14:30",
-	},
-	{
-		workspace: "new_workspace_1",
-		owner: "Alice Brown",
-		status: "Inactive",
-		costs: "$2,100.00",
-		region: "US-West 2",
-		capacity: "75%",
-		lastEdited: "24/09/2023 09:15",
-	},
-];
+export default function BusinessProductsTable({ userProducts }: any) {
+  const [isOpen, setIsOpen] = useState(false);
 
-export default function BusinessProductsTable(userProducts: any) {
-	return (
-		<>
-			<div className='p-20 sm:flex sm:items-center sm:justify-between sm:space-x-10'>
-				<div>
-					<h3 className='font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-						Listado de productos
-					</h3>
-					<p className='mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content'>
-						Pantallazo de todos los productos registrados en tu cuenta.
-					</p>
-				</div>
-				<button
-					type='button'
-					className='mt-4 w-full whitespace-nowrap rounded-tremor-small bg-tremor-brand px-4 py-2.5 text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis sm:mt-0 sm:w-fit'>
-					Publicar Producto
-				</button>
-			</div>
-			<Table className='mt-8'>
-				<TableHead>
-					<TableRow className='border-b border-tremor-border dark:border-dark-tremor-border'>
-						<TableHeaderCell className='text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-							Nombre
-						</TableHeaderCell>
-						<TableHeaderCell className='text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-							Owner
-						</TableHeaderCell>
-						<TableHeaderCell className='text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-							Status
-						</TableHeaderCell>
-						<TableHeaderCell className='text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-							Region
-						</TableHeaderCell>
-						<TableHeaderCell className='text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-							Capacity
-						</TableHeaderCell>
-						<TableHeaderCell className='text-right text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-							Precio
-						</TableHeaderCell>
-						<TableHeaderCell className='text-right text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-							Last edited
-						</TableHeaderCell>
-					</TableRow>
-				</TableHead>
-				<TableBody>
-					{data.map((item) => (
-						<TableRow
-							key={item.workspace}
-							className='even:bg-tremor-background-muted even:dark:bg-dark-tremor-background-muted'>
-							<TableCell className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-								{item.workspace}
-							</TableCell>
-							<TableCell>{item.owner}</TableCell>
-							<TableCell>{item.status}</TableCell>
-							<TableCell>{item.region}</TableCell>
-							<TableCell>{item.capacity}</TableCell>
-							<TableCell className='text-right'>{item.costs}</TableCell>
-							<TableCell className='text-right'>{item.lastEdited}</TableCell>
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-		</>
-	);
+  const openModal = () => setIsOpen(true);
+  const closeModal = () => setIsOpen(false);
+
+  console.log("A VER QUE HAY", userProducts);
+
+  return (
+    <>
+      <div className="p-20 sm:flex sm:items-center sm:justify-between sm:space-x-10">
+        <div>
+          <h3 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            Listado de productos
+          </h3>
+          <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+            En esta sección puedes observar todos los productos que has
+            publicado. <tr />
+            Además puedes publicar productos desde aquí mismo de una manera mas
+            sencilla y rápida.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="mt-4 w-full whitespace-nowrap rounded-tremor-small bg-tremor-brand px-4 py-2.5 text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis sm:mt-0 sm:w-fit"
+        >
+          Publicar Producto
+        </button>
+      </div>
+      <div className="w-45 ml-3 m-auto">
+        <Card className="relative mx-auto h-96 overflow-hidden w-full">
+          <Table className="w-full">
+            <TableHead>
+              <TableRow>
+                {/* <TableHeaderCell className="bg-white text-center">
+                  Imagen
+                </TableHeaderCell> */}
+                <TableHeaderCell className="bg-white text-center">
+                  Título
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Categoría
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Stock
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Precio ($)
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Condición
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Status
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Garantía
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Tipo de publicación
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Fecha de publicación
+                </TableHeaderCell>
+                <TableHeaderCell className="bg-white text-center">
+                  Acciones
+                </TableHeaderCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {userProducts?.map((product: any) => (
+                <TableRow
+                  key={product.id}
+                  className="hover:bg-gray-50 cursor-pointer"
+                >
+                  {/* <TableCell> */}
+                  {/* <Image
+                      src={product.thumbnail}
+                      alt={product.title}
+                      height={200}
+                      width={200}
+                    /> */}
+                  {/* </TableCell> */}
+                  <TableCell>
+                    <a
+                      className="text-blue-500 hover:underline"
+                      href={product.permalink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {product.title}
+                    </a>
+                  </TableCell>
+                  <TableCell>{product.category_id}</TableCell>
+                  <TableCell>
+                    <Text>
+                      {product.available_quantity == 1
+                        ? `${product.available_quantity} disponible`
+                        : product.available_quantity}
+                    </Text>
+                  </TableCell>
+                  <TableCell>
+                    <Text>{product.condition}</Text>
+                  </TableCell>
+                  <TableCell>
+                    <Text>{`${product.currency_id} ${product.price}`}</Text>
+                  </TableCell>
+                  <TableCell>
+                    <TableCell className="text-right">
+                      <BadgeDelta
+                        deltaType={
+                          product.status != "closed" ? "increase" : "unchanged"
+                        }
+                        size="xs"
+                      >
+                        {product.status == "closed" ? "Cerrado" : "Abierto"}
+                      </BadgeDelta>
+                    </TableCell>
+                  </TableCell>
+                  <TableCell>
+                    <TableCell className="text-right">
+                      <BadgeDelta
+                        deltaType={
+                          product.warranty != "Sin garantía"
+                            ? "increase"
+                            : "unchanged"
+                        }
+                        size="xs"
+                      >
+                        {product.warranty}
+                      </BadgeDelta>
+                    </TableCell>
+                  </TableCell>
+                  <TableCell>{product.listing_type_id}</TableCell>
+                  <TableCell>{product.date_created}</TableCell>
+                  <TableCell>
+                    <TableDropdown
+                      url={product.permalink}
+                      productId={product.id}
+                      isFollowing={product.isFollowing}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <div className="inset-x-0 bottom-0 flex justify-center bg-gradient-to-t mt-4 from-white pt-12 pb-8 absolute rounded-b-lg">
+            {userProducts.length > 3 ? (
+              <Button
+                icon={BsArrowsExpand}
+                className="bg-white shadow-md border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300"
+                onClick={openModal}
+              >
+                Mostrar Más
+              </Button>
+            ) : null}
+          </div>
+        </Card>
+      </div>
+
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-50" onClose={closeModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-gray-900 bg-opacity-25" />
+          </Transition.Child>
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className="w-[80%] transform overflow-hidden ring-tremor bg-white
+                                p-6 text-left align-middle shadow-tremor transition-all rounded-xl"
+                >
+                  <div className="relative mt-3 w-full">
+                    <Table className="h-[450px]">
+                      <TableHead>
+                        <TableRow>
+                          {/* <TableHeaderCell className="bg-white text-center">
+                  Imagen
+                </TableHeaderCell> */}
+                          <TableHeaderCell className="bg-white text-center">
+                            Título
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Categoría
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Stock
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Precio ($)
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Condición
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Status
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Garantía
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Tipo de publicación
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Fecha de publicación
+                          </TableHeaderCell>
+                          <TableHeaderCell className="bg-white text-center">
+                            Acciones
+                          </TableHeaderCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {userProducts?.map((product: any) => (
+                          <TableRow
+                            key={product.id}
+                            className="hover:bg-gray-50 cursor-pointer"
+                          >
+                            {/* <TableCell> */}
+                            {/* <Image
+                      src={product.thumbnail}
+                      alt={product.title}
+                      height={200}
+                      width={200}
+                    /> */}
+                            {/* </TableCell> */}
+                            <TableCell>
+                              <a
+                                className="text-blue-500 hover:underline"
+                                href={product.permalink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {product.title}
+                              </a>
+                            </TableCell>
+                            <TableCell>{product.category_id}</TableCell>
+                            <TableCell>
+                              <Text>
+                                {product.available_quantity == 1
+                                  ? `${product.available_quantity} disponible`
+                                  : product.available_quantity}
+                              </Text>
+                            </TableCell>
+                            <TableCell>
+                              <Text>{product.condition}</Text>
+                            </TableCell>
+                            <TableCell>
+                              <Text>{`${product.currency_id} ${product.price}`}</Text>
+                            </TableCell>
+                            <TableCell>
+                              <TableCell className="text-right">
+                                <BadgeDelta
+                                  deltaType={
+                                    product.status != "closed"
+                                      ? "increase"
+                                      : "unchanged"
+                                  }
+                                  size="xs"
+                                >
+                                  {product.status == "closed"
+                                    ? "Cerrado"
+                                    : "Abierto"}
+                                </BadgeDelta>
+                              </TableCell>
+                            </TableCell>
+                            <TableCell>
+                              <TableCell className="text-right">
+                                <BadgeDelta
+                                  deltaType={
+                                    product.warranty != "Sin garantía"
+                                      ? "increase"
+                                      : "unchanged"
+                                  }
+                                  size="xs"
+                                >
+                                  {product.warranty}
+                                </BadgeDelta>
+                              </TableCell>
+                            </TableCell>
+                            <TableCell>{product.listing_type_id}</TableCell>
+                            <TableCell>{product.date_created}</TableCell>
+                            <TableCell>
+                              <TableDropdown
+                                url={product.permalink}
+                                productId={product.id}
+                                isFollowing={product.isFollowing}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-b from-transparent to-white z-0 h-20 w-full" />
+                    </Table>
+                  </div>
+                  <Button
+                    className="mt-5 w-full bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300"
+                    onClick={closeModal}
+                  >
+                    Volver
+                  </Button>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    </>
+  );
 }

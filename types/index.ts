@@ -162,6 +162,7 @@ export type SellerProfile = {
   points: number;
   site_id: string;
   permalink: string;
+  access_token: string;
   seller_experience: string;
   seller_reputation: {
     level_id: string | null;
