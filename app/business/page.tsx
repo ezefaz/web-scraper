@@ -14,8 +14,6 @@ const BusinessPage = async (props: Props) => {
 
 	const transactions = foundSeller.seller_reputation.total;
 
-	console.log(foundSeller);
-
 	return <BusinessDashboard sales={transactions} />;
 };
 

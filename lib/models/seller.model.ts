@@ -122,6 +122,9 @@ const sellerSchema = new mongoose.Schema({
 	logo: {
 		type: String,
 	},
+	access_token: {
+		type: String,
+	},
 	// points: {
 	// 	type: Number,
 	// },
