@@ -13,167 +13,167 @@ import { getUserByEmail } from "@/data/user";
 import sellerModel from "../models/seller.model";
 
 export async function scrapeAndStoreProducts(productUrl: string) {
-	if (!productUrl) return;
+  if (!productUrl) return;
 
-	try {
-		connectToDb();
+  try {
+    connectToDb();
 
-		const scrapedProduct: any = await scrapeMLProduct(productUrl);
-		const currentUser = await getCurrentUser();
+    const scrapedProduct: any = await scrapeMLProduct(productUrl);
+    const currentUser = await getCurrentUser();
 
-		if (!scrapedProduct) return;
+    if (!scrapedProduct) return;
 
-		let product = scrapedProduct;
+    let product = scrapedProduct;
 
-		const existingProduct = await Product.findOne({ url: scrapedProduct.url });
+    const existingProduct = await Product.findOne({ url: scrapedProduct.url });
 
-		const userProducts =
-			scrapedProduct.users?.length > 0
-				? scrapedProduct.users.map((user: any) => {
-						user.products.push(scrapedProduct);
-						return user.products;
-				  })
-				: null;
+    const userProducts =
+      scrapedProduct.users?.length > 0
+        ? scrapedProduct.users.map((user: any) => {
+            user.products.push(scrapedProduct);
+            return user.products;
+          })
+        : null;
 
-		if (currentUser && existingProduct && !existingProduct.users) {
-			existingProduct.users = scrapedProduct.users;
-		}
+    if (currentUser && existingProduct && !existingProduct.users) {
+      existingProduct.users = scrapedProduct.users;
+    }
 
-		if (existingProduct) {
-			const updatedExistingUser = [
-				...existingProduct.users,
-				{ products: userProducts },
-			];
+    if (existingProduct) {
+      const updatedExistingUser = [
+        ...existingProduct.users,
+        { products: userProducts },
+      ];
 
-			const updatedDolar: CurrentDolar = scrapedProduct.currentDolar;
+      const updatedDolar: CurrentDolar = scrapedProduct.currentDolar;
 
-			const updatedDolarValue = scrapedProduct.currentDolar.value;
+      const updatedDolarValue = scrapedProduct.currentDolar.value;
 
-			const previousDolarHistory = existingProduct.dolarHistory || [];
+      const previousDolarHistory = existingProduct.dolarHistory || [];
 
-			const updatedPriceHistory: any = [
-				...existingProduct.priceHistory,
-				{ price: scrapedProduct.currentPrice },
-			];
+      const updatedPriceHistory: any = [
+        ...existingProduct.priceHistory,
+        { price: scrapedProduct.currentPrice },
+      ];
 
-			const updatedDolarHistory: any = [
-				...previousDolarHistory,
-				{ value: updatedDolarValue, date: new Date() },
-			];
+      const updatedDolarHistory: any = [
+        ...previousDolarHistory,
+        { value: updatedDolarValue, date: new Date() },
+      ];
 
-			product = {
-				...scrapedProduct,
-				priceHistory: updatedPriceHistory,
-				lowestPrice: getLowestPrice(updatedPriceHistory),
-				highestPrice: getHighestPrice(updatedPriceHistory),
-				averagePrice: getAveragePrice(updatedPriceHistory),
-				currentDolar: updatedDolar,
-				dolarHistory: updatedDolarHistory,
-				users: updatedExistingUser,
-			};
-		}
+      product = {
+        ...scrapedProduct,
+        priceHistory: updatedPriceHistory,
+        lowestPrice: getLowestPrice(updatedPriceHistory),
+        highestPrice: getHighestPrice(updatedPriceHistory),
+        averagePrice: getAveragePrice(updatedPriceHistory),
+        currentDolar: updatedDolar,
+        dolarHistory: updatedDolarHistory,
+        users: updatedExistingUser,
+      };
+    }
 
-		const newProduct = await Product.findOneAndUpdate(
-			{ url: scrapedProduct.url },
-			product,
-			{
-				upsert: true,
-				new: true,
-			}
-		);
+    const newProduct = await Product.findOneAndUpdate(
+      { url: scrapedProduct.url },
+      product,
+      {
+        upsert: true,
+        new: true,
+      }
+    );
 
-		if (currentUser) {
-			const user = await User.findOne({ email: currentUser.email });
+    if (currentUser) {
+      const user = await User.findOne({ email: currentUser.email });
 
-			if (user && user.products) {
-				const existingProduct = user.products.find(
-					(p: any) => p.url === scrapedProduct.url
-				);
+      if (user && user.products) {
+        const existingProduct = user.products.find(
+          (p: any) => p.url === scrapedProduct.url
+        );
 
-				if (!existingProduct) {
-					await User.findOneAndUpdate(
-						{ email: currentUser.email },
-						{ $addToSet: { products: scrapedProduct } }
-					);
-				}
-			}
-		}
+        if (!existingProduct) {
+          await User.findOneAndUpdate(
+            { email: currentUser.email },
+            { $addToSet: { products: scrapedProduct } }
+          );
+        }
+      }
+    }
 
-		revalidatePath(`/products/${newProduct._id}`);
-		return newProduct._id.toString();
-	} catch (error: any) {
-		throw new Error(`Failed to create/update product: ${error.message}`);
-	}
+    revalidatePath(`/products/${newProduct._id}`);
+    return newProduct._id.toString();
+  } catch (error: any) {
+    throw new Error(`Failed to create/update product: ${error.message}`);
+  }
 }
 
 export async function getProductByURL(url: string) {
-	try {
-		connectToDb();
+  try {
+    connectToDb();
 
-		const product = await Product.findOne({ url: url });
+    const product = await Product.findOne({ url: url });
 
-		if (!product) return;
+    if (!product) return;
 
-		return product;
-	} catch (error) {
-		console.log("[GET_PRODUCT_ID]", error);
-	}
+    return product;
+  } catch (error) {
+    console.log("[GET_PRODUCT_ID]", error);
+  }
 }
 
 export async function getAllProducts() {
-	try {
-		connectToDb();
+  try {
+    connectToDb();
 
-		const products = await Product.find();
+    const products = await Product.find();
 
-		return products;
-	} catch (error) {
-		console.log(error);
-	}
+    return products;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export async function getProductsForDashboard() {
-	try {
-		const products = await Product.find();
+  try {
+    const products = await Product.find();
 
-		const dashboardProducts = products.map((product) => ({
-			id: product._id.toString(),
-			image: product.image,
-			currentPrice: product.currentPrice,
-			stock: product.stockAvailable,
-			title: product.title,
-			createdAt: product.createdAt,
-			url: product.url,
-		}));
+    const dashboardProducts = products.map((product) => ({
+      id: product._id.toString(),
+      image: product.image,
+      currentPrice: product.currentPrice,
+      stock: product.stockAvailable,
+      title: product.title,
+      createdAt: product.createdAt,
+      url: product.url,
+    }));
 
-		return dashboardProducts;
-	} catch (error) {
-		console.log(error);
-		return [];
-	}
+    return dashboardProducts;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
 }
 
 export async function getUsersForDashboard() {
-	try {
-		const users = await User.find();
+  try {
+    const users = await User.find();
 
-		const dashboardUsers = users.map((user) => ({
-			id: user._id,
-			name: user.name,
-			email: user.email,
-			emailVerified: user.emailVerified
-				? user.emailVerified.toISOString()
-				: null,
-			products: user.products.length,
-			createdAt: user.createdAt ? user.createdAt.toISOString() : null,
-			role: user.role,
-		}));
+    const dashboardUsers = users.map((user) => ({
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      emailVerified: user.emailVerified
+        ? user.emailVerified.toISOString()
+        : null,
+      products: user.products.length,
+      createdAt: user.createdAt ? user.createdAt.toISOString() : null,
+      role: user.role,
+    }));
 
-		return dashboardUsers;
-	} catch (error) {
-		console.log(error);
-		return [];
-	}
+    return dashboardUsers;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
 }
 
 // export async function getUserProducts() {
@@ -202,235 +202,235 @@ export async function getUsersForDashboard() {
 // }
 
 export async function deleteProduct(productId: string) {
-	try {
-		await connectToDb();
-		const user: any = await getCurrentUser();
+  try {
+    await connectToDb();
+    const user: any = await getCurrentUser();
 
-		const productToDelete = user.products.find(
-			(product: any) => product._id.toString() === productId
-		);
+    const productToDelete = user.products.find(
+      (product: any) => product._id.toString() === productId
+    );
 
-		const updatedUser = await User.findOneAndUpdate(
-			{ _id: user._id },
-			{ $pull: { products: { _id: productId } } },
-			{ new: true }
-		);
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: user._id },
+      { $pull: { products: { _id: productId } } },
+      { new: true }
+    );
 
-		console.log(updatedUser);
+    console.log(updatedUser);
 
-		if (!updatedUser) {
-			throw new Error(
-				"User not found or product not present in the user's products array"
-			);
-		}
+    if (!updatedUser) {
+      throw new Error(
+        "User not found or product not present in the user's products array"
+      );
+    }
 
-		if (!productToDelete || !productToDelete.url) {
-			throw new Error("Product not found or missing URL");
-		}
+    if (!productToDelete || !productToDelete.url) {
+      throw new Error("Product not found or missing URL");
+    }
 
-		const deletedProduct = await Product.findOneAndDelete({
-			url: productToDelete.url,
-		});
+    const deletedProduct = await Product.findOneAndDelete({
+      url: productToDelete.url,
+    });
 
-		if (!deletedProduct) {
-			throw new Error("Product not found");
-		}
+    if (!deletedProduct) {
+      throw new Error("Product not found");
+    }
 
-		return deletedProduct.id;
-	} catch (error: any) {
-		throw new Error(`Failed to delete product: ${error.message}`);
-	}
+    return deletedProduct.id;
+  } catch (error: any) {
+    throw new Error(`Failed to delete product: ${error.message}`);
+  }
 }
 
 export async function getUserProducts() {
-	try {
-		await connectToDb();
-		const user: any = await getCurrentUser();
+  try {
+    await connectToDb();
+    const user: any = await getCurrentUser();
 
-		if (!user) return;
+    if (!user) return;
 
-		const userWithProducts = await User.findOne({ email: user.email }).populate(
-			"products"
-		);
+    const userWithProducts = await User.findOne({ email: user.email }).populate(
+      "products"
+    );
 
-		if (!userWithProducts) {
-			throw new Error("User not found");
-		}
+    if (!userWithProducts) {
+      throw new Error("User not found");
+    }
 
-		return userWithProducts.products;
-	} catch (error: any) {
-		throw new Error(`Failed to fetch user products: ${error.message}`);
-	}
+    return userWithProducts.products;
+  } catch (error: any) {
+    throw new Error(`Failed to fetch user products: ${error.message}`);
+  }
 }
 
 export async function searchUserProducts(searchTerm: string) {
-	try {
-		const user: any = await getCurrentUser();
+  try {
+    const user: any = await getCurrentUser();
 
-		if (!user) throw new Error("Usuario no encontrado");
+    if (!user) throw new Error("Usuario no encontrado");
 
-		const userProducts: Array<ProductType> = (await getUserProducts()) ?? [];
+    const userProducts: Array<ProductType> = (await getUserProducts()) ?? [];
 
-		if (!userProducts) console.log("El usuario no tiene productos.");
+    if (!userProducts) console.log("El usuario no tiene productos.");
 
-		const filteredProducts = userProducts.filter((product: any) =>
-			product.title.toLowerCase().includes(searchTerm.toLowerCase())
-		);
+    const filteredProducts = userProducts.filter((product: any) =>
+      product.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
-		return filteredProducts;
-	} catch (error: any) {
-		throw new Error(`Failed to search user products: ${error.message}`);
-	}
+    return filteredProducts;
+  } catch (error: any) {
+    throw new Error(`Failed to search user products: ${error.message}`);
+  }
 }
 
 export async function getSimilarProducts(productId: string) {
-	try {
-		await connectToDb();
-		const currentProduct = await Product.findById(productId);
+  try {
+    await connectToDb();
+    const currentProduct = await Product.findById(productId);
 
-		if (!currentProduct) return null;
+    if (!currentProduct) return null;
 
-		const similarProductsInSameCategory = await Product.find({
-			_id: { $ne: productId },
-			category: currentProduct.category,
-		}).limit(3);
+    const similarProductsInSameCategory = await Product.find({
+      _id: { $ne: productId },
+      category: currentProduct.category,
+    }).limit(3);
 
-		if (similarProductsInSameCategory.length === 0) {
-			const randomProducts = await Product.aggregate([
-				{ $sample: { size: 3 } },
-			]);
-			return randomProducts;
-		}
+    if (similarProductsInSameCategory.length === 0) {
+      const randomProducts = await Product.aggregate([
+        { $sample: { size: 3 } },
+      ]);
+      return randomProducts;
+    }
 
-		return similarProductsInSameCategory;
-	} catch (error) {
-		console.error(error);
-		throw new Error("Error fetching similar products");
-	}
+    return similarProductsInSameCategory;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error fetching similar products");
+  }
 }
 
 export async function addUserEmailToProduct(
-	productId: string,
-	userEmail: string
+  productId: string,
+  userEmail: string
 ) {
-	try {
-		const product = await getProductByURL(productId);
-		const user = await getUserByEmail(userEmail);
+  try {
+    const product = await getProductByURL(productId);
+    const user = await getUserByEmail(userEmail);
 
-		if (!product) return;
+    if (!product) return;
 
-		const userExists: boolean = product.users.some(
-			(user: UserType) => user.email === userEmail
-		);
-		const userProduct = user.products.find(
-			(p: ProductType) => p.url === product.url
-		);
+    const userExists: boolean = product.users.some(
+      (user: UserType) => user.email === userEmail
+    );
+    const userProduct = user.products.find(
+      (p: ProductType) => p.url === product.url
+    );
 
-		if (userExists) {
-			product.users.push({ email: userEmail, isFollowing: true });
+    if (userExists) {
+      product.users.push({ email: userEmail, isFollowing: true });
 
-			await product.save();
+      await product.save();
 
-			if (userProduct) {
-				userProduct.isFollowing = true;
+      if (userProduct) {
+        userProduct.isFollowing = true;
 
-				await user.save();
-			}
+        await user.save();
+      }
 
-			if (userProduct.isFollowing) {
-				const emailContent = await generateEmailBody(product, "WELCOME");
-				await sendEmail(emailContent, [userEmail]);
-			}
-		}
-	} catch (error) {
-		console.log("[ADD_USER_EMAIL_TO_PRODUCT]", error);
-	}
+      if (userProduct.isFollowing) {
+        const emailContent = await generateEmailBody(product, "WELCOME");
+        await sendEmail(emailContent, [userEmail]);
+      }
+    }
+  } catch (error) {
+    console.log("[ADD_USER_EMAIL_TO_PRODUCT]", error);
+  }
 }
 
 export async function getCurrentUser() {
-	try {
-		const session = await auth();
+  try {
+    const session = await auth();
 
-		if (!session) return null;
+    if (!session) return null;
 
-		const currentUserEmail = session.user?.email;
+    const currentUserEmail = session.user?.email;
 
-		const userDb = await User.findOne({ email: currentUserEmail });
+    const userDb = await User.findOne({ email: currentUserEmail });
 
-		return userDb;
-	} catch (error) {
-		console.log(error);
-		throw new Error("[GET_CURRENT_USER] Error retrieving the current user");
-	}
+    return userDb;
+  } catch (error) {
+    console.log(error);
+    throw new Error("[GET_CURRENT_USER] Error retrieving the current user");
+  }
 }
 
 export async function unfollowProduct(productId: string) {
-	const user = await getCurrentUser();
-	// const product = await getProductById(productId);
+  const user = await getCurrentUser();
+  // const product = await getProductById(productId);
 
-	try {
-		if (!user) return;
+  try {
+    if (!user) return;
 
-		// const userProduct: ProductType = await product.users.find((userProduct: any) => userProduct.email === user.email);
-		const userProduct = user.products.find(
-			(product: any) => product._id.toString() === productId
-		);
+    // const userProduct: ProductType = await product.users.find((userProduct: any) => userProduct.email === user.email);
+    const userProduct = user.products.find(
+      (product: any) => product._id.toString() === productId
+    );
 
-		if (userProduct) {
-			userProduct.isFollowing = false;
+    if (userProduct) {
+      userProduct.isFollowing = false;
 
-			await user.save();
-		}
-	} catch (error) {
-		console.log("[UNFOLLOW_PRODUCT_ERROR]", error);
-	}
+      await user.save();
+    }
+  } catch (error) {
+    console.log("[UNFOLLOW_PRODUCT_ERROR]", error);
+  }
 }
 
 export async function followProduct(productId: string) {
-	try {
-		const user = await getCurrentUser();
-		// const product = await getProductById(productId);
+  try {
+    const user = await getCurrentUser();
+    // const product = await getProductById(productId);
 
-		if (!user) {
-			console.log("Invalid parameters or missing data.");
-			return;
-		}
+    if (!user) {
+      console.log("Invalid parameters or missing data.");
+      return;
+    }
 
-		const isAlreadyFollowing = user.products.some(
-			(userProduct: any) =>
-				userProduct.email === user.email && userProduct.isFollowing
-		);
+    const isAlreadyFollowing = user.products.some(
+      (userProduct: any) =>
+        userProduct.email === user.email && userProduct.isFollowing
+    );
 
-		if (isAlreadyFollowing) {
-			console.log("User is already following this product.");
-			return;
-		}
+    if (isAlreadyFollowing) {
+      console.log("User is already following this product.");
+      return;
+    }
 
-		// const productUser = product.users.find((userProduct: any) => userProduct.email === user.email);
-		const productUser = user.products.find(
-			(product: any) => product._id.toString() === productId
-		);
+    // const productUser = product.users.find((userProduct: any) => userProduct.email === user.email);
+    const productUser = user.products.find(
+      (product: any) => product._id.toString() === productId
+    );
 
-		if (productUser && !productUser.isFollowing) {
-			productUser.isFollowing = true;
+    if (productUser && !productUser.isFollowing) {
+      productUser.isFollowing = true;
 
-			await user.save();
+      await user.save();
 
-			console.log("Successfully followed the product.");
-		}
-	} catch (error) {
-		console.log("[FOLLOW_PRODUCT_ERROR]", error);
-	}
+      console.log("Successfully followed the product.");
+    }
+  } catch (error) {
+    console.log("[FOLLOW_PRODUCT_ERROR]", error);
+  }
 }
 
 export async function getProductById(productId: string) {
-	const product = await Product.findById({ _id: productId });
+  const product = await Product.findById({ _id: productId });
 
-	if (!product) {
-		console.log("No se ha encontrado el producto");
-	}
+  if (!product) {
+    console.log("No se ha encontrado el producto");
+  }
 
-	return product;
+  return product;
 }
 
 // export async function addProductToDB(productUrl: string) {
@@ -439,22 +439,25 @@ export async function getProductById(productId: string) {
 //   const foundedProduct = await user.products?.map((product: ProductType) => productUrl === product.url);
 // }
 
-export async function getSeller(email: string) {
-	if (!email) return;
+export async function getSeller() {
+  try {
+    const currentUser: UserType = await getCurrentUser();
 
-	try {
-		const currentUser: UserType = await getCurrentUser();
+    const foundSeller = await sellerModel.find({ email: currentUser.email });
 
-		const foundSeller = await sellerModel.find({ email: currentUser.email });
+    if (!foundSeller || foundSeller.length === 0) {
+      return {
+        message:
+          "Las cuentas deben compartir el mismo correo. Puedes modificarlo en configuración!",
+      };
+    }
 
-		if (!foundSeller) {
-			return alert(
-				"Las cuentas deben tener el mismo correo. Puedes modificarlo en configuración!"
-			);
-		}
-
-		return foundSeller;
-	} catch (error) {
-		console.log("[ERROR_GETTING_SELLER]", error);
-	}
+    return foundSeller[0];
+  } catch (error) {
+    console.log("[ERROR_GETTING_SELLER]", error);
+    return {
+      error:
+        "Error al obtener el vendedor. Consulta los registros para más detalles.",
+    };
+  }
 }

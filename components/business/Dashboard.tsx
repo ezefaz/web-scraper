@@ -59,7 +59,7 @@ const kpiData: Kpi[] = [
     deltaType: "increase",
   },
   {
-    title: "Usuarios",
+    title: "Ventas",
     metric: "1,072",
     progress: 53.6,
     target: "2,000",
@@ -217,9 +217,9 @@ export default function BusinessDashboard() {
     yAxisWidth: 60,
   };
   return (
-    <main className="pt-20">
+    <main className="h-full p-20">
       <Title className="dark:text-white text-4xl">Dashboard</Title>
-      <Text>Información global acerca de SaveMelin.</Text>
+      <Text>Información global acerca de tu performance como vendedor.</Text>
       <TabGroup className="mt-6">
         <TabList>
           <Tab>General</Tab>
@@ -275,7 +275,7 @@ export default function BusinessDashboard() {
                         <TabList color="gray" variant="solid">
                           <Tab>Profit</Tab>
                           <Tab>Productos</Tab>
-                          <Tab>Usuarios</Tab>
+                          <Tab>Ventas</Tab>
                         </TabList>
                       </TabGroup>
                     </div>

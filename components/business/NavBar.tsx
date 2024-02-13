@@ -9,7 +9,7 @@ import { BsArrowsExpand, BsArrowsCollapse } from "react-icons/bs";
 
 const navigation = [
   { name: "Dashboard", href: "/business" },
-  { name: "Configuración", href: "/settings" },
+  { name: "Configuración", href: "/business/settings" },
 ];
 
 function classNames(...classes: string[]) {
