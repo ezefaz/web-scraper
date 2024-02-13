@@ -5,14 +5,15 @@
  */
 
 export const publicRoutes = [
-	"/",
-	"/new-verification",
-	"/api/cron",
-	"/products",
-	"/products/[id]",
-	"/products/local/[slug]",
-	"/products/international/[slug]",
-	"/privacy-policy",
+  "/",
+  "/new-verification",
+  "/api/cron",
+  "/products",
+  "/products/[id]",
+  "/products/local/[slug]",
+  "/products/international/[slug]",
+  "/privacy-policy",
+  "/profile/business",
 ];
 
 /**
@@ -22,13 +23,12 @@ export const publicRoutes = [
  */
 
 export const authRoutes = [
-	"/sign-in",
-	"/sign-up",
-	"/error",
-	"/reset",
-	"/new-password",
-	"/api/mercadolibre",
-	"/profile/business",
+  "/sign-in",
+  "/sign-up",
+  "/error",
+  "/reset",
+  "/new-password",
+  "/api/mercadolibre",
 ];
 
 /**

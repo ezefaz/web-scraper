@@ -69,12 +69,9 @@ export async function getMLUserCode(code: string | null) {
 		if (existingSeller) {
 			console.log("Seller already exists");
 			return {
-				error: "Cuenta vendedor ya existe! Porfavor inicie sesión.",
-				existingSeller,
+				message: "Cuenta vendedor ya existe! Porfavor inicie sesión.",
 			};
 		}
-
-		// 4. Create seller on DB
 
 		const seller = await sellerModel.create({
 			id: sellerData.id,

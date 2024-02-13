@@ -4,6 +4,35 @@ import { startTransition, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getMLUserCode } from "@/app/actions/get-ml-user-code";
 import { SellerProfile } from "@/types";
+import { MdCheckBoxOutlineBlank } from "react-icons/md";
+import { IoCloudyNight } from "react-icons/io5";
+import { IoMdCheckboxOutline } from "react-icons/io";
+
+const steps = [
+	{
+		id: 1,
+		type: "done",
+		title: "Iniciar sesión con Mercadolibre",
+		description: "Para comenzar, debes haberte logueado con tu cuenta.",
+		href: "#",
+	},
+	{
+		id: 2,
+		type: "in progress",
+		title: "Import data",
+		description:
+			"Connect your database to the new workspace by using one of 20+ database connectors.",
+		href: "#",
+	},
+	{
+		id: 3,
+		type: "open",
+		title: "Comienza a vender",
+		description:
+			"Una vez configurada tu cuenta ya puedes empezar a utilizar la plataforma.",
+		href: "#",
+	},
+];
 
 import { useSession } from "next-auth/react";
 import FormError from "@/components/auth/FormError";
