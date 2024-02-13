@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronFirst, ChevronLast, MoreVertical } from "lucide-react";
-import profile from "../assets/profile.png";
 import { createContext, useContext, useState } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import Link from "next/link";
