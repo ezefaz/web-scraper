@@ -2,7 +2,7 @@
 
 import { startTransition, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { getMLUserCode } from "@/app/actions/get-ml-user-code";
+import { getMLUserCode } from "@/app/actions/mercadolibre/get-ml-user-code";
 import { SellerProfile } from "@/types";
 import { MdCheckBoxOutlineBlank } from "react-icons/md";
 import { IoCloudyNight } from "react-icons/io5";
@@ -34,7 +34,6 @@ const steps = [
 	},
 ];
 
-import { useSession } from "next-auth/react";
 import FormError from "@/components/auth/FormError";
 import FormSuccess from "@/components/auth/FormSuccess";
 import { DotLoader } from "react-spinners";
@@ -55,8 +54,6 @@ const BusinessProfilePage = (props: Props) => {
 				const sellerCreated = await getMLUserCode(code);
 
 				console.log(sellerCreated);
-
-				// const data: SellerProfile = await response.data;
 			} catch (error) {
 				console.error("Error al crear la cuenta vendedor:", error);
 			}

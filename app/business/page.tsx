@@ -6,11 +6,17 @@ import React from "react";
 type Props = {};
 
 const BusinessPage = async (props: Props) => {
-  const foundSeller = await getSeller();
+	const foundSeller = await getSeller();
 
-  console.log(foundSeller);
+	if (!foundSeller) {
+		return alert("No se encontró vendedor");
+	}
 
-  return <BusinessDashboard />;
+	const transactions = foundSeller.seller_reputation.total;
+
+	console.log(foundSeller);
+
+	return <BusinessDashboard sales={transactions} />;
 };
 
 export default BusinessPage;

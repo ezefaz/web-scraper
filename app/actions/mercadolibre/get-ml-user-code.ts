@@ -6,10 +6,10 @@ import { SellerProfile } from "@/types";
 import axios from "axios";
 
 const BACKEND_URL =
-	"https://4486-2800-40-3c-a31-bd35-e231-a9db-75f2.ngrok-free.app/profile/business";
+	"https://84cf-2800-40-3c-a31-8942-f74e-cd92-a472.ngrok-free.app/profile/business";
 
 const REDIRECT_URL =
-	"https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://4737-2800-40-3c-a31-fd2d-d9d1-b96e-62e4.ngrok-free.app/profile/business";
+	"https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://84cf-2800-40-3c-a31-8942-f74e-cd92-a472.ngrok-free.app/profile/business";
 
 export async function getMLUserCode(code: string | null) {
 	if (!code) {
@@ -23,7 +23,7 @@ export async function getMLUserCode(code: string | null) {
 		client_secret: String(process.env.MERCADOLIBRE_CLIENT_SECRET),
 		// client_secret: "ueOGFqfmUl1CGxl4dHHx5BIkU1AdbeC2",
 		redirect_uri:
-			"https://4737-2800-40-3c-a31-fd2d-d9d1-b96e-62e4.ngrok-free.app/profile/business",
+			"https://84cf-2800-40-3c-a31-8942-f74e-cd92-a472.ngrok-free.app/profile/business",
 		code,
 	});
 
