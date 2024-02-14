@@ -1,8 +1,8 @@
 "use client";
 import Sidebar, { SidebarItem } from "@/components/business/Sidebar";
 import { FaHome, FaProductHunt } from "react-icons/fa";
-import { MdPayment, MdSettings } from "react-icons/md";
-import { PiLifebuoy } from "react-icons/pi";
+import { MdPayment, MdSettings, MdStart } from "react-icons/md";
+import { PiArrowsInLineVertical, PiLifebuoy } from "react-icons/pi";
 import { TbLayoutDashboard } from "react-icons/tb";
 import { usePathname } from "next/navigation";
 import { IoBusiness } from "react-icons/io5";
@@ -50,6 +50,12 @@ const BusinessLayout = ({ children }: BusinessPageProps) => {
             link="/business/billing"
           />
           <hr className="my-3" />
+          <SidebarItem
+            icon={<MdStart size={20} />}
+            text="Onboarding"
+            link="/business/onboarding"
+            active={pathname === "/business/onbording" ? true : false}
+          />
           <SidebarItem
             icon={<MdSettings size={20} />}
             text="Configuración"
