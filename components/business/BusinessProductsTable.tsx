@@ -19,6 +19,7 @@ import { BsArrowsExpand } from "react-icons/bs";
 import TableDropdown from "../TableDropdown";
 import { Dialog, Transition } from "@headlessui/react";
 import BusinessProductBadge from "./BusinessProductBadge";
+import PublishProductModal from "./PublishProductModal";
 
 export default function BusinessProductsTable({ userProducts }: any) {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,8 +30,6 @@ export default function BusinessProductsTable({ userProducts }: any) {
   const soldProducts = userProducts.filter(
     (product: any) => product.sold_quantity > 0
   );
-
-  console.log("A VER QUE HAY", soldProducts);
 
   return (
     <>
@@ -50,9 +49,10 @@ export default function BusinessProductsTable({ userProducts }: any) {
           />
         </div>
         <div className="mt-3">
-          <Button className="whitespace-nowrap rounded-tremor-small bg-primary text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-secondary dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis">
+          {/* <Button className="whitespace-nowrap rounded-tremor-small bg-primary text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-secondary dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis">
             Publicar Producto
-          </Button>
+          </Button> */}
+          <PublishProductModal />
         </div>
       </div>
       <div className="w-45 ml-3 flex items-start">
