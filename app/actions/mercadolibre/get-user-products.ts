@@ -32,7 +32,7 @@ export async function getUserProducts() {
       return { error: "No se pudieron obtener los productos del usuario." };
     }
 
-    const itemsQueryString = productsIds.results.slice(0, 2).join(",");
+    const itemsQueryString = productsIds.results.slice(0, 20).join(",");
 
     const itemsResponse = await axios.get(
       `https://api.mercadolibre.com/items?ids=${itemsQueryString}`,

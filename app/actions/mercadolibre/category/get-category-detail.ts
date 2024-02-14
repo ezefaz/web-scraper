@@ -9,11 +9,12 @@ import axios from "axios";
 // 	visits_detail: any[];
 // }
 
-export async function getMLCategories(siteId: string) {
+export async function getCategoryDetail(categoryId: string) {
   const { access_token } = await getSeller();
+
   try {
     const response = await axios(
-      `https://api.mercadolibre.com/sites/${siteId}/categories`,
+      `https://api.mercadolibre.com/categories/${categoryId}`,
       {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -23,15 +24,15 @@ export async function getMLCategories(siteId: string) {
       }
     );
 
-    let categories = await response.data;
+    let category = await response.data;
 
-    if (!categories) {
+    if (!category) {
       return { error: "No se pudieron obtener las categorias." };
     }
 
-    return categories;
+    return category;
   } catch (error) {
-    console.error("[ERROR_GETTING_CATEGORIES]", error);
-    return { error: "Error al obtener las categorias disponisbles del sitio." };
+    console.error("[ERROR_GETTING_CATEGORY]", error);
+    return { error: "Error al obtener la categoría." };
   }
 }

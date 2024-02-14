@@ -243,3 +243,8 @@ export type SellerProfile = {
     credit_level_id: string;
   };
 };
+
+export type Category = {
+  id: string;
+  name: string;
+};

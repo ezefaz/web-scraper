@@ -18,6 +18,7 @@ import { Fragment, useEffect, useState } from "react";
 import { BsArrowsExpand } from "react-icons/bs";
 import TableDropdown from "../TableDropdown";
 import { Dialog, Transition } from "@headlessui/react";
+import BusinessProductBadge from "./BusinessProductBadge";
 
 export default function BusinessProductsTable({ userProducts }: any) {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,32 +26,38 @@ export default function BusinessProductsTable({ userProducts }: any) {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  console.log("A VER QUE HAY", userProducts);
+  const soldProducts = userProducts.filter(
+    (product: any) => product.sold_quantity > 0
+  );
+
+  console.log("A VER QUE HAY", soldProducts);
 
   return (
     <>
-      <div className="p-20 sm:flex sm:items-center sm:justify-between sm:space-x-10">
-        <div>
-          <h3 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-            Listado de productos
-          </h3>
-          <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-            En esta sección puedes observar todos los productos que has
-            publicado. <tr />
-            Además puedes publicar productos desde aquí mismo de una manera mas
-            sencilla y rápida.
-          </p>
+      <div className="p-5 w-full flex flex-col items-start">
+        <h3 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong text-lg">
+          Listado de productos
+        </h3>
+        <p className="mt-2 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+          En esta sección puedes observar todos los productos que has publicado.{" "}
+          Además, puedes publicar productos desde aquí mismo de una manera más
+          sencilla y rápida.
+        </p>
+        <div className="mt-3">
+          <BusinessProductBadge
+            soldProducts={soldProducts}
+            totalProducts={userProducts.length}
+          />
         </div>
-        <button
-          type="button"
-          className="mt-4 w-full whitespace-nowrap rounded-tremor-small bg-tremor-brand px-4 py-2.5 text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis sm:mt-0 sm:w-fit"
-        >
-          Publicar Producto
-        </button>
+        <div className="mt-3">
+          <Button className="whitespace-nowrap rounded-tremor-small bg-primary text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-secondary dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis">
+            Publicar Producto
+          </Button>
+        </div>
       </div>
-      <div className="w-45 ml-3 m-auto">
-        <Card className="relative mx-auto h-96 overflow-hidden w-full">
-          <Table className="w-full">
+      <div className="w-45 ml-3 flex items-start">
+        <Card className="relative w-[60%] flex justify-start items-start mx-auto h-96 overflow-hidden ">
+          <Table className="w-[100%]">
             <TableHead>
               <TableRow>
                 {/* <TableHeaderCell className="bg-white text-center">
@@ -66,10 +73,10 @@ export default function BusinessProductsTable({ userProducts }: any) {
                   Stock
                 </TableHeaderCell>
                 <TableHeaderCell className="bg-white text-center">
-                  Precio ($)
+                  Condición
                 </TableHeaderCell>
                 <TableHeaderCell className="bg-white text-center">
-                  Condición
+                  Precio ($)
                 </TableHeaderCell>
                 <TableHeaderCell className="bg-white text-center">
                   Status
@@ -166,7 +173,7 @@ export default function BusinessProductsTable({ userProducts }: any) {
             </TableBody>
           </Table>
           <div className="inset-x-0 bottom-0 flex justify-center bg-gradient-to-t mt-4 from-white pt-12 pb-8 absolute rounded-b-lg">
-            {userProducts.length > 3 ? (
+            {userProducts.length > 5 ? (
               <Button
                 icon={BsArrowsExpand}
                 className="bg-white shadow-md border-gray-200 text-gray-500 hover:bg-gray-50 hover:border-gray-300"
@@ -224,10 +231,10 @@ export default function BusinessProductsTable({ userProducts }: any) {
                             Stock
                           </TableHeaderCell>
                           <TableHeaderCell className="bg-white text-center">
-                            Precio ($)
+                            Condición
                           </TableHeaderCell>
                           <TableHeaderCell className="bg-white text-center">
-                            Condición
+                            Precio ($)
                           </TableHeaderCell>
                           <TableHeaderCell className="bg-white text-center">
                             Status
