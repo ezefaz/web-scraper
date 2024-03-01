@@ -49,6 +49,7 @@ const Navbar = () => {
           pathname == "/reset" ||
           pathname == "/business/products" ||
           pathname == "/business/onboarding" ||
+          pathname == "/business/clients" ||
           pathname == "/new-verification" ? null : (
             <div className="w-[55%] m-auto ml-7">
               <Searchbar />
