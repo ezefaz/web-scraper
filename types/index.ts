@@ -248,3 +248,10 @@ export type Category = {
   id: string;
   name: string;
 };
+
+export enum STEPS {
+  CATEGORY = 0,
+  INFO = 1,
+  IMAGES = 2,
+  PRICE = 3,
+}

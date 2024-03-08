@@ -10,7 +10,7 @@ import axios from "axios";
 // 	visits_detail: any[];
 // }
 
-export async function getUserProducts() {
+export async function getSellerProducts() {
   const seller: SellerProfile = await getSeller();
   const { access_token, id } = seller;
 

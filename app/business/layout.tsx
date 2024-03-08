@@ -7,6 +7,7 @@ import { TbLayoutDashboard } from "react-icons/tb";
 import { usePathname } from "next/navigation";
 import { IoBusiness } from "react-icons/io5";
 import { BsPerson } from "react-icons/bs";
+import PublishProductModal from "@/components/business/modal/PublishProductModal";
 
 interface BusinessPageProps {
   children: React.ReactNode;
@@ -68,6 +69,9 @@ const BusinessLayout = ({ children }: BusinessPageProps) => {
             link="/business"
             active={pathname === "/business/help" ? true : false}
           />
+          <div className="hidden">
+            <PublishProductModal />
+          </div>
         </Sidebar>
         {children}
       </div>

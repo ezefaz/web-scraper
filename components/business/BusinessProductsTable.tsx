@@ -1,7 +1,5 @@
 "use client";
 
-import { getUserProducts } from "@/app/actions/mercadolibre/get-user-products";
-import { getSeller } from "@/lib/actions";
 import {
   BadgeDelta,
   Button,
@@ -19,7 +17,7 @@ import { BsArrowsExpand } from "react-icons/bs";
 import TableDropdown from "../TableDropdown";
 import { Dialog, Transition } from "@headlessui/react";
 import BusinessProductBadge from "./BusinessProductBadge";
-import PublishProductModal from "./PublishProductModal";
+import PublishProductModal from "./modal/PublishProductModal";
 
 export default function BusinessProductsTable({ userProducts }: any) {
   const [isOpen, setIsOpen] = useState(false);
