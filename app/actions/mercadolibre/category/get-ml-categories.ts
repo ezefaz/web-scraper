@@ -10,28 +10,38 @@ import axios from "axios";
 // }
 
 export async function getMLCategories(siteId: string) {
-  const { access_token } = await getSeller();
-  try {
-    const response = await axios(
-      `https://api.mercadolibre.com/sites/${siteId}/categories`,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          accept: "application/json",
-          Authorization: `Bearer ${access_token}`,
-        },
-      }
-    );
+	const { access_token } = await getSeller();
 
-    let categories = await response.data;
+	try {
+		const response = await axios(
+			`https://api.mercadolibre.com/sites/${siteId}/categories`,
+			{
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					accept: "application/json",
+					Authorization: `Bearer ${access_token}`,
+				},
+			}
+		);
 
-    if (!categories) {
-      return { error: "No se pudieron obtener las categorias." };
-    }
+		console.log("DATINES", response.data);
 
-    return categories;
-  } catch (error) {
-    console.error("[ERROR_GETTING_CATEGORIES]", error);
-    return { error: "Error al obtener las categorias disponisbles del sitio." };
-  }
+		let categories = await response.data;
+
+		console.log("OBTENIENDO DATOS", categories);
+
+		if (!categories) {
+			return { error: "No se pudieron obtener las categorias." };
+		}
+
+		const formattedCategories = categories.map((category: any) => ({
+			id: category.id,
+			name: category.name,
+		}));
+
+		return formattedCategories;
+	} catch (error) {
+		console.error("[ERROR_GETTING_CATEGORIES]", error);
+		return { error: "Error al obtener las categorias disponibles del sitio." };
+	}
 }
