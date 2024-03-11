@@ -42,10 +42,7 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 			link = "https://listado.mercadolibre.com.co";
 		}
 
-		console.log("NOMBRE", countryName);
-
 		const searchUrl = `${link}/${productTitle}`;
-		console.log("enlace", searchUrl);
 
 		const response = await axios.get(searchUrl);
 

@@ -4,6 +4,7 @@ import BusinessProductsTable from "@/components/business/BusinessProductsTable";
 import { getSeller } from "@/lib/actions";
 import { InitialProductDialog } from "@/components/business/modal/InitialProductDialog";
 import { getMLCategories } from "@/app/actions/mercadolibre/category/get-ml-categories";
+import NoData from "@/components/NoData";
 
 type Props = {};
 
@@ -13,7 +14,15 @@ const BusinessProductsPage = async (props: Props) => {
 	return (
 		<div className='pt-20'>
 			<InitialProductDialog />
-			<BusinessProductsTable userProducts={userProducts} />
+			{userProducts ? (
+				<div>
+					<NoData />
+				</div>
+			) : (
+				<>
+					<BusinessProductsTable userProducts={userProducts} />
+				</>
+			)}
 		</div>
 	);
 };

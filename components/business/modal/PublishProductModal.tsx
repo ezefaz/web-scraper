@@ -10,12 +10,61 @@ import {
 	useDisclosure,
 	Input,
 	Select,
+	SelectItem,
 } from "@nextui-org/react";
 
 import useProductModal from "@/hooks/use-product-modal";
 import { STEPS } from "@/types";
 import CategoryInput from "../inputs/CategoryInput";
 import { FieldValues, useForm } from "react-hook-form";
+import ImageUpload from "../ImageUpload";
+import DescriptionInput from "../inputs/DescriptionInput";
+
+const conditions = [
+	{
+		id: "2230284",
+		name: "Nuevo",
+	},
+	{
+		id: "2230581",
+		name: "Usado",
+	},
+	{
+		id: "2230582",
+		name: "Reacondicionado",
+	},
+];
+
+const genders = [
+	{
+		id: "339665",
+		name: "Mujer",
+	},
+	{
+		id: "339666",
+		name: "Hombre",
+	},
+	{
+		id: "339668",
+		name: "Niñas",
+	},
+	{
+		id: "339667",
+		name: "Niños",
+	},
+	{
+		id: "110461",
+		name: "Sin género",
+	},
+	{
+		id: "19159491",
+		name: "Sin género infantil",
+	},
+	{
+		id: "371795",
+		name: "Bebés",
+	},
+];
 
 export default function PublishProductModal() {
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -36,12 +85,14 @@ export default function PublishProductModal() {
 			available_quantity: 1,
 			condition: "",
 			pictures: "",
+			gender: "",
 			attributes: [],
 			price: "1",
 		},
 	});
 
 	const category = watch("category");
+	const pictures = watch("pictures");
 
 	const setCustomValue = (id: string, value: any) => {
 		setValue(id, value, {
@@ -91,9 +142,16 @@ export default function PublishProductModal() {
 					<Select
 						variant='underlined'
 						label='Condición'
-						placeholder='En qué condición se encuentra el producto?'
+						placeholder='En cual condición se encuentra su producto?'
 						className='max-w-xs'
-					/>
+						{...register("condition")}>
+						{conditions &&
+							conditions.map((condition: any) => (
+								<SelectItem key={condition.id} value={condition.id}>
+									{condition.name}
+								</SelectItem>
+							))}
+					</Select>
 				</ModalBody>
 				<ModalFooter>
 					<Button
@@ -120,20 +178,127 @@ export default function PublishProductModal() {
 					</ModalHeader>
 					<ModalBody>
 						<Input
-							autoFocus
-							label='Título'
-							placeholder='Ej: Microondas Grill BGH Quick Chef B223D plata 23L 220V'
-							variant='bordered'
-						/>
-						<CategoryInput
-							label='Seleccionar categoría'
-							onClick={(category) => setCustomValue("category", category)}
+							type='number'
+							variant='underlined'
+							label='Stock'
+							placeholder='1'
+							labelPlacement='outside'
+							defaultValue='1'
+							aria-valuemin={1}
+							endContent={
+								<div className='pointer-events-none flex items-center'>
+									<span className='text-default-400 text-small'>Q</span>
+								</div>
+							}
 						/>
 						<Select
 							variant='underlined'
-							label='Condición'
-							placeholder='En qué condición se encuentra el producto?'
+							label='Género'
+							placeholder='Seleccione el género'
 							className='max-w-xs'
+							{...register("gender")}>
+							{genders &&
+								genders.map((gender: any) => (
+									<SelectItem key={gender.id} value={gender.id}>
+										{gender.name}
+									</SelectItem>
+								))}
+						</Select>
+
+						<DescriptionInput />
+					</ModalBody>
+					<ModalFooter>
+						<Button color='danger' variant='flat' onPress={onBack}>
+							{secondaryActionLabel}
+						</Button>
+						<Button color='primary' onPress={onNext}>
+							{actionLabel}
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</div>
+		);
+	}
+
+	if (step === STEPS.IMAGES) {
+		bodyContent = (
+			<div>
+				<ModalContent>
+					<ModalHeader className='flex flex-col gap-1'>
+						Suba las imagenes
+					</ModalHeader>
+					<ModalBody>
+						<ImageUpload
+							onChange={(value) => setCustomValue("pictures", value)}
+							value={pictures}
+						/>
+						{/* <Input
+							label='Stock'
+							onClick={(stock) => setCustomValue("available_quantity", stock)}
+						/> */}
+					</ModalBody>
+					<ModalFooter>
+						<Button color='danger' variant='flat' onPress={onBack}>
+							{secondaryActionLabel}
+						</Button>
+						<Button color='primary' onPress={onNext}>
+							{actionLabel}
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</div>
+		);
+	}
+
+	if (step === STEPS.ATTRIBUTES) {
+		bodyContent = (
+			<div>
+				<ModalContent>
+					<ModalHeader className='flex flex-col gap-1'>
+						Atributos del Producto
+					</ModalHeader>
+					<ModalBody>
+						<Input
+							type='number'
+							label='Atributos'
+							placeholder='0.00'
+							labelPlacement='outside'
+							startContent={
+								<div className='pointer-events-none flex items-center'>
+									<span className='text-default-400 text-small'>$</span>
+								</div>
+							}
+						/>
+					</ModalBody>
+					<ModalFooter>
+						<Button color='danger' variant='flat' onPress={onBack}>
+							{secondaryActionLabel}
+						</Button>
+						<Button color='primary' onPress={onNext}>
+							{actionLabel}
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</div>
+		);
+	}
+
+	if (step === STEPS.PRICE) {
+		bodyContent = (
+			<div>
+				<ModalContent>
+					<ModalHeader className='flex flex-col gap-1'>Precios</ModalHeader>
+					<ModalBody>
+						<Input
+							type='number'
+							label='Price'
+							placeholder='0.00'
+							labelPlacement='outside'
+							startContent={
+								<div className='pointer-events-none flex items-center'>
+									<span className='text-default-400 text-small'>$</span>
+								</div>
+							}
 						/>
 					</ModalBody>
 					<ModalFooter>

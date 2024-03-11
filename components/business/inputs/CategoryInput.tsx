@@ -23,7 +23,6 @@ const CategoryInput: React.FC<CategoryInputProps> = ({
 				const fetchedCategories = await getMLCategories("MLA");
 
 				if (!fetchedCategories.error) {
-					// If categories are successfully obtained
 					setCategories(
 						fetchedCategories.map((category: any) => ({
 							id: category.id,
