@@ -41,7 +41,8 @@ import { DotLoader } from "react-spinners";
 type Props = {};
 
 const BusinessProfilePage = (props: Props) => {
-	const [userData, setUserData] = useState<SellerProfile | null>(null);
+	// const [userData, setUserData] = useState<SellerProfile | null>(null);
+	const [isCreated, setIsCreated] = useState<boolean>(false);
 	const [error, setError] = useState<string | undefined>();
 	const [success, setSuccess] = useState<string | undefined>();
 	const searchParams = useSearchParams();
@@ -54,6 +55,7 @@ const BusinessProfilePage = (props: Props) => {
 				const sellerCreated = await getMLUserCode(code);
 
 				console.log(sellerCreated);
+				setIsCreated(true);
 			} catch (error) {
 				console.error("Error al crear la cuenta vendedor:", error);
 			}
@@ -64,11 +66,12 @@ const BusinessProfilePage = (props: Props) => {
 
 	return (
 		<div>
-			{userData ? (
+			{isCreated ? (
 				<div>
 					<h1>Cuenta creada con éxito.</h1>
 					<p>
-						Porfavor termine de configurar su cuenta <span>aquí.</span>
+						Porfavor termine de configurar su cuenta{" "}
+						<a href='/business/settings'>aquí.</a>
 					</p>
 
 					<FormError message={error} />

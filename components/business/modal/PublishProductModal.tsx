@@ -291,8 +291,8 @@ export default function PublishProductModal() {
 					<ModalBody>
 						<Input
 							type='number'
-							label='Price'
-							placeholder='0.00'
+							label='Precio'
+							placeholder='10000'
 							labelPlacement='outside'
 							startContent={
 								<div className='pointer-events-none flex items-center'>

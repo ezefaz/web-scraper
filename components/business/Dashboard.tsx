@@ -167,14 +167,20 @@ const deltaTypes: { [key: string]: DeltaType } = {
 
 interface BusinessDashboardProps {
 	sales: string | undefined;
+	soldProducts: number;
+	userProducts: number;
 }
 
-export default function BusinessDashboard({ sales }: BusinessDashboardProps) {
+export default function BusinessDashboard({
+	sales,
+	soldProducts,
+	userProducts,
+}: BusinessDashboardProps) {
 	const kpiData: Kpi[] = [
 		{
 			title: "Productos",
 			metric: sales,
-			progress: 15.9,
+			progress: userProducts,
 			target: "$ 80,000",
 			delta: "13.2%",
 			deltaType: "moderateIncrease",
@@ -190,7 +196,7 @@ export default function BusinessDashboard({ sales }: BusinessDashboardProps) {
 		{
 			title: "Ventas",
 			metric: sales,
-			progress: 53.6,
+			progress: soldProducts,
 			target: "2,000",
 			delta: "10.1%",
 			deltaType: "moderateDecrease",
@@ -246,8 +252,8 @@ export default function BusinessDashboard({ sales }: BusinessDashboardProps) {
 										</BadgeDelta>
 									</Flex>
 									<Flex className='mt-4 space-x-2'>
-										<Text className='truncate'>{`${item.progress}% (${item.metric})`}</Text>
-										<Text className='truncate'>{item.target}</Text>
+										<Text className='truncate'>{`${item.progress} productos`}</Text>
+										{/* <Text className='truncate'>{item.target}</Text> */}
 									</Flex>
 									<ProgressBar value={item.progress} className='mt-2' />
 								</Card>

@@ -14,7 +14,7 @@ const BusinessProductsPage = async (props: Props) => {
 	return (
 		<div className='pt-20'>
 			<InitialProductDialog />
-			{userProducts ? (
+			{!userProducts ? (
 				<div>
 					<NoData />
 				</div>
