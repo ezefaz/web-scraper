@@ -10,6 +10,10 @@ interface ComparedProduct {
   price: number;
   image: string;
   dolarPrice: number;
+  source: 'mercadolibre' | 'google-shopping';
+  domain: string;
+  trustScore: number;
+  trustLabel: 'Alta' | 'Media' | 'Baja';
 }
 
 interface ScraperButtonProps {

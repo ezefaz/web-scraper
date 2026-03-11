@@ -13,7 +13,7 @@
   }
   ```
 */
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
 import { PiMinusCircleBold, PiPlusCircleBold } from 'react-icons/pi';
 import { IoArrowDownCircleOutline } from 'react-icons/io5';
@@ -21,6 +21,7 @@ import { BsFunnelFill } from 'react-icons/bs';
 import ProductResults from './ProductResults';
 import { useSearchParams } from 'next/navigation';
 import { scrapeProductSearchPageML } from '@/lib/scraper/product-search-page-ml';
+import { scrapeGoogleShoppingSearchProducts } from '@/lib/scraper/google-shopping';
 import { SyncLoader } from 'react-spinners';
 // import { XMarkIcon } from '@heroicons/react/24/outline';
 // import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
@@ -78,6 +79,7 @@ function classNames(...classes: any) {
 export default function ResultsCategory() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'price_asc' | 'price_desc'>('price_asc');
+  const [activeSource, setActiveSource] = useState<'mercadolibre' | 'google-shopping'>('mercadolibre');
 
   const searchParams = useSearchParams();
 
@@ -86,24 +88,29 @@ export default function ResultsCategory() {
   const formattedProduct = product?.replace(/-/g, ' ');
 
   const [scrapingInProgress, setScrapingInProgress] = useState(false);
-  const [scrapedData, setScrapedData] = useState<any[]>([]);
+  const [mercadolibreData, setMercadolibreData] = useState<any[]>([]);
+  const [googleShoppingData, setGoogleShoppingData] = useState<any[]>([]);
   const [freeShipping, setFreeShipping] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!product) {
+        setMercadolibreData([]);
+        setGoogleShoppingData([]);
+        return;
+      }
+
       setScrapingInProgress(true);
       try {
-        // const formattedProductTitle = formattedProduct.replace(/\s/g, '-');
-        const data = await scrapeProductSearchPageML(product);
+        const [mlResult, googleResult] = await Promise.allSettled([
+          scrapeProductSearchPageML(product),
+          scrapeGoogleShoppingSearchProducts(product),
+        ]);
 
-        const filteredData = freeShipping ? data.filter((item: any) => item.freeShipping !== '') : data;
-
-        const sortedData = [...filteredData].sort((a: any, b: any) => {
-          if (sortOrder === 'price_desc') return b.currentPrice - a.currentPrice;
-          return a.currentPrice - b.currentPrice;
-        });
-
-        setScrapedData(sortedData);
+        setMercadolibreData(mlResult.status === 'fulfilled' && Array.isArray(mlResult.value) ? mlResult.value : []);
+        setGoogleShoppingData(
+          googleResult.status === 'fulfilled' && Array.isArray(googleResult.value) ? googleResult.value : [],
+        );
       } catch (error) {
         console.error('Error Comparing prices:', error);
       } finally {
@@ -112,7 +119,36 @@ export default function ResultsCategory() {
     };
 
     fetchData();
-  }, [product, sortOrder, freeShipping]);
+  }, [product]);
+
+  const sortAndFilter = (items: any[]) => {
+    const filteredData = freeShipping ? items.filter((item: any) => item.freeShipping !== '') : items;
+    return [...filteredData].sort((a: any, b: any) => {
+      if (sortOrder === 'price_desc') return (b.currentPrice || 0) - (a.currentPrice || 0);
+      return (a.currentPrice || 0) - (b.currentPrice || 0);
+    });
+  };
+
+  const sortedMercadoLibreData = useMemo(
+    () => sortAndFilter(mercadolibreData),
+    [mercadolibreData, sortOrder, freeShipping],
+  );
+  const sortedGoogleShoppingData = useMemo(
+    () => sortAndFilter(googleShoppingData),
+    [googleShoppingData, sortOrder, freeShipping],
+  );
+
+  useEffect(() => {
+    if (activeSource === 'mercadolibre' && sortedMercadoLibreData.length === 0 && sortedGoogleShoppingData.length > 0) {
+      setActiveSource('google-shopping');
+      return;
+    }
+    if (activeSource === 'google-shopping' && sortedGoogleShoppingData.length === 0 && sortedMercadoLibreData.length > 0) {
+      setActiveSource('mercadolibre');
+    }
+  }, [activeSource, sortedMercadoLibreData.length, sortedGoogleShoppingData.length]);
+
+  const activeData = activeSource === 'mercadolibre' ? sortedMercadoLibreData : sortedGoogleShoppingData;
 
   return (
     <>
@@ -289,6 +325,33 @@ export default function ResultsCategory() {
                   Products
                 </h2>
 
+                <div className='mb-6 flex items-center justify-between gap-3'>
+                  <div className='inline-flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900'>
+                    <button
+                      type='button'
+                      className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                        activeSource === 'mercadolibre'
+                          ? 'bg-primary text-white'
+                          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                      }`}
+                      onClick={() => setActiveSource('mercadolibre')}
+                    >
+                      MercadoLibre ({sortedMercadoLibreData.length})
+                    </button>
+                    <button
+                      type='button'
+                      className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                        activeSource === 'google-shopping'
+                          ? 'bg-primary text-white'
+                          : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                      }`}
+                      onClick={() => setActiveSource('google-shopping')}
+                    >
+                      Otras tiendas ({sortedGoogleShoppingData.length})
+                    </button>
+                  </div>
+                </div>
+
                 <div className='grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4'>
                   {/* Filters */}
                   <form className='hidden lg:block'>
@@ -358,7 +421,7 @@ export default function ResultsCategory() {
 
                   {/* Product grid */}
                   <div className='lg:col-span-3'>
-                    <ProductResults data={scrapedData} />
+                    <ProductResults data={activeData} />
                   </div>
                 </div>
               </section>

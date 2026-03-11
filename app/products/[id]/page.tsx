@@ -276,7 +276,7 @@ const ProductDetails = async ({ params: { id } }: Props) => {
           Comparación de Precios
         </h1>
 
-        <p className='pt-2 text-muted'>Te mostramos productos de al menos un 10% menor al valor.</p>
+        <p className='pt-2 text-muted'>Comparamos precios locales y de otras tiendas, ordenados de menor a mayor.</p>
       </div>
       <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-full'>
         <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />

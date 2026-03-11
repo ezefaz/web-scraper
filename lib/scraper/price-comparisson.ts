@@ -4,6 +4,8 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { getCurrentUser } from '../actions';
 import { scrapeDolarValue } from './dolar';
+import { scrapeGoogleShoppingProducts } from './google-shopping';
+import { getDomainFromUrl, getDomainTrustIndex, getTrustLabel, TrustLabel } from './trust-score';
 
 type Country = 'argentina' | 'brasil' | 'colombia' | 'uruguay';
 
@@ -13,6 +15,10 @@ interface PriceComparisonProduct {
   price: number;
   image: string;
   dolarPrice: number;
+  source: 'mercadolibre' | 'google-shopping';
+  domain: string;
+  trustScore: number;
+  trustLabel: TrustLabel;
 }
 
 type RawProduct = {
@@ -312,7 +318,12 @@ const parseItemsFromDom = ($: any, requestId?: string) => {
   return items;
 };
 
-const buildProductList = (items: RawProduct[], dolarValue: number, maxPrice?: number) => {
+const buildProductList = (
+  items: RawProduct[],
+  dolarValue: number,
+  maxPrice?: number,
+  source: 'mercadolibre' | 'google-shopping' = 'mercadolibre',
+) => {
   const validDolarValue = Number.isFinite(dolarValue) && dolarValue > 0 ? dolarValue : 1;
   const seenUrls = new Set<string>();
 
@@ -325,11 +336,15 @@ const buildProductList = (items: RawProduct[], dolarValue: number, maxPrice?: nu
       return true;
     })
     .map((item) => ({
-      url: item.url,
+      url: normalizeListingUrl(item.url),
       title: item.title,
       price: item.price,
       image: toHttpsImageUrl(item.image),
       dolarPrice: item.price / validDolarValue,
+      source,
+      domain: getDomainFromUrl(item.url),
+      trustScore: getDomainTrustIndex(getDomainFromUrl(item.url), source),
+      trustLabel: getTrustLabel(getDomainTrustIndex(getDomainFromUrl(item.url), source)),
     }))
     .sort((a, b) => a.price - b.price)
     .slice(0, 30);
@@ -417,7 +432,8 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
   const dolarValueResponse = await scrapeDolarValue().catch(() => undefined);
   const dolarValue = Number(dolarValueResponse);
   const queryCandidates = buildQueryCandidates(query);
-  let bestComparableProducts: PriceComparisonProduct[] = [];
+  let localCheaperProducts: PriceComparisonProduct[] = [];
+  let localComparableProducts: PriceComparisonProduct[] = [];
 
   logInfo(requestId, 'Starting price comparison search (SCRAPER ONLY)', {
     country,
@@ -431,8 +447,8 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
 
   for (const candidate of queryCandidates) {
     const htmlItems = await fetchFromHtml(country, candidate, priceThreshold, requestId);
-    const htmlProducts = buildProductList(htmlItems, dolarValue, priceThreshold);
-    const comparableProducts = buildProductList(htmlItems, dolarValue);
+    const htmlProducts = buildProductList(htmlItems, dolarValue, priceThreshold, 'mercadolibre');
+    const comparableProducts = buildProductList(htmlItems, dolarValue, undefined, 'mercadolibre');
 
     logInfo(requestId, 'Filtered HTML scraper results', {
       candidate,
@@ -441,37 +457,85 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
       comparableCount: comparableProducts.length,
     });
 
-    if (htmlProducts.length > 0) {
-      logInfo(requestId, 'Returning HTML scraper results', {
+    if (localCheaperProducts.length === 0 && htmlProducts.length > 0) {
+      localCheaperProducts = htmlProducts;
+      logInfo(requestId, 'Stored local cheaper results', {
         candidate,
         count: htmlProducts.length,
         sample: htmlProducts.slice(0, 3).map((item) => ({ title: item.title, price: item.price })),
       });
-      return htmlProducts;
+      break;
     }
 
-    if (bestComparableProducts.length === 0 && comparableProducts.length > 0) {
-      bestComparableProducts = [...comparableProducts]
+    if (localComparableProducts.length === 0 && comparableProducts.length > 0) {
+      localComparableProducts = [...comparableProducts]
         .sort((a, b) => Math.abs(a.price - productPrice) - Math.abs(b.price - productPrice))
         .slice(0, 30);
 
       logInfo(requestId, 'Stored fallback comparable results', {
         candidate,
-        count: bestComparableProducts.length,
-        sample: bestComparableProducts.slice(0, 3).map((item) => ({ title: item.title, price: item.price })),
+        count: localComparableProducts.length,
+        sample: localComparableProducts.slice(0, 3).map((item) => ({ title: item.title, price: item.price })),
       });
     }
   }
 
-  if (bestComparableProducts.length > 0) {
-    logInfo(requestId, 'Returning fallback comparable results (no cheaper products found)', {
-      count: bestComparableProducts.length,
-      sample: bestComparableProducts.slice(0, 3).map((item) => ({ title: item.title, price: item.price })),
+  const localResults =
+    localCheaperProducts.length > 0
+      ? localCheaperProducts
+      : localComparableProducts;
+
+  let googleShoppingResults: PriceComparisonProduct[] = [];
+  try {
+    googleShoppingResults = await scrapeGoogleShoppingProducts(query, productPrice, country, dolarValue);
+    logInfo(requestId, 'Google Shopping comparison parsed', {
+      totalResults: googleShoppingResults.length,
+      sample: googleShoppingResults.slice(0, 3).map((item) => ({
+        title: item.title,
+        price: item.price,
+        domain: item.domain,
+      })),
     });
-    return bestComparableProducts;
+  } catch (error: any) {
+    logError(requestId, 'Google Shopping comparison failed. Keeping local-only comparison.', {
+      message: error?.message,
+    });
   }
 
-  logError(requestId, 'No results from HTML scraper candidates. Returning empty result set.', {
+  const combinedByUrl = new Map<string, PriceComparisonProduct>();
+  [...localResults, ...googleShoppingResults].forEach((item) => {
+    const normalizedUrl = normalizeListingUrl(item.url);
+    if (!normalizedUrl) return;
+    if (!combinedByUrl.has(normalizedUrl)) {
+      combinedByUrl.set(normalizedUrl, {
+        ...item,
+        url: normalizedUrl,
+      });
+    }
+  });
+
+  const combinedResults = Array.from(combinedByUrl.values())
+    .filter((item) => Number.isFinite(item.price) && item.price > 0)
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 40);
+
+  if (combinedResults.length > 0) {
+    logInfo(requestId, 'Returning combined comparison results', {
+      localCount: localResults.length,
+      googleCount: googleShoppingResults.length,
+      combinedCount: combinedResults.length,
+      sample: combinedResults.slice(0, 5).map((item) => ({
+        title: item.title,
+        price: item.price,
+        source: item.source,
+        domain: item.domain,
+        trustScore: item.trustScore,
+      })),
+    });
+    return combinedResults;
+  }
+
+  logError(requestId, 'No results from local or Google Shopping. Returning empty result set.', {
     normalizedQuery: query,
     queryCandidates,
   });

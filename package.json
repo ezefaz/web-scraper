@@ -9,6 +9,9 @@
 		"lint": "next lint",
 		"serve": "node route.ts"
 	},
+	"engines": {
+		"node": "24.x"
+	},
 	"dependencies": {
 		"@auth/mongodb-adapter": "^2.0.10",
 		"@faker-js/faker": "^8.2.0",

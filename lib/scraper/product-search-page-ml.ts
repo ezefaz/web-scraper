@@ -3,6 +3,7 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { getCurrentUser } from "../actions";
+import { getDomainTrustIndex, getTrustLabel } from "./trust-score";
 
 type Country = "argentina" | "uruguay" | "brasil" | "colombia";
 
@@ -16,6 +17,10 @@ type SearchProduct = {
 	currency: string;
 	features: string;
 	isBestSeller: string;
+	source: "mercadolibre";
+	domain: string;
+	trustScore: number;
+	trustLabel: "Alta" | "Media" | "Baja";
 };
 
 const SEARCH_BASE_BY_COUNTRY: Record<Country, string> = {
@@ -58,6 +63,22 @@ const parsePriceNumber = (value?: string | number) => {
 	const sanitized = String(value).replace(/[^\d]/g, "");
 	if (!sanitized) return 0;
 	return Number(sanitized);
+};
+
+const getDomainFromUrl = (value: string) => {
+	if (!value) return "";
+	try {
+		return new URL(value).hostname.replace(/^www\./, "");
+	} catch {
+		return "";
+	}
+};
+
+const buildTrustMeta = (url: string) => {
+	const domain = getDomainFromUrl(url);
+	const trustScore = getDomainTrustIndex(domain, "mercadolibre");
+	const trustLabel = getTrustLabel(trustScore);
+	return { domain, trustScore, trustLabel };
 };
 
 const getImageFromSrcset = (srcset?: string) => {
@@ -151,6 +172,8 @@ const parseDomProducts = ($: any) => {
 
 		if (!title || !url || currentPrice <= 0) return;
 
+		const trustMeta = buildTrustMeta(url);
+
 		items.push({
 			url,
 			title,
@@ -161,6 +184,10 @@ const parseDomProducts = ($: any) => {
 			currency,
 			features,
 			isBestSeller,
+			source: "mercadolibre",
+			domain: trustMeta.domain,
+			trustScore: trustMeta.trustScore,
+			trustLabel: trustMeta.trustLabel,
 		});
 	});
 
@@ -183,6 +210,8 @@ const parseLdJsonProducts = ($: any) => {
 
 		if (!title || !url || currentPrice <= 0) return;
 
+		const trustMeta = buildTrustMeta(url);
+
 		items.push({
 			url,
 			title,
@@ -193,6 +222,10 @@ const parseLdJsonProducts = ($: any) => {
 			currency: offer?.priceCurrency === "ARS" ? "$" : String(offer?.priceCurrency || "$"),
 			features: "",
 			isBestSeller: "",
+			source: "mercadolibre",
+			domain: trustMeta.domain,
+			trustScore: trustMeta.trustScore,
+			trustLabel: trustMeta.trustLabel,
 		});
 	};
 
