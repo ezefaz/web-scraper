@@ -2,30 +2,23 @@
 
 import * as z from "zod";
 import { useState, useTransition } from "react";
-import { FaGoogle, FaGithub } from "react-icons/fa";
 import { useForm } from "react-hook-form";
-import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterSchema } from "@/schemas";
 import CardWrapper from "../CardWrapper";
 import FormError from "./FormError";
 import FormSuccess from "./FormSuccess";
-import { Button, Divider } from "@tremor/react";
 import { register as registration } from "@/app/actions/register";
-import CountrySelect from "./CountrySelect";
-import { Avatar, Input, Select, SelectItem } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
 import { TbEyeFilled } from "react-icons/tb";
 import { IoMdEyeOff } from "react-icons/io";
-import Link from "next/link";
 import { Social } from "./Social";
 import { BsCart } from "react-icons/bs";
-
-type Props = {};
 
 const mercadolibreAuthUrl: string =
   "https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://savemelin.com/";
 
-const RegisterForm = (props: Props) => {
+const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -47,200 +40,140 @@ const RegisterForm = (props: Props) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof RegisterSchema>) => {
+  const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     setError("");
     setSuccess("");
 
     startTransition(() => {
-      registration(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
-      });
+      registration(values)
+        .then((data) => {
+          setError(data?.error);
+          setSuccess(data?.success);
+        })
+        .catch((submitError) => {
+          console.error("Error occurred during registration:", submitError);
+          setError("Algo salió mal, intenta nuevamente.");
+        });
     });
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <CardWrapper
-        HeaderLabel="Crea una cuenta!"
-        backButtonHref="/sign-in"
-        backButtonLabel="Ya tienes una cuenta?"
-        showSocial
-      >
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <Input
-              id="email"
-              type="email"
-              label="Email"
-              variant="bordered"
-              disabled={isPending}
-              placeholder="Ingresa tu correo"
-              {...register("email")}
-              className="max-w-xs"
-            />
-            {errors.email && (
-              <span className="text-red-500">{errors.email.message}</span>
-            )}
-          </div>
-          <div>
-            <Input
-              id="name"
-              type="name"
-              label="Nombre"
-              variant="bordered"
-              disabled={isPending}
-              placeholder="Ingresa tu nombre"
-              {...register("name")}
-              className="max-w-xs"
-            />
-            {errors.name && (
-              <span className="text-red-500">{errors.name.message}</span>
-            )}
-          </div>
-          <div>
-            <Input
-              id="password"
-              label="Contraseña"
-              variant="bordered"
-              disabled={isPending}
-              placeholder="******"
-              {...register("password")}
-              endContent={
-                <button
-                  className="focus:outline-none"
-                  type="button"
-                  onClick={toggleVisibility}
-                >
-                  {isVisible ? (
-                    <IoMdEyeOff className="text-2xl text-default-400 pointer-events-none" />
-                  ) : (
-                    <TbEyeFilled className="text-2xl text-default-400 pointer-events-none" />
-                  )}
-                </button>
-              }
-              type={isVisible ? "text" : "password"}
-              className="max-w-xs"
-            />
-            {errors.password && (
-              <span className="text-red-500">{errors.password.message}</span>
-            )}
-          </div>
+    <CardWrapper HeaderLabel="Crea tu cuenta" backButtonHref="/sign-in" backButtonLabel="¿Ya tienes una cuenta? Iniciar sesión">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div className="space-y-1">
+          <Input
+            id="email"
+            type="email"
+            label="Email"
+            autoComplete="email"
+            variant="bordered"
+            disabled={isPending}
+            placeholder="tu@email.com"
+            {...register("email")}
+            className="w-full"
+          />
+          {errors.email && <span className="text-xs text-red-600">{errors.email.message}</span>}
+        </div>
 
-          <div>
-            <Select
-              className="max-w-xs"
-              label="Seleccionar País"
-              id="country"
-              {...register("country")}
-            >
-              <SelectItem
-                key="argentina"
-                id="country"
-                {...register("country")}
-                startContent={
-                  <Avatar
-                    alt="Argentina"
-                    className="w-6 h-6"
-                    src="https://flagcdn.com/ar.svg"
-                  />
-                }
+        <div className="space-y-1">
+          <Input
+            id="name"
+            type="text"
+            label="Nombre"
+            autoComplete="name"
+            variant="bordered"
+            disabled={isPending}
+            placeholder="Tu nombre"
+            {...register("name")}
+            className="w-full"
+          />
+          {errors.name && <span className="text-xs text-red-600">{errors.name.message}</span>}
+        </div>
+
+        <div className="space-y-1">
+          <Input
+            id="password"
+            label="Contraseña"
+            autoComplete="new-password"
+            variant="bordered"
+            disabled={isPending}
+            placeholder="••••••••"
+            {...register("password")}
+            endContent={
+              <button
+                className="focus:outline-none"
+                type="button"
+                onClick={toggleVisibility}
+                aria-label={isVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
               >
-                Argentina
-              </SelectItem>
-              <SelectItem
-                key="brazil"
-                id="country"
-                {...register("country")}
-                startContent={
-                  <Avatar
-                    alt="Brazil"
-                    className="w-6 h-6"
-                    src="https://flagcdn.com/br.svg"
-                  />
-                }
-              >
-                Brasil
-              </SelectItem>
-              <SelectItem
-                key="colombia"
-                id="country"
-                {...register("country")}
-                startContent={
-                  <Avatar
-                    alt="Colombia"
-                    className="w-6 h-6"
-                    src="https://flagcdn.com/co.svg"
-                  />
-                }
-              >
-                Colombia
-              </SelectItem>
-              <SelectItem
-                key="uruguay"
-                id="country"
-                {...register("country")}
-                startContent={
-                  <Avatar
-                    alt="Uruguay"
-                    className="w-6 h-6"
-                    src="https://flagcdn.com/uy.svg"
-                  />
-                }
-              >
-                Uruguay
-              </SelectItem>
-              {/* <SelectItem
-                key='venezuela'
-                id='country'
-                {...register('country')}
-                startContent={<Avatar alt='Venezuela' className='w-6 h-6' src='https://flagcdn.com/ve.svg' />}
-              >
-                Venezuela
-              </SelectItem> */}
-            </Select>
-          </div>
-          <FormError message={error} />
-          <FormSuccess message={success} />
-          <div>
-            <Button
-              type="submit"
-              size="md"
-              disabled={isPending}
-              className="inline-flex w-full mt-4 items-center justify-center space-x-2 rounded-tremor-default border border-tremor-border bg-primary py-2 text-tremor-content-strong shadow-tremor-input hover:bg-tremor-background-subtle dark:border-dark-tremor-border dark:bg-dark-tremor-background text-white hover:text-black dark:text-dark-tremor-content-strong dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-background-subtle"
-            >
-              Crear Cuenta
-            </Button>
-          </div>
-        </form>
-        <Divider className="block px-0 text-sm text-center font-normal text-gray-600 hover:text-primary focus:outline-none focus:text-blue-500"></Divider>
-        <Social />
-        <a
-          href={mercadolibreAuthUrl}
-          className="inline-flex w-full mt-2 items-center justify-center space-x-2 rounded-tremor-default border border-tremor-border bg-primary py-2 text-tremor-content-strong shadow-tremor-input hover:bg-tremor-background-subtle dark:border-dark-tremor-border dark:bg-dark-tremor-background text-white hover:text-black dark:text-dark-tremor-content-strong dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-background-subtle"
-        >
-          <BsCart className="h-5 w-5" aria-hidden={true} />
-          <span className="text-tremor-default font-medium">
-            Iniciar como vendedor
-          </span>
-        </a>
-        <p className="mt-4 text-tremor-label text-tremor-content dark:text-dark-tremor-content">
-          Al iniciar sesión, estas aceptando nuestros politicas de{" "}
-          {/* <a href="#" className="underline underline-offset-4">
-            terms of service
-          </a>{" "} */}
-          {/* and{" "} */}
-          <a
-            href="/privacy-policy"
-            className="underline underline-offset-4"
-            target="_blank"
+                {isVisible ? (
+                  <IoMdEyeOff className="pointer-events-none text-2xl text-default-400" />
+                ) : (
+                  <TbEyeFilled className="pointer-events-none text-2xl text-default-400" />
+                )}
+              </button>
+            }
+            type={isVisible ? "text" : "password"}
+            className="w-full"
+          />
+          {errors.password && <span className="text-xs text-red-600">{errors.password.message}</span>}
+        </div>
+
+        <div className="space-y-1">
+          <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+            País
+          </label>
+          <select
+            id="country"
+            disabled={isPending}
+            {...register("country")}
+            className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none dark:border-white/15 dark:bg-black/30 dark:text-gray-100"
           >
-            privacidad
-          </a>
-          .
-        </p>
-      </CardWrapper>
-    </div>
+            <option value="">Seleccionar país</option>
+            <option value="argentina">Argentina</option>
+            <option value="brasil">Brasil</option>
+            <option value="colombia">Colombia</option>
+            <option value="uruguay">Uruguay</option>
+          </select>
+          {errors.country && <span className="text-xs text-red-600">{errors.country.message}</span>}
+        </div>
+
+        <FormError message={error} />
+        <FormSuccess message={success} />
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isPending ? "Creando cuenta..." : "Crear cuenta"}
+        </button>
+      </form>
+
+      <div className="my-5 text-center text-xs font-medium uppercase tracking-[0.12em] text-gray-500">o continúa con</div>
+      <Social />
+
+      <a
+        href={mercadolibreAuthUrl}
+        className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-black/10 bg-black px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-black/85 dark:border-white/10 dark:bg-white/10 dark:hover:bg-white/20"
+      >
+        <BsCart className="h-5 w-5" aria-hidden={true} />
+        Iniciar como vendedor
+      </a>
+
+      <p className="mt-5 text-xs text-gray-600 dark:text-gray-300">
+        Al registrarte aceptas nuestra política de{" "}
+        <a
+          href="/privacy-policy"
+          className="font-medium text-primary underline underline-offset-4"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          privacidad
+        </a>
+        .
+      </p>
+    </CardWrapper>
   );
 };
 

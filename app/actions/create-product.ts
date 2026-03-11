@@ -10,16 +10,15 @@ export const createProduct = async (productUrl: string) => {
   if (!productUrl) return;
 
   try {
-    // await connectToDb();
+    await connectToDb();
 
     const data: any = await scrapeMLProduct(productUrl);
 
     const existingProduct = await Product.findOne({ url: data.url });
     const currentUser = await getCurrentUser();
 
-    const isProductAlreadyAdded = currentUser.products.some(
-      (product: ProductType) => product.url === data.url
-    );
+    const isProductAlreadyAdded =
+      currentUser?.products?.some((product: ProductType) => product.url === data.url) ?? false;
 
     if (existingProduct && currentUser && !isProductAlreadyAdded) {
       await currentUser.products.push(existingProduct);

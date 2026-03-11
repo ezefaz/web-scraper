@@ -1,9 +1,16 @@
 import LoginForm from "@/components/auth/LoginForm";
+import AuthPageShell from "@/components/auth/AuthPageShell";
 
 export default function Page() {
-	return (
-		<div className='h-full flex justify-center align-center items-center'>
-			<LoginForm />
-		</div>
-	);
+  return (
+    <AuthPageShell
+      badge="¿Primera vez por acá?"
+      title="Volvé a tu espacio de ahorro"
+      description="Seguí productos, monitoreá cambios de precios y compará oportunidades en segundos."
+      ctaHref="/sign-up"
+      ctaLabel="Crear cuenta"
+    >
+      <LoginForm />
+    </AuthPageShell>
+  );
 }

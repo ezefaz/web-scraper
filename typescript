@@ -1,0 +1,9 @@
+Script started on Wed Mar 11 11:52:30 2026
+^Dmkdir: /Users/ezefaz/.cache/oh-my-zsh: Operation not permitted
+rm: /Users/ezefaz/.zcompdump-Ezes-MacBook-Pro-5.9: Operation not permitted
+/Users/ezefaz/.oh-my-zsh/oh-my-zsh.sh:129: nice(5) failed: operation not permitted
+zsh: locking failed for /Users/ezefaz/.zsh_history: operation not permitted: reading anyway
+%                                                                               [49m[39m[49m[34m[44m[3254m [3255m~[44m[3254m/[3250mDe[44m[3254m/[3250mP[44m[3254m/[3255msavemelin[44m[3254m[44m[3254m [43m[34m[43m[30m [30mmain [30m!25 [30m?2[43m[30m [49m[33m[49m[39m [49m[39m[?2004h[?2004l
+zsh: locking failed for /Users/ezefaz/.zsh_history: operation not permitted
+
+Script done on Wed Mar 11 11:52:30 2026

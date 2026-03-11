@@ -25,7 +25,7 @@ import { Skeleton } from '@nextui-org/react';
 interface Product {
   url: string;
   title: string;
-  price: string;
+  price: number;
   image: string;
   dolarPrice: number;
 }
@@ -48,7 +48,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
-  const sortedData = scrapedData.sort((a, b) => Number(a.price) - Number(b.price));
+  const sortedData = [...scrapedData].sort((a, b) => a.price - b.price);
 
   return (
     <>

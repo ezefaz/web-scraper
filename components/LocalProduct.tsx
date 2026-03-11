@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useCallback, useEffect, useState, useTransition } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Badge, Card } from '@tremor/react';
-import { Image, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@nextui-org/react';
+import { Image, Skeleton } from '@nextui-org/react';
 import { PiKeyReturn } from 'react-icons/pi';
 import { MdOutlineProductionQuantityLimits } from 'react-icons/md';
 
@@ -13,12 +13,8 @@ import PriceInfoCard from './PriceInfoCard';
 import { formatNumber } from '@/lib/utils';
 import ProductBadges from './ProductBadges';
 import { scrapeMLProductDetail } from '@/lib/scraper/mercadolibre-product-detail';
-import InternationalScraperButton from './InternationalScraperButton';
-import { IoMdInformationCircleOutline } from 'react-icons/io';
 import ScraperButton from './ScraperButton';
-import { ProductType } from '@/types';
 import { createProduct } from '@/app/actions/create-product';
-import { toast } from 'react-hot-toast';
 
 const mercadolibreDomains = [
   'mercadolibre.com',
@@ -43,18 +39,19 @@ const isValidMLProductUrl = (url: string) => {
 const LocalProduct = () => {
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState(false);
   const searchParams = useSearchParams();
   const productURL: any = searchParams.get('productUrl');
   const [productData, setProductData] = useState<any>();
-  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    setIsLoading(true);
-
     const fetchData = async () => {
       try {
         const url = productURL?.trim();
+        if (!url || !isValidMLProductUrl(url)) {
+          setProductData(undefined);
+          return;
+        }
+
         const data: any = await scrapeMLProductDetail(url);
 
         setProductData(data);
@@ -65,18 +62,18 @@ const LocalProduct = () => {
 
     if (productURL) {
       fetchData();
+      return;
     }
-    setIsLoading(false);
+
+    setProductData(undefined);
   }, [productURL]);
 
   const handleSubmit = useCallback(
     async (productUrl: string) => {
-      startTransition(async () => {
-        await createProduct(productUrl);
-      });
+      await createProduct(productUrl);
       router.push('/user-products');
     },
-    [productData]
+    [router]
   );
 
   return (
@@ -200,34 +197,6 @@ const LocalProduct = () => {
           </div>
           <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
             <ScraperButton productTitle={productData.title} productPrice={productData.currentPrice} />
-          </div>
-          <div className='mx-auto max-w-[510px] text-center mb-2 mt-40'>
-            <div id='priceCompare'></div>
-            <span className='block text-lg font-semibold text-primary'>Precios Internacionales</span>
-            <h1 className=' text-3xl mb-3 font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
-              Comparación de Precios Internacional
-            </h1>
-            <Popover placement='bottom'>
-              <PopoverTrigger className='m-auto'>
-                <IoMdInformationCircleOutline clasName='flex justify-center m-auto' size={30} />
-              </PopoverTrigger>
-              <PopoverContent>
-                <div className='px-0 py-1 w-30'>
-                  <div className='text-small font-bold'>Importante!</div>
-                  <div className='text-tiny'>
-                    Ten en consideración las distintas normativas de aduana en tu país. Además considera gastos de envío
-                    e impuestos.
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-            {/* <p className='pt-2 text-muted'>Considera tambien el costo de impuestos y envío.</p> */}
-          </div>
-          <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
-            <InternationalScraperButton
-              productTitle={productData.title}
-              productPrice={Number(productData.currentPrice)}
-            />
           </div>
         </>
       ) : (

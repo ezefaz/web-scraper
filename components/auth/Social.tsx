@@ -1,7 +1,6 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { FaGithub, FaGoogle } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
 
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
@@ -18,33 +17,23 @@ export const Social = () => {
   };
 
   return (
-    // <div className="flex items-center space-x-3">
-    <>
-      <a
-        href="#"
-        className="inline-flex w-full mt-2 items-center justify-center space-x-2 rounded-tremor-default border border-tremor-border bg-tremor-background py-2 text-tremor-content-strong shadow-tremor-input hover:bg-tremor-background-subtle dark:border-dark-tremor-border dark:bg-dark-tremor-background dark:text-dark-tremor-content-strong dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-background-subtle"
+    <div className="grid gap-2">
+      <button
+        type="button"
+        onClick={() => onClick("google")}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-white/15 dark:bg-black/30 dark:text-gray-100 dark:hover:bg-white/5"
       >
         <BsGoogle className="h-5 w-5" aria-hidden={true} />
-        <span
-          className="text-tremor-default font-medium"
-          onClick={() => onClick("google")}
-        >
-          Iniciar sesión con Google
-        </span>
-      </a>
-      <a
-        href="#"
-        className="inline-flex w-full mt-2 items-center justify-center space-x-2 rounded-tremor-default border border-tremor-border bg-tremor-background py-2 text-tremor-content-strong shadow-tremor-input hover:bg-tremor-background-subtle dark:border-dark-tremor-border dark:bg-dark-tremor-background dark:text-dark-tremor-content-strong dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-background-subtle"
+        Continuar con Google
+      </button>
+      <button
+        type="button"
+        onClick={() => onClick("github")}
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-white/15 dark:bg-black/30 dark:text-gray-100 dark:hover:bg-white/5"
       >
         <BsGithub className="h-5 w-5" aria-hidden={true} />
-        <span
-          className="text-tremor-default font-medium"
-          onClick={() => onClick("github")}
-        >
-          Iniciar sesión con Github
-        </span>
-      </a>
-    </>
-    // </div>
+        Continuar con GitHub
+      </button>
+    </div>
   );
 };

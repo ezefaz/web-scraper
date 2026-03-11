@@ -8,12 +8,21 @@ export const publicRoutes = [
   "/",
   "/new-verification",
   "/api/cron",
+  "/api/meli",
   "/products",
-  "/products/[id]",
-  "/products/local/[slug]",
-  "/products/international/[slug]",
+  "/products/local",
   "/privacy-policy",
   "/profile/business",
+];
+
+/**
+ * Public route prefixes for dynamic segments
+ * @type {string[]}
+ */
+export const publicRoutePrefixes = [
+  "/products/",
+  "/products/internacional/",
+  "/products/international/",
 ];
 
 /**
@@ -28,7 +37,6 @@ export const authRoutes = [
   "/error",
   "/reset",
   "/new-password",
-  "/api/mercadolibre",
 ];
 
 /**

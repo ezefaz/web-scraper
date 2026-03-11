@@ -16,7 +16,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
   if (!productUrl) return;
 
   try {
-    connectToDb();
+    await connectToDb();
 
     const scrapedProduct: any = await scrapeMLProduct(productUrl);
     const currentUser = await getCurrentUser();
@@ -108,7 +108,7 @@ export async function scrapeAndStoreProducts(productUrl: string) {
 
 export async function getProductByURL(url: string) {
   try {
-    connectToDb();
+    await connectToDb();
 
     const product = await Product.findOne({ url: url });
 
@@ -122,7 +122,7 @@ export async function getProductByURL(url: string) {
 
 export async function getAllProducts() {
   try {
-    connectToDb();
+    await connectToDb();
 
     const products = await Product.find();
 
@@ -134,6 +134,7 @@ export async function getAllProducts() {
 
 export async function getProductsForDashboard() {
   try {
+    await connectToDb();
     const products = await Product.find();
 
     const dashboardProducts = products.map((product) => ({
@@ -155,6 +156,7 @@ export async function getProductsForDashboard() {
 
 export async function getUsersForDashboard() {
   try {
+    await connectToDb();
     const users = await User.find();
 
     const dashboardUsers = users.map((user) => ({
@@ -205,6 +207,9 @@ export async function deleteProduct(productId: string) {
   try {
     await connectToDb();
     const user: any = await getCurrentUser();
+    if (!user) {
+      throw new Error("User not found");
+    }
 
     const productToDelete = user.products.find(
       (product: any) => product._id.toString() === productId
@@ -317,16 +322,16 @@ export async function addUserEmailToProduct(
     const product = await getProductByURL(productId);
     const user = await getUserByEmail(userEmail);
 
-    if (!product) return;
+    if (!product || !user) return;
 
     const userExists: boolean = product.users.some(
       (user: UserType) => user.email === userEmail
     );
-    const userProduct = user.products.find(
+    const userProduct = user.products?.find(
       (p: ProductType) => p.url === product.url
     );
 
-    if (userExists) {
+    if (!userExists) {
       product.users.push({ email: userEmail, isFollowing: true });
 
       await product.save();
@@ -337,7 +342,7 @@ export async function addUserEmailToProduct(
         await user.save();
       }
 
-      if (userProduct.isFollowing) {
+      if (userProduct?.isFollowing) {
         const emailContent = await generateEmailBody(product, "WELCOME");
         await sendEmail(emailContent, [userEmail]);
       }
@@ -349,6 +354,7 @@ export async function addUserEmailToProduct(
 
 export async function getCurrentUser() {
   try {
+    await connectToDb();
     const session = await auth();
 
     if (!session) return null;
@@ -424,6 +430,7 @@ export async function followProduct(productId: string) {
 }
 
 export async function getProductById(productId: string) {
+  await connectToDb();
   const product = await Product.findById({ _id: productId });
 
   if (!product) {
@@ -441,7 +448,11 @@ export async function getProductById(productId: string) {
 
 export async function getSeller() {
   try {
+    await connectToDb();
     const currentUser: UserType = await getCurrentUser();
+    if (!currentUser?.email) {
+      return { error: "Usuario no autenticado." };
+    }
 
     const foundSeller = await sellerModel.find({ email: currentUser.email });
 

@@ -8,8 +8,8 @@ type Props = {
 const FormError: React.FC<Props> = ({ message }) => {
   if (!message) return null;
   return (
-    <div className='flex items-center bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded-md '>
-      <FaExclamationCircle className='mr-2' />
+    <div className='flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-200'>
+      <FaExclamationCircle className='h-4 w-4 shrink-0' />
       <span>{message}</span>
     </div>
   );

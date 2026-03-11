@@ -2,68 +2,478 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import { getCurrentUser } from '../actions';
 import { scrapeDolarValue } from './dolar';
 
-export async function scrapePriceComparissonProducts(productTitle: string, productPrice: number) {
-  // bright data proxy configuration
-  const username = String(process.env.BRIGHT_DATA_USERNAME);
-  const password = String(process.env.BRIGHT_DATA_PASSWORD);
-  const port = 22225;
-  const session_id = (1000000 * Math.random()) | 0;
+type Country = 'argentina' | 'brasil' | 'colombia' | 'uruguay';
 
-  const options = {
-    auth: {
-      username: `${username}-session-${session_id}`,
-      password: password,
-    },
-    host: 'brd.superproxy.io',
-    port,
-    rejectUnathorized: false,
-  };
+interface PriceComparisonProduct {
+  url: string;
+  title: string;
+  price: number;
+  image: string;
+  dolarPrice: number;
+}
+
+type RawProduct = {
+  url: string;
+  title: string;
+  price: number;
+  image?: string;
+};
+
+const LOG_TAG = '[PRICE_COMPARISON]';
+const PRICE_COMPARISON_DEBUG = process.env.PRICE_COMPARISON_DEBUG === 'true';
+
+const SEARCH_BASE_BY_COUNTRY: Record<Country, string> = {
+  argentina: 'https://listado.mercadolibre.com.ar',
+  brasil: 'https://lista.mercadolivre.com.br',
+  colombia: 'https://listado.mercadolibre.com.co',
+  uruguay: 'https://listado.mercadolibre.com.uy',
+};
+
+const REQUEST_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'es-AR,es;q=0.9,en;q=0.8',
+  Referer: 'https://www.mercadolibre.com/',
+};
+
+const logInfo = (requestId: string, message: string, meta?: Record<string, unknown>) => {
+  if (!PRICE_COMPARISON_DEBUG) return;
+  if (meta) {
+    console.log(`${LOG_TAG}[${requestId}] ${message}`, meta);
+    return;
+  }
+  console.log(`${LOG_TAG}[${requestId}] ${message}`);
+};
+
+const logError = (requestId: string, message: string, meta?: Record<string, unknown>) => {
+  if (!PRICE_COMPARISON_DEBUG) return;
+  if (meta) {
+    console.error(`${LOG_TAG}[${requestId}] ${message}`, meta);
+    return;
+  }
+  console.error(`${LOG_TAG}[${requestId}] ${message}`);
+};
+
+const cleanSearchQuery = (title: string) =>
+  title
+    .replace(/['"`]/g, '')
+    .replace(/[^\p{L}\p{N}\s-]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const buildQueryCandidates = (query: string) => {
+  const words = query.split(' ').filter(Boolean);
+  const candidates = [
+    query,
+    words.slice(0, 8).join(' '),
+    words.slice(0, 6).join(' '),
+    words.slice(0, 4).join(' '),
+  ].filter((item) => item.length > 0);
+
+  return Array.from(new Set(candidates));
+};
+
+const parsePrice = (value: string) => {
+  if (!value) return NaN;
+  const numeric = value.replace(/[^\d]/g, '');
+  if (!numeric) return NaN;
+  return Number(numeric);
+};
+
+const toHttpsImageUrl = (url?: string) => {
+  if (!url) return '';
+  return url.startsWith('http://') ? url.replace('http://', 'https://') : url;
+};
+
+const normalizeListingUrl = (url?: string) => {
+  if (!url) return '';
 
   try {
-    // filtramos por un 15% menor al precio del producto.
+    const parsed = new URL(url);
+    parsed.hash = '';
+    parsed.search = '';
+    return `${parsed.origin}${parsed.pathname}`;
+  } catch {
+    return url.split('#')[0].split('?')[0];
+  }
+};
 
-    const pricePercentage = productPrice * 0.1;
-    const priceForFilter = Math.round(productPrice - pricePercentage);
+const findFirstMatch = (root: any, selectors: string[]) => {
+  for (const selector of selectors) {
+    const match = root.find(selector).first();
+    if (match.length > 0) return match;
+  }
+  return null;
+};
 
-    const searchUrl = `https://listado.mercadolibre.com.ar/${productTitle}_PriceRange_0-${priceForFilter}_NoIndex_True`;
+const findFirstText = (root: any, selectors: string[]) => {
+  for (const selector of selectors) {
+    const value = root.find(selector).first().text().trim();
+    if (value) return value;
+  }
+  return '';
+};
 
-    const response = await axios.get(searchUrl);
+const findFirstAttr = (root: any, selectors: string[], attr: string) => {
+  for (const selector of selectors) {
+    const value = root.find(selector).first().attr(attr);
+    if (value) return String(value);
+  }
+  return '';
+};
 
-    const html = response.data;
-    const $ = cheerio.load(html);
+const getBrightDataOptions = () => {
+  const username = String(process.env.BRIGHT_DATA_USERNAME || '');
+  const password = String(process.env.BRIGHT_DATA_PASSWORD || '');
+  if (!username || !password) return null;
 
-    const scrapedDolarValue = await scrapeDolarValue();
+  const sessionId = (1000000 * Math.random()) | 0;
 
-    const productList: any = [];
-    $('.ui-search-layout.ui-search-layout--stack .ui-search-layout__item').each((index, element) => {
-      const product = $(element);
-      const title = product.find('.ui-search-item__title').text().trim();
-      const url = product.find('a.ui-search-link').attr('href') || '';
-      let priceLabel = product.find('.andes-money-amount').attr('aria-label');
+  return {
+    auth: {
+      username: `${username}-session-${sessionId}`,
+      password,
+    },
+    host: 'brd.superproxy.io',
+    port: 22225,
+  };
+};
 
-      if (priceLabel && priceLabel.includes('Antes')) {
-        priceLabel = priceLabel.replace('Antes: ', '');
+const buildSearchUrls = (country: Country, candidate: string, priceThreshold: number) => {
+  const baseUrl = SEARCH_BASE_BY_COUNTRY[country] || SEARCH_BASE_BY_COUNTRY.argentina;
+  const slug = candidate.replace(/\s+/g, '-');
+  const encodedSlug = encodeURIComponent(slug);
+
+  return [
+    `${baseUrl}/${encodedSlug}_PriceRange_0-${priceThreshold}_NoIndex_True`,
+    `${baseUrl}/${encodedSlug}`,
+  ];
+};
+
+const parseItemsFromLdJson = ($: any) => {
+  const items: RawProduct[] = [];
+
+  const pushProduct = (value: any) => {
+    if (!value || typeof value !== 'object') return;
+
+    const title = String(value.name || '').trim();
+
+    const rawOffer = Array.isArray(value.offers) ? value.offers[0] : value.offers;
+    const resolvedUrl =
+      String(value.url || rawOffer?.url || value?.offers?.url || value?.item_offered?.url || '').trim();
+    const url = normalizeListingUrl(resolvedUrl);
+
+    const rawPrice =
+      rawOffer?.price ??
+      rawOffer?.priceSpecification?.price ??
+      rawOffer?.lowPrice ??
+      rawOffer?.highPrice ??
+      value?.offers?.price ??
+      value.price;
+
+    const parsedPrice =
+      typeof rawPrice === 'number' ? rawPrice : parsePrice(String(rawPrice ?? ''));
+
+    const rawImage = Array.isArray(value.image) ? value.image[0] : value.image;
+    const image = String(rawImage || '').trim();
+
+    items.push({ url, title, price: parsedPrice, image });
+  };
+
+  const walk = (value: any) => {
+    if (!value) return;
+
+    if (Array.isArray(value)) {
+      value.forEach((entry) => walk(entry));
+      return;
+    }
+
+    if (typeof value !== 'object') return;
+
+    if (value['@type'] === 'ItemList' && Array.isArray(value.itemListElement)) {
+      value.itemListElement.forEach((entry: any) => walk(entry?.item || entry));
+    }
+
+    if (value['@type'] === 'Product' || (value.name && (value.offers || value.url))) {
+      pushProduct(value);
+    }
+
+    if (Array.isArray(value['@graph'])) {
+      value['@graph'].forEach((entry: any) => walk(entry));
+    }
+  };
+
+  $('script[type="application/ld+json"]').each((_: any, element: any) => {
+    const rawScript = $(element).contents().text().trim();
+    if (!rawScript) return;
+
+    try {
+      const parsed = JSON.parse(rawScript);
+      walk(parsed);
+    } catch {
+      // Ignore malformed JSON-LD blocks
+    }
+  });
+
+  return items;
+};
+
+const parseItemsFromDom = ($: any, requestId?: string) => {
+  const items: RawProduct[] = [];
+  const cardSelectors = [
+    '.ui-search-layout .ui-search-layout__item',
+    'li.ui-search-layout__item',
+    '.poly-card',
+    '.ui-search-result__wrapper',
+  ];
+
+  const selectorStats = cardSelectors.map((selector) => ({ selector, count: $(selector).length }));
+  const selectedCards = selectorStats.find((entry) => entry.count > 0);
+
+  if (requestId) {
+    logInfo(requestId, 'DOM selector scan', {
+      selectorStats,
+      selectedSelector: selectedCards?.selector || 'none-by-count',
+      selectedCount: selectedCards?.count || 0,
+    });
+  }
+
+  if (!selectedCards || selectedCards.count === 0) return items;
+
+  $(selectedCards.selector).each((_: any, element: any) => {
+    const card = $(element);
+    const titleAnchor = findFirstMatch(card, [
+      'h3.poly-component__title-wrapper a.poly-component__title',
+      'a.poly-component__title',
+      'a.ui-search-link',
+      'a[href*="/MLA"]',
+      'a[href*="/ML"]',
+    ]);
+
+    const title =
+      titleAnchor?.text().trim() ||
+      findFirstText(card, ['.ui-search-item__title']) ||
+      findFirstAttr(card, ['a[title]'], 'title') ||
+      '';
+
+    const rawUrl =
+      titleAnchor?.attr('href') ||
+      findFirstAttr(card, ['a.ui-search-link', 'a[href*="/MLA"]', 'a[href*="/ML"]'], 'href') ||
+      '';
+
+    const url = normalizeListingUrl(rawUrl);
+    const mainCurrentPrice = findFirstMatch(card, [
+      '.poly-price__current .andes-money-amount',
+      '.andes-money-amount[aria-label*="Ahora"]',
+      '.andes-money-amount',
+    ]);
+    const currentPriceAria = mainCurrentPrice?.attr('aria-label') || '';
+    const currentPriceFraction =
+      mainCurrentPrice?.find('.andes-money-amount__fraction').first().text().trim() ||
+      findFirstText(card, ['.andes-money-amount__fraction']);
+    const metaPrice = findFirstAttr(card, ['meta[itemprop="price"]'], 'content');
+
+    const parsedPrice =
+      parsePrice(currentPriceAria) ||
+      parsePrice(currentPriceFraction) ||
+      parsePrice(metaPrice);
+
+    const image = findFirstAttr(
+      card,
+      [
+        '.poly-component__picture',
+        '.ui-search-result-image__element',
+        'img[data-testid="picture"]',
+        'img',
+      ],
+      'src',
+    )
+      || findFirstAttr(
+        card,
+        [
+          '.poly-component__picture',
+          '.ui-search-result-image__element',
+          'img[data-testid="picture"]',
+          'img',
+        ],
+        'data-src',
+      )
+      '';
+
+    if (!title && !url) return;
+
+    items.push({ url: String(url), title: String(title), price: parsedPrice, image: String(image) });
+  });
+
+  return items;
+};
+
+const buildProductList = (items: RawProduct[], dolarValue: number, maxPrice?: number) => {
+  const validDolarValue = Number.isFinite(dolarValue) && dolarValue > 0 ? dolarValue : 1;
+  const seenUrls = new Set<string>();
+
+  return items
+    .filter((item) => {
+      if (!item.url || !item.title || seenUrls.has(item.url)) return false;
+      seenUrls.add(item.url);
+      if (!Number.isFinite(item.price) || item.price <= 0) return false;
+      if (typeof maxPrice === 'number') return item.price <= maxPrice;
+      return true;
+    })
+    .map((item) => ({
+      url: item.url,
+      title: item.title,
+      price: item.price,
+      image: toHttpsImageUrl(item.image),
+      dolarPrice: item.price / validDolarValue,
+    }))
+    .sort((a, b) => a.price - b.price)
+    .slice(0, 30);
+};
+
+const fetchFromHtml = async (country: Country, candidate: string, priceThreshold: number, requestId: string) => {
+  const urls = buildSearchUrls(country, candidate, priceThreshold);
+  const brightDataOptions = getBrightDataOptions();
+  const requestStrategies = [
+    { name: 'direct', config: { headers: REQUEST_HEADERS, timeout: 12000 } },
+    ...(brightDataOptions
+      ? [{ name: 'proxy', config: { headers: REQUEST_HEADERS, timeout: 12000, ...brightDataOptions } }]
+      : []),
+  ];
+
+  for (const strategy of requestStrategies) {
+    for (const searchUrl of urls) {
+      try {
+        logInfo(requestId, 'Trying HTML scraper', {
+          country,
+          candidate,
+          strategy: strategy.name,
+          searchUrl,
+        });
+
+        const response = await axios.get(searchUrl, strategy.config);
+        const $ = cheerio.load(response.data);
+
+        const ldJsonItems = parseItemsFromLdJson($);
+        const domItems = ldJsonItems.length > 0 ? [] : parseItemsFromDom($, requestId);
+        const items = ldJsonItems.length > 0 ? ldJsonItems : domItems;
+
+        logInfo(requestId, 'HTML scraper response parsed', {
+          status: response.status,
+          source: ldJsonItems.length > 0 ? 'ld-json' : 'dom',
+          totalResults: items.length,
+          strategy: strategy.name,
+        });
+
+        if (items.length > 0) return items;
+
+        const htmlText = String(response.data || '');
+        logInfo(requestId, 'No parseable items found in HTML response', {
+          pageTitle: $('title').text().trim().slice(0, 140),
+          htmlLength: htmlText.length,
+          hasCaptchaWord: /captcha|robot|interruption|denied|forbidden/i.test(htmlText),
+          strategy: strategy.name,
+        });
+      } catch (error: any) {
+        logError(requestId, 'HTML scraper request failed', {
+          candidate,
+          strategy: strategy.name,
+          searchUrl,
+          status: error?.response?.status,
+          message: error?.message,
+        });
       }
+    }
+  }
 
-      let price = '';
-      if (priceLabel) {
-        price = priceLabel.replace(' pesos', '');
-      } else {
-        const priceElement = product.find('.andes-money-amount.ui-search-price__part');
-        price = priceElement.attr('aria-label') || '';
-      }
+  return [] as RawProduct[];
+};
 
-      const image = product.find('.ui-search-result-image__element').attr('data-src');
+export async function scrapePriceComparissonProducts(productTitle: string, productPrice: number) {
+  const requestId = Math.random().toString(36).slice(2, 10);
 
-      const dolarPrice = Number(price) / Number(scrapedDolarValue);
+  if (!productTitle || !Number.isFinite(productPrice) || productPrice <= 0) {
+    logInfo(requestId, 'Invalid input received. Returning empty result set.', {
+      productTitle,
+      productPrice,
+    });
+    return [] as PriceComparisonProduct[];
+  }
 
-      productList.push({ url, title, price, image, dolarPrice });
+  const user = await getCurrentUser();
+  const country = (user?.country as Country) || 'argentina';
+  const query = cleanSearchQuery(productTitle);
+
+  if (!query) {
+    logInfo(requestId, 'Query is empty after normalization. Returning empty result set.', { productTitle });
+    return [] as PriceComparisonProduct[];
+  }
+
+  const priceThreshold = Math.max(1, Math.round(productPrice));
+  const dolarValueResponse = await scrapeDolarValue().catch(() => undefined);
+  const dolarValue = Number(dolarValueResponse);
+  const queryCandidates = buildQueryCandidates(query);
+  let bestComparableProducts: PriceComparisonProduct[] = [];
+
+  logInfo(requestId, 'Starting price comparison search (SCRAPER ONLY)', {
+    country,
+    originalTitle: productTitle,
+    normalizedQuery: query,
+    queryCandidates,
+    productPrice,
+    priceThreshold,
+    dolarValue: Number.isFinite(dolarValue) ? dolarValue : 'unavailable',
+  });
+
+  for (const candidate of queryCandidates) {
+    const htmlItems = await fetchFromHtml(country, candidate, priceThreshold, requestId);
+    const htmlProducts = buildProductList(htmlItems, dolarValue, priceThreshold);
+    const comparableProducts = buildProductList(htmlItems, dolarValue);
+
+    logInfo(requestId, 'Filtered HTML scraper results', {
+      candidate,
+      rawCount: htmlItems.length,
+      filteredCount: htmlProducts.length,
+      comparableCount: comparableProducts.length,
     });
 
-    return productList;
-  } catch (error: any) {
-    throw new Error(`Failed to scrape local price compare: ${error.message}`);
+    if (htmlProducts.length > 0) {
+      logInfo(requestId, 'Returning HTML scraper results', {
+        candidate,
+        count: htmlProducts.length,
+        sample: htmlProducts.slice(0, 3).map((item) => ({ title: item.title, price: item.price })),
+      });
+      return htmlProducts;
+    }
+
+    if (bestComparableProducts.length === 0 && comparableProducts.length > 0) {
+      bestComparableProducts = [...comparableProducts]
+        .sort((a, b) => Math.abs(a.price - productPrice) - Math.abs(b.price - productPrice))
+        .slice(0, 30);
+
+      logInfo(requestId, 'Stored fallback comparable results', {
+        candidate,
+        count: bestComparableProducts.length,
+        sample: bestComparableProducts.slice(0, 3).map((item) => ({ title: item.title, price: item.price })),
+      });
+    }
   }
+
+  if (bestComparableProducts.length > 0) {
+    logInfo(requestId, 'Returning fallback comparable results (no cheaper products found)', {
+      count: bestComparableProducts.length,
+      sample: bestComparableProducts.slice(0, 3).map((item) => ({ title: item.title, price: item.price })),
+    });
+    return bestComparableProducts;
+  }
+
+  logError(requestId, 'No results from HTML scraper candidates. Returning empty result set.', {
+    normalizedQuery: query,
+    queryCandidates,
+  });
+  return [] as PriceComparisonProduct[];
 }

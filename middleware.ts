@@ -1,19 +1,28 @@
 import authConfig from '@/auth.config';
 import NextAuth from 'next-auth';
 
-import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, publicRoutes } from '@/routes';
+import {
+  DEFAULT_LOGIN_REDIRECT,
+  authRoutes,
+  publicRoutePrefixes,
+  publicRoutes,
+} from '@/routes';
 
 const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
+  const pathname = nextUrl.pathname;
 
-  const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  const isApiRoute = pathname.startsWith('/api');
+  const isPublicRoute =
+    publicRoutes.includes(pathname) ||
+    publicRoutePrefixes.some((prefix) => pathname.startsWith(prefix));
+  const isAuthRoute = authRoutes.includes(pathname);
 
-  if (isApiAuthRoute) {
+  // Keep API routes accessible and let each handler enforce its own auth rules.
+  if (isApiRoute) {
     return null;
   }
 

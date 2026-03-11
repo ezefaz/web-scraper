@@ -12,16 +12,19 @@ import { PiKeyReturn } from "react-icons/pi";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 
 const InternationalProduct = () => {
-	const [isLoading, setIsLoading] = useState(false);
 	const searchParams = useSearchParams();
 	const productURL = searchParams.get("productUrl");
+	const productHref = productURL ?? "#";
 	const [productData, setProductData] = useState<TiendamiaProduct[]>([]);
 
 	useEffect(() => {
-		setIsLoading(true);
 		const fetchData = async () => {
 			try {
 				const url = productURL?.trim();
+				if (!url) {
+					setProductData([]);
+					return;
+				}
 				const data: any = await scrapeTiendamiaProduct(url);
 
 				setProductData(data);
@@ -32,8 +35,10 @@ const InternationalProduct = () => {
 
 		if (productURL) {
 			fetchData();
+			return;
 		}
-		setIsLoading(false);
+
+		setProductData([]);
 	}, [productURL]);
 
 	return (
@@ -53,16 +58,16 @@ const InternationalProduct = () => {
 					</div>
 					<div className='flex-1 flex flex-col'>
 						<div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
-							<div className='flex flex-col gap-3'>
-								<p className='text-[28px] hover:text-primary transition-colors duration-300'>
-									{productData[0].title}
-								</p>
-								<Link
-									href={productURL}
-									target='_blank'
-									className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300 dark:text-white'>
-									Visitar Producto
-								</Link>
+								<div className='flex flex-col gap-3'>
+									<p className='text-[28px] hover:text-primary transition-colors duration-300'>
+										{productData[0].title}
+									</p>
+									<Link
+										href={productHref}
+										target='_blank'
+										className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300 dark:text-white'>
+										Visitar Producto
+									</Link>
 								<p>
 									Vendido por:{" "}
 									{productData[0].brand ? productData[0].brand : ""}
@@ -109,7 +114,7 @@ const InternationalProduct = () => {
 										height={22}
 									/>
 									<Link
-										href={productURL}
+										href={productHref}
 										target='_blank'
 										className='text-base text-white'>
 										Comprar Ahora
