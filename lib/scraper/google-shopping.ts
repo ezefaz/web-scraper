@@ -117,23 +117,72 @@ const normalizeUrl = (value?: string) => {
   if (!raw) return '';
 
   const decodeGoogleRedirect = (candidate: string) => {
+    const redirectKeys = ['q', 'url', 'adurl', 'imgurl', 'rdct_url', 'dest', 'target', 'u'];
+    let current = candidate;
+
+    // Follow nested Google redirects up to a safe depth.
+    for (let i = 0; i < 3; i += 1) {
+      let parsed: URL;
+      try {
+        const withBase = current.startsWith('http') ? current : `https://www.google.com${current}`;
+        parsed = new URL(withBase);
+      } catch {
+        break;
+      }
+
+      const nextTarget = redirectKeys
+        .map((key) => parsed.searchParams.get(key) || '')
+        .map((candidateValue) => {
+          try {
+            return decodeURIComponent(candidateValue);
+          } catch {
+            return candidateValue;
+          }
+        })
+        .find((candidateValue) => /^https?:\/\//i.test(candidateValue));
+
+      if (!nextTarget) {
+        current = parsed.toString();
+        break;
+      }
+
+      current = nextTarget;
+    }
+
+    return current;
+  };
+
+  const shouldDecodeGoogleRedirect = (candidate: string) => {
     try {
       const withBase = candidate.startsWith('http') ? candidate : `https://www.google.com${candidate}`;
       const parsed = new URL(withBase);
-      const redirectTarget = parsed.searchParams.get('q') || parsed.searchParams.get('url');
-      if (redirectTarget) return decodeURIComponent(redirectTarget);
-      return withBase;
+      const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
+      const path = parsed.pathname.toLowerCase();
+      const hasRedirectParams = ['q', 'url', 'adurl', 'imgurl', 'rdct_url', 'dest', 'target', 'u'].some((key) =>
+        parsed.searchParams.has(key),
+      );
+      return (
+        host.endsWith('google.com')
+        || host.endsWith('google.com.ar')
+        || path.startsWith('/url')
+        || path.startsWith('/aclk')
+        || hasRedirectParams
+      );
     } catch {
-      return candidate;
+      return candidate.startsWith('/url?') || candidate.startsWith('/aclk?');
     }
   };
 
-  const resolved = raw.startsWith('/url?') ? decodeGoogleRedirect(raw) : raw;
+  const resolved = shouldDecodeGoogleRedirect(raw) ? decodeGoogleRedirect(raw) : raw;
 
   try {
     const parsed = new URL(resolved.startsWith('http') ? resolved : `https://www.google.com${resolved}`);
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
     parsed.hash = '';
-    parsed.search = '';
+    // Keep query params for non-Google URLs to preserve direct product links.
+    if (host.endsWith('google.com') || host.endsWith('google.com.ar')) {
+      parsed.search = '';
+    }
     return parsed.toString();
   } catch {
     return resolved.split('#')[0].split('?')[0];
@@ -158,11 +207,19 @@ const MERCADOLIBRE_DOMAINS = [
   'mercadolibre.cl',
 ];
 
+const LOCAL_DOMAINS = ['localhost', '127.0.0.1', '0.0.0.0', '::1'];
+
 const domainMatches = (domain: string, allowedDomains: string[]) =>
   allowedDomains.some((item) => domain === item || domain.endsWith(`.${item}`));
 
 const isGoogleOwnedDomain = (domain: string) => domainMatches(domain, GOOGLE_OWNED_DOMAINS);
 const isMercadoLibreDomain = (domain: string) => domainMatches(domain, MERCADOLIBRE_DOMAINS);
+const isLocalDomain = (domain: string) =>
+  domainMatches(domain, LOCAL_DOMAINS) || /^(\d{1,3}\.){3}\d{1,3}$/.test(domain);
+const isLikelyPublicStoreDomain = (domain: string) =>
+  !!domain && domain.includes('.') && !isGoogleOwnedDomain(domain) && !isLocalDomain(domain);
+const isAllowedOtherStoreDomain = (domain: string) =>
+  !!domain && domain.includes('.') && !isLocalDomain(domain) && !isMercadoLibreDomain(domain);
 
 const parsePrice = (value: string) => {
   if (!value) return NaN;
@@ -315,12 +372,11 @@ const parseGoogleShoppingFromMarkdown = (
     const url = normalizedCandidates.find((candidate) => {
       const domain = getDomainFromUrl(candidate);
       if (!domain) return false;
-      if (isGoogleOwnedDomain(domain)) return false;
-      return true;
+      return isAllowedOtherStoreDomain(domain);
     }) || '';
     const domain = getDomainFromUrl(url);
     if (!url || !domain) continue;
-    if (isMercadoLibreDomain(domain)) continue;
+    if (!isAllowedOtherStoreDomain(domain)) continue;
 
     if (seen.has(url)) continue;
     seen.add(url);
@@ -405,7 +461,7 @@ const parseGoogleShoppingDom = (
     );
 
     if (!title || !url || !domain || !Number.isFinite(price) || price <= 0) return;
-    if (isGoogleOwnedDomain(domain) || isMercadoLibreDomain(domain)) return;
+    if (!isAllowedOtherStoreDomain(domain)) return;
     if (price > maxPrice * 1.8) return;
 
     const similarity = getTitleSimilarity(originalQuery, title);
@@ -562,19 +618,36 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
     1,
   );
 
-  return comparisonItems.map((item) => ({
-    url: item.url,
-    title: item.title,
-    currentPrice: item.price,
-    originalPrice: 0,
-    image: item.image,
-    freeShipping: '',
-    currency: CURRENCY_BY_COUNTRY[country] || '$',
-    features: '',
-    isBestSeller: '',
-    source: 'google-shopping',
-    domain: item.domain,
-    trustScore: item.trustScore,
-    trustLabel: item.trustLabel,
-  }));
+  const sanitized = comparisonItems.filter((item) => {
+    const domain = getDomainFromUrl(item.url) || item.domain;
+    if (!domain) return false;
+    return isAllowedOtherStoreDomain(domain);
+  });
+
+  const strict = sanitized.filter((item) => {
+    const domain = getDomainFromUrl(item.url) || item.domain;
+    return isLikelyPublicStoreDomain(domain);
+  });
+
+  const selected = strict.length > 0 ? strict : sanitized;
+
+  return selected.map((item) => {
+    const domain = getDomainFromUrl(item.url) || item.domain;
+    const trustScore = getDomainTrustIndex(domain, 'google-shopping');
+    return {
+      url: item.url,
+      title: item.title,
+      currentPrice: item.price,
+      originalPrice: 0,
+      image: item.image,
+      freeShipping: '',
+      currency: CURRENCY_BY_COUNTRY[country] || '$',
+      features: '',
+      isBestSeller: '',
+      source: 'google-shopping' as const,
+      domain,
+      trustScore,
+      trustLabel: getTrustLabel(trustScore),
+    };
+  });
 }

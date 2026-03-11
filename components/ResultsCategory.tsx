@@ -91,6 +91,8 @@ export default function ResultsCategory() {
     /mercadolibre\.com|mercadolivre\.com|mercadolibre\.com\.ar|mercadolibre\.com\.co|mercadolibre\.com\.uy|mercadolibre\.cl/i.test(
       String(url || ''),
     );
+  const isLocalDevUrl = (url: string) =>
+    /localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]|::1/i.test(String(url || ''));
 
   const [scrapingInProgress, setScrapingInProgress] = useState(false);
   const [mercadolibreData, setMercadolibreData] = useState<any[]>([]);
@@ -120,7 +122,8 @@ export default function ResultsCategory() {
         const googleItems =
           googleResult.status === 'fulfilled' && Array.isArray(googleResult.value)
             ? googleResult.value.filter(
-                (item: any) => item?.source === 'google-shopping' && !isMercadoLibreUrl(item?.url),
+                (item: any) =>
+                  item?.source === 'google-shopping' && !isMercadoLibreUrl(item?.url) && !isLocalDevUrl(item?.url),
               )
             : [];
 
