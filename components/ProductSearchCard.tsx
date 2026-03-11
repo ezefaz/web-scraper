@@ -19,6 +19,12 @@ const ProductSearchCard = ({ product }: Props) => {
   const currency = product?.currency || '$';
   const source = product?.source === 'google-shopping' ? 'google-shopping' : 'mercadolibre';
   const sourceLabel = source === 'google-shopping' ? 'Otras tiendas' : 'Mercado Libre';
+  const productUrl = String(product?.url || '');
+  const isMercadoLibreUrl =
+    /mercadolibre\.com|mercadolivre\.com|mercadolibre\.com\.ar|mercadolibre\.com\.co|mercadolibre\.com\.uy|mercadolibre\.cl/i.test(
+      productUrl,
+    );
+  const shouldUseLocalDetail = source === 'mercadolibre' || isMercadoLibreUrl;
   const domain = product?.domain || '';
   const trustScore = Number(product?.trustScore) || 0;
   const trustLabel = product?.trustLabel || (trustScore >= 80 ? 'Alta' : trustScore >= 60 ? 'Media' : 'Baja');
@@ -89,16 +95,16 @@ const ProductSearchCard = ({ product }: Props) => {
     </article>
   );
 
-  if (source === 'google-shopping') {
+  if (!shouldUseLocalDetail) {
     return (
-      <a href={product.url} target='_blank' rel='noopener noreferrer' className='group block h-full'>
+      <a href={productUrl} target='_blank' rel='noopener noreferrer' className='group block h-full'>
         {cardContent}
       </a>
     );
   }
 
   return (
-    <Link href={`/products/local?productUrl=${product.url}`} className='group block h-full'>
+    <Link href={`/products/local?productUrl=${encodeURIComponent(productUrl)}`} className='group block h-full'>
       {cardContent}
     </Link>
   );

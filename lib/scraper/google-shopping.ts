@@ -91,12 +91,15 @@ const getBrightDataOptions = () => {
 
   const sessionId = (1000000 * Math.random()) | 0;
   return {
-    auth: {
-      username: `${username}-session-${sessionId}`,
-      password,
+    proxy: {
+      protocol: 'http' as const,
+      host: 'brd.superproxy.io',
+      port: 22225,
+      auth: {
+        username: `${username}-session-${sessionId}`,
+        password,
+      },
     },
-    host: 'brd.superproxy.io',
-    port: 22225,
   };
 };
 
@@ -136,6 +139,30 @@ const normalizeUrl = (value?: string) => {
     return resolved.split('#')[0].split('?')[0];
   }
 };
+
+const GOOGLE_OWNED_DOMAINS = [
+  'google.com',
+  'google.com.ar',
+  'googleusercontent.com',
+  'gstatic.com',
+  'googleadservices.com',
+  'doubleclick.net',
+];
+
+const MERCADOLIBRE_DOMAINS = [
+  'mercadolibre.com',
+  'mercadolibre.com.ar',
+  'mercadolivre.com.br',
+  'mercadolibre.com.uy',
+  'mercadolibre.com.co',
+  'mercadolibre.cl',
+];
+
+const domainMatches = (domain: string, allowedDomains: string[]) =>
+  allowedDomains.some((item) => domain === item || domain.endsWith(`.${item}`));
+
+const isGoogleOwnedDomain = (domain: string) => domainMatches(domain, GOOGLE_OWNED_DOMAINS);
+const isMercadoLibreDomain = (domain: string) => domainMatches(domain, MERCADOLIBRE_DOMAINS);
 
 const parsePrice = (value: string) => {
   if (!value) return NaN;
@@ -220,7 +247,6 @@ const parseGoogleShoppingFromMarkdown = (
   query: string,
   maxPrice: number,
   dolarValue: number,
-  gl: string,
 ) => {
   const items: GoogleShoppingComparisonProduct[] = [];
   const seen = new Set<string>();
@@ -266,10 +292,36 @@ const parseGoogleShoppingFromMarkdown = (
     const similarity = getTitleSimilarity(query, title);
     if (similarity < 0.2) continue;
 
-    const merchantMatch = line.match(/favicon[^\)]*\)\s*([^\d$][^]+?)(?:Devoluciones|[0-9],[0-9]|\s{2,}|$)/i);
-    const merchant = merchantMatch?.[1]?.trim() || 'google-shopping';
-    const domain = merchant.toLowerCase().replace(/[^a-z0-9.-]/g, '').slice(0, 60) || 'google-shopping';
-    const url = `${GOOGLE_SHOPPING_URL(gl, title)}#item=${encodeURIComponent(title.slice(0, 80))}`;
+    const linkCandidates: string[] = [];
+    const markdownLinkRegex = /\[[^\]]+\]\(([^)\s]+)\)/ig;
+    let linkMatch: RegExpExecArray | null = markdownLinkRegex.exec(line);
+    while (linkMatch) {
+      linkCandidates.push(linkMatch[1]);
+      linkMatch = markdownLinkRegex.exec(line);
+    }
+    const rawUrlRegex = /(https?:\/\/[^\s)]+)/ig;
+    let rawUrlMatch: RegExpExecArray | null = rawUrlRegex.exec(line);
+    while (rawUrlMatch) {
+      linkCandidates.push(rawUrlMatch[1]);
+      rawUrlMatch = rawUrlRegex.exec(line);
+    }
+
+    const imageSet = new Set(imageMatches.map((img) => normalizeUrl(img)));
+    const normalizedCandidates = linkCandidates
+      .map((candidate) => normalizeUrl(candidate))
+      .filter(Boolean)
+      .filter((candidate) => !imageSet.has(candidate));
+
+    const url = normalizedCandidates.find((candidate) => {
+      const domain = getDomainFromUrl(candidate);
+      if (!domain) return false;
+      if (isGoogleOwnedDomain(domain)) return false;
+      return true;
+    }) || '';
+    const domain = getDomainFromUrl(url);
+    if (!url || !domain) continue;
+    if (isMercadoLibreDomain(domain)) continue;
+
     if (seen.has(url)) continue;
     seen.add(url);
 
@@ -353,6 +405,7 @@ const parseGoogleShoppingDom = (
     );
 
     if (!title || !url || !domain || !Number.isFinite(price) || price <= 0) return;
+    if (isGoogleOwnedDomain(domain) || isMercadoLibreDomain(domain)) return;
     if (price > maxPrice * 1.8) return;
 
     const similarity = getTitleSimilarity(originalQuery, title);
@@ -471,7 +524,7 @@ export async function scrapeGoogleShoppingProducts(
         timeout: 15000,
       });
       const markdown = String(response.data || '');
-      const fallbackItems = parseGoogleShoppingFromMarkdown(markdown, query, productPrice, dolarValue, gl);
+      const fallbackItems = parseGoogleShoppingFromMarkdown(markdown, query, productPrice, dolarValue);
 
       logInfo(requestId, 'Rendered fallback parsed', {
         candidate,

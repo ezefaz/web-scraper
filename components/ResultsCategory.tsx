@@ -87,6 +87,11 @@ export default function ResultsCategory() {
 
   const formattedProduct = product?.replace(/-/g, ' ');
 
+  const isMercadoLibreUrl = (url: string) =>
+    /mercadolibre\.com|mercadolivre\.com|mercadolibre\.com\.ar|mercadolibre\.com\.co|mercadolibre\.com\.uy|mercadolibre\.cl/i.test(
+      String(url || ''),
+    );
+
   const [scrapingInProgress, setScrapingInProgress] = useState(false);
   const [mercadolibreData, setMercadolibreData] = useState<any[]>([]);
   const [googleShoppingData, setGoogleShoppingData] = useState<any[]>([]);
@@ -107,10 +112,20 @@ export default function ResultsCategory() {
           scrapeGoogleShoppingSearchProducts(product),
         ]);
 
-        setMercadolibreData(mlResult.status === 'fulfilled' && Array.isArray(mlResult.value) ? mlResult.value : []);
-        setGoogleShoppingData(
-          googleResult.status === 'fulfilled' && Array.isArray(googleResult.value) ? googleResult.value : [],
-        );
+        const mlItems =
+          mlResult.status === 'fulfilled' && Array.isArray(mlResult.value)
+            ? mlResult.value.filter((item: any) => item?.source === 'mercadolibre' || isMercadoLibreUrl(item?.url))
+            : [];
+
+        const googleItems =
+          googleResult.status === 'fulfilled' && Array.isArray(googleResult.value)
+            ? googleResult.value.filter(
+                (item: any) => item?.source === 'google-shopping' && !isMercadoLibreUrl(item?.url),
+              )
+            : [];
+
+        setMercadolibreData(mlItems);
+        setGoogleShoppingData(googleItems);
       } catch (error) {
         console.error('Error Comparing prices:', error);
       } finally {

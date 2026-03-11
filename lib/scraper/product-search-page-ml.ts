@@ -38,6 +38,29 @@ const REQUEST_HEADERS = {
 	Referer: "https://www.mercadolibre.com/",
 };
 
+const LOG_TAG = "[ML_SEARCH]";
+const ML_SEARCH_DEBUG =
+	process.env.PRICE_COMPARISON_DEBUG === "true"
+	|| process.env.ML_SEARCH_DEBUG === "true";
+
+const logInfo = (requestId: string, message: string, meta?: Record<string, unknown>) => {
+	if (!ML_SEARCH_DEBUG) return;
+	if (meta) {
+		console.log(`${LOG_TAG}[${requestId}] ${message}`, meta);
+		return;
+	}
+	console.log(`${LOG_TAG}[${requestId}] ${message}`);
+};
+
+const logError = (requestId: string, message: string, meta?: Record<string, unknown>) => {
+	if (!ML_SEARCH_DEBUG) return;
+	if (meta) {
+		console.error(`${LOG_TAG}[${requestId}] ${message}`, meta);
+		return;
+	}
+	console.error(`${LOG_TAG}[${requestId}] ${message}`);
+};
+
 const toHttps = (value: string) => {
 	if (!value) return "";
 	if (value.startsWith("http://")) return value.replace("http://", "https://");
@@ -267,46 +290,184 @@ const parseLdJsonProducts = ($: any) => {
 	return items;
 };
 
+const getBrightDataProxyConfig = () => {
+	const username = String(process.env.BRIGHT_DATA_USERNAME || "").trim();
+	const password = String(process.env.BRIGHT_DATA_PASSWORD || "").trim();
+	if (!username || !password) return null;
+
+	const sessionId = (1000000 * Math.random()) | 0;
+	return {
+		proxy: {
+			protocol: "http" as const,
+			host: "brd.superproxy.io",
+			port: 22225,
+			auth: {
+				username: `${username}-session-${sessionId}`,
+				password,
+			},
+		},
+	};
+};
+
+const normalizeQueryText = (value: string) =>
+	value
+		.replace(/[-_]+/g, " ")
+		.replace(/\s+/g, " ")
+		.trim();
+
+const buildSearchPathSlug = (value: string) =>
+	value
+		.trim()
+		.replace(/\s+/g, "-")
+		.replace(/-+/g, "-");
+
+const looksBlocked = (html: string, pageTitle: string) => {
+	const haystack = `${pageTitle}\n${html.slice(0, 5000)}`.toLowerCase();
+	return /(captcha|recaptcha|verify you are human|enablejs|robot|tr[aá]fico inusual)/i.test(haystack);
+};
+
+const mergeSearchResults = (domProducts: SearchProduct[], ldProducts: SearchProduct[]) => {
+	const ldByUrl = new Map(ldProducts.map((product) => [product.url, product]));
+
+	const mergedFromDom = domProducts.map((product) => {
+		const fromLd = ldByUrl.get(product.url);
+		return {
+			...product,
+			image: product.image || fromLd?.image || "",
+			currentPrice: product.currentPrice || fromLd?.currentPrice || 0,
+			currency: product.currency || fromLd?.currency || "$",
+		};
+	});
+
+	const domUrls = new Set(mergedFromDom.map((product) => product.url));
+	const ldOnly = ldProducts.filter((product) => !domUrls.has(product.url));
+	const all = [...mergedFromDom, ...ldOnly].filter(
+		(product) => product.title && product.url && product.currentPrice > 0
+	);
+
+	const byUrl = new Map<string, SearchProduct>();
+	for (const item of all) {
+		if (!byUrl.has(item.url)) {
+			byUrl.set(item.url, item);
+			continue;
+		}
+		const existing = byUrl.get(item.url)!;
+		byUrl.set(item.url, {
+			...existing,
+			image: existing.image || item.image,
+			originalPrice: existing.originalPrice || item.originalPrice,
+		});
+	}
+
+	return Array.from(byUrl.values());
+};
+
 export async function scrapeProductSearchPageML(productTitle: any) {
 	const user = await getCurrentUser();
+	const requestId = Math.random().toString(36).slice(2, 10);
 	try {
 		const defaultCountry: Country = "argentina";
 		const country = (user?.country as Country) || defaultCountry;
 		const baseUrl = SEARCH_BASE_BY_COUNTRY[country] || SEARCH_BASE_BY_COUNTRY.argentina;
-		const query = decodeURIComponent(String(productTitle || "")).trim();
-		const searchUrl = `${baseUrl}/${query}`;
+		const rawQuery = decodeURIComponent(String(productTitle || "")).trim();
+		if (!rawQuery) return [];
 
-		const response = await axios.get(searchUrl, {
-			headers: REQUEST_HEADERS,
-			timeout: 12000,
-		});
-		const html = response.data;
-		const $ = cheerio.load(html);
-
-		const domProducts = parseDomProducts($);
-		const ldProducts = parseLdJsonProducts($);
-
-		const ldByUrl = new Map(ldProducts.map((product) => [product.url, product]));
-
-		// Complete missing images (and fallback values) with JSON-LD payload.
-		const mergedFromDom = domProducts.map((product) => {
-			const fromLd = ldByUrl.get(product.url);
-			return {
-				...product,
-				image: product.image || fromLd?.image || "",
-				currentPrice: product.currentPrice || fromLd?.currentPrice || 0,
-				currency: product.currency || fromLd?.currency || "$",
-			};
-		});
-
-		// Add products that only exist in JSON-LD and were not parsed from DOM.
-		const domUrls = new Set(mergedFromDom.map((product) => product.url));
-		const ldOnly = ldProducts.filter((product) => !domUrls.has(product.url));
-
-		return [...mergedFromDom, ...ldOnly].filter(
-			(product) => product.title && product.url && product.currentPrice > 0
+		const normalizedQuery = normalizeQueryText(rawQuery);
+		const queryCandidates = Array.from(
+			new Set([
+				rawQuery,
+				normalizedQuery,
+				normalizedQuery.split(" ").slice(0, 8).join(" "),
+				normalizedQuery.split(" ").slice(0, 6).join(" "),
+			].filter(Boolean))
 		);
+
+		const proxyConfig = getBrightDataProxyConfig();
+		const requestStrategies = [
+			{
+				name: "direct",
+				config: { headers: REQUEST_HEADERS, timeout: 12000 },
+			},
+			...(proxyConfig
+				? [
+					{
+						name: "proxy",
+						config: {
+							headers: REQUEST_HEADERS,
+							timeout: 15000,
+							...proxyConfig,
+						},
+					},
+				]
+				: []),
+		];
+
+		logInfo(requestId, "Starting MercadoLibre search scrape", {
+			country,
+			baseUrl,
+			rawQuery,
+			normalizedQuery,
+			queryCandidates,
+			strategies: requestStrategies.map((strategy) => strategy.name),
+		});
+
+		for (const candidate of queryCandidates) {
+			const slug = buildSearchPathSlug(candidate);
+			if (!slug) continue;
+			const searchUrl = `${baseUrl}/${slug}`;
+
+			for (const strategy of requestStrategies) {
+				try {
+					logInfo(requestId, "Trying search request", {
+						candidate,
+						strategy: strategy.name,
+						searchUrl,
+					});
+					const response = await axios.get(searchUrl, strategy.config);
+					const html = String(response.data || "");
+					const $ = cheerio.load(html);
+
+					const domProducts = parseDomProducts($);
+					const ldProducts = parseLdJsonProducts($);
+					const merged = mergeSearchResults(domProducts, ldProducts);
+					const pageTitle = $("title").text().trim();
+					const blocked = looksBlocked(html, pageTitle);
+
+					logInfo(requestId, "Search response parsed", {
+						status: response.status,
+						candidate,
+						strategy: strategy.name,
+						totalDom: domProducts.length,
+						totalLdJson: ldProducts.length,
+						totalMerged: merged.length,
+						pageTitle: pageTitle.slice(0, 120),
+						blocked,
+					});
+
+					if (merged.length > 0) {
+						return merged.sort((a, b) => a.currentPrice - b.currentPrice).slice(0, 60);
+					}
+				} catch (error: any) {
+					logError(requestId, "Search request failed", {
+						candidate,
+						strategy: strategy.name,
+						searchUrl,
+						status: error?.response?.status,
+						message: error?.message,
+					});
+				}
+			}
+		}
+
+		logError(requestId, "No MercadoLibre products found for any candidate", {
+			rawQuery,
+			queryCandidates,
+		});
+		return [];
 	} catch (error: any) {
-		throw new Error(`Failed to scrape ML search product: ${error.message}`);
+		logError(requestId, "Unexpected MercadoLibre search scraper error", {
+			message: error?.message,
+		});
+		return [];
 	}
 }
