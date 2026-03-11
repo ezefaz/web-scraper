@@ -26,9 +26,8 @@ import { SyncLoader } from 'react-spinners';
 // import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
 
 const sortOptions = [
-  // { name: 'Más Popular', href: '#', current: true },
-  { name: 'Precio: Menor a Mayor', href: '#', current: false, key: 'desc' },
-  { name: 'Precio: Mayor a Menor', href: '#', current: false, key: 'asc' },
+  { name: 'Precio: Menor a Mayor', key: 'price_asc' },
+  { name: 'Precio: Mayor a Menor', key: 'price_desc' },
 ];
 
 const subCategories = [
@@ -78,8 +77,7 @@ function classNames(...classes: any) {
 
 export default function ResultsCategory() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [currentSortOption, setCurrentSortOption] = useState(sortOrder);
+  const [sortOrder, setSortOrder] = useState<'price_asc' | 'price_desc'>('price_asc');
 
   const searchParams = useSearchParams();
 
@@ -88,7 +86,7 @@ export default function ResultsCategory() {
   const formattedProduct = product?.replace(/-/g, ' ');
 
   const [scrapingInProgress, setScrapingInProgress] = useState(false);
-  const [scrapedData, setScrapedData] = useState([]);
+  const [scrapedData, setScrapedData] = useState<any[]>([]);
   const [freeShipping, setFreeShipping] = useState(false);
 
   useEffect(() => {
@@ -100,13 +98,9 @@ export default function ResultsCategory() {
 
         const filteredData = freeShipping ? data.filter((item: any) => item.freeShipping !== '') : data;
 
-        const sortedData = filteredData.sort((a: any, b: any) => {
-          if (sortOrder === 'asc') {
-            return b.currentPrice - a.currentPrice;
-          }
-          if (sortOrder === 'desc') {
-            return a.currentPrice - b.currentPrice;
-          }
+        const sortedData = [...filteredData].sort((a: any, b: any) => {
+          if (sortOrder === 'price_desc') return b.currentPrice - a.currentPrice;
+          return a.currentPrice - b.currentPrice;
         });
 
         setScrapedData(sortedData);
@@ -239,7 +233,7 @@ export default function ResultsCategory() {
                   <Menu as='div' className='relative inline-block text-left'>
                     <div>
                       <Menu.Button className='group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-200'>
-                        Ordenar Por:
+                        {sortOrder === 'price_asc' ? 'Orden: Menor a Mayor' : 'Orden: Mayor a Menor'}
                         <IoArrowDownCircleOutline
                           className='-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500'
                           aria-hidden='true'
@@ -256,22 +250,22 @@ export default function ResultsCategory() {
                       leaveFrom='transform opacity-100 scale-100'
                       leaveTo='transform opacity-0 scale-95'
                     >
-                      <Menu.Items className='absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none'>
+                      <Menu.Items className='absolute right-0 z-10 mt-2 w-52 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-zinc-900'>
                         <div className='py-1'>
                           {sortOptions.map((option) => (
                             <Menu.Item key={option.key}>
                               {({ active }) => (
-                                <a
-                                  href={option.href}
+                                <button
+                                  type='button'
                                   className={classNames(
-                                    option.current ? 'font-medium text-gray-900' : 'text-gray-500',
-                                    active ? 'bg-gray-100' : '',
-                                    'block px-4 py-2 text-sm'
+                                    sortOrder === option.key ? 'font-semibold text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300',
+                                    active ? 'bg-gray-100 dark:bg-zinc-800' : '',
+                                    'block w-full px-4 py-2 text-left text-sm'
                                   )}
-                                  onClick={() => setSortOrder(option.key.toLowerCase())}
+                                  onClick={() => setSortOrder(option.key as 'price_asc' | 'price_desc')}
                                 >
                                   {option.name}
-                                </a>
+                                </button>
                               )}
                             </Menu.Item>
                           ))}

@@ -2,135 +2,277 @@
 
 import axios from "axios";
 import * as cheerio from "cheerio";
-import { scrapeDolarValue } from "./dolar";
 import { getCurrentUser } from "../actions";
 
-export async function scrapeProductSearchPageML(productTitle: any) {
-	// bright data proxy configuration
-	const username = String(process.env.BRIGHT_DATA_USERNAME);
-	const password = String(process.env.BRIGHT_DATA_PASSWORD);
-	const port = 22225;
-	const session_id = (1000000 * Math.random()) | 0;
+type Country = "argentina" | "uruguay" | "brasil" | "colombia";
 
-	const options = {
-		auth: {
-			username: `${username}-session-${session_id}`,
-			password: password,
-		},
-		host: "brd.superproxy.io",
-		port,
-		rejectUnathorized: false,
+type SearchProduct = {
+	url: string;
+	title: string;
+	currentPrice: number;
+	originalPrice: number;
+	image: string;
+	freeShipping: string;
+	currency: string;
+	features: string;
+	isBestSeller: string;
+};
+
+const SEARCH_BASE_BY_COUNTRY: Record<Country, string> = {
+	argentina: "https://listado.mercadolibre.com.ar",
+	uruguay: "https://listado.mercadolibre.com.uy",
+	brasil: "https://lista.mercadolivre.com.br",
+	colombia: "https://listado.mercadolibre.com.co",
+};
+
+const REQUEST_HEADERS = {
+	"User-Agent":
+		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+	Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+	"Accept-Language": "es-AR,es;q=0.9,en;q=0.8",
+	Referer: "https://www.mercadolibre.com/",
+};
+
+const toHttps = (value: string) => {
+	if (!value) return "";
+	if (value.startsWith("http://")) return value.replace("http://", "https://");
+	if (value.startsWith("//")) return `https:${value}`;
+	return value;
+};
+
+const normalizeUrl = (value: string) => {
+	if (!value) return "";
+	try {
+		const parsed = new URL(value);
+		parsed.hash = "";
+		parsed.search = "";
+		return `${parsed.origin}${parsed.pathname}`;
+	} catch {
+		return value.split("#")[0].split("?")[0];
+	}
+};
+
+const parsePriceNumber = (value?: string | number) => {
+	if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+	if (!value) return 0;
+	const sanitized = String(value).replace(/[^\d]/g, "");
+	if (!sanitized) return 0;
+	return Number(sanitized);
+};
+
+const getImageFromSrcset = (srcset?: string) => {
+	if (!srcset) return "";
+	const firstCandidate = srcset
+		.split(",")
+		.map((candidate) => candidate.trim())
+		.filter(Boolean)[0];
+	if (!firstCandidate) return "";
+	return firstCandidate.split(" ")[0] || "";
+};
+
+const parseDomProducts = ($: any) => {
+	const items: SearchProduct[] = [];
+	const selectors = [
+		".ui-search-layout .ui-search-layout__item",
+		"li.ui-search-layout__item",
+		".ui-search-result__wrapper",
+	];
+	const selected = selectors.find((selector) => $(selector).length > 0);
+	if (!selected) return items;
+
+	$(selected).each((_: any, element: any) => {
+		const product = $(element);
+
+		const titleAnchor =
+			product.find("h3.poly-component__title-wrapper a.poly-component__title").first()
+				|| product.find("a.poly-component__title").first()
+				|| product.find("a.ui-search-link").first();
+
+		const title =
+			titleAnchor.text().trim()
+			|| product.find(".ui-search-item__title").first().text().trim()
+			|| "";
+		const url = normalizeUrl(
+			String(
+				titleAnchor.attr("href")
+					|| product.find("a.ui-search-link").first().attr("href")
+					|| product.find("a[href*='/MLA']").first().attr("href")
+					|| product.find("a[href*='/ML']").first().attr("href")
+					|| ""
+			)
+		);
+
+		const currentAmount = product.find(".poly-price__current .andes-money-amount").first();
+		const currentPrice =
+			parsePriceNumber(currentAmount.attr("aria-label"))
+			|| parsePriceNumber(currentAmount.find(".andes-money-amount__fraction").first().text())
+			|| parsePriceNumber(product.find(".andes-money-amount__fraction").first().text());
+
+		const previousAmount = product.find("s.andes-money-amount--previous").first();
+		const originalPrice =
+			parsePriceNumber(previousAmount.attr("aria-label"))
+			|| parsePriceNumber(previousAmount.find(".andes-money-amount__fraction").first().text());
+
+		const picture = product.find(".poly-component__picture").first();
+		const image = toHttps(
+			String(
+				picture.attr("src")
+					|| picture.attr("data-src")
+					|| getImageFromSrcset(picture.attr("srcset"))
+					|| product.find(".ui-search-result-image__element").first().attr("data-src")
+					|| product.find(".ui-search-result-image__element").first().attr("src")
+					|| getImageFromSrcset(product.find("img").first().attr("srcset"))
+					|| product.find("img").first().attr("data-src")
+					|| product.find("img").first().attr("src")
+					|| ""
+			)
+		);
+
+		const currency =
+			product.find(".andes-money-amount__currency-symbol").first().text().trim() || "$";
+		const freeShipping =
+			product.find(".poly-component__shipping").first().text().trim()
+			|| product.find(".ui-search-item__shipping").first().text().trim()
+			|| "";
+		const features =
+			product
+				.find(".ui-search-item__group__element.ui-search-item__variations-text")
+				.text()
+				.trim()
+			|| product.find(".poly-buy-box__headline").first().text().trim()
+			|| "";
+		const isBestSeller =
+			product
+				.find(".ui-search-styled-label.ui-search-item__highlight-label__text")
+				.text()
+				.trim()
+			|| product.find(".poly-component__ad-label").first().text().trim()
+			|| "";
+
+		if (!title || !url || currentPrice <= 0) return;
+
+		items.push({
+			url,
+			title,
+			currentPrice,
+			originalPrice,
+			image,
+			freeShipping,
+			currency,
+			features,
+			isBestSeller,
+		});
+	});
+
+	return items;
+};
+
+const parseLdJsonProducts = ($: any) => {
+	const items: SearchProduct[] = [];
+
+	const pushItem = (value: any) => {
+		if (!value || typeof value !== "object") return;
+
+		const offer = Array.isArray(value.offers) ? value.offers[0] : value.offers;
+		const currentPrice = parsePriceNumber(offer?.price ?? value.price);
+		const rawUrl = String(value.url || offer?.url || "").trim();
+		const url = normalizeUrl(rawUrl);
+		const title = String(value.name || "").trim();
+		const rawImage = Array.isArray(value.image) ? value.image[0] : value.image;
+		const image = toHttps(String(rawImage || "").trim());
+
+		if (!title || !url || currentPrice <= 0) return;
+
+		items.push({
+			url,
+			title,
+			currentPrice,
+			originalPrice: 0,
+			image,
+			freeShipping: "",
+			currency: offer?.priceCurrency === "ARS" ? "$" : String(offer?.priceCurrency || "$"),
+			features: "",
+			isBestSeller: "",
+		});
 	};
 
-	const user = await getCurrentUser();
-	try {
-		const defaultCountry = "argentina";
+	const walk = (value: any) => {
+		if (!value) return;
 
-		const country: string = user?.country || defaultCountry;
-
-		let link = "";
-
-		const countryName = country;
-
-		if (countryName == "argentina") {
-			link = "https://listado.mercadolibre.com.ar";
-		} else if (countryName == "uruguay") {
-			link = "https://listado.mercadolibre.com.uy";
-		} else if (countryName == "brasil") {
-			link = "https://lista.mercadolivre.com.br";
-		} else if (countryName == "colombia") {
-			link = "https://listado.mercadolibre.com.co";
+		if (Array.isArray(value)) {
+			value.forEach((entry) => walk(entry));
+			return;
 		}
 
-		const searchUrl = `${link}/${productTitle}`;
+		if (typeof value !== "object") return;
 
-		const response = await axios.get(searchUrl);
+		if (value["@type"] === "ItemList" && Array.isArray(value.itemListElement)) {
+			value.itemListElement.forEach((entry: any) => walk(entry?.item || entry));
+		}
 
+		if (value["@type"] === "Product" || (value.name && value.offers)) {
+			pushItem(value);
+		}
+
+		if (Array.isArray(value["@graph"])) {
+			value["@graph"].forEach((entry: any) => walk(entry));
+		}
+	};
+
+	$("script[type='application/ld+json']").each((_: any, element: any) => {
+		const rawScript = $(element).contents().text().trim();
+		if (!rawScript) return;
+
+		try {
+			const parsed = JSON.parse(rawScript);
+			walk(parsed);
+		} catch {
+			// Ignore malformed JSON-LD blocks.
+		}
+	});
+
+	return items;
+};
+
+export async function scrapeProductSearchPageML(productTitle: any) {
+	const user = await getCurrentUser();
+	try {
+		const defaultCountry: Country = "argentina";
+		const country = (user?.country as Country) || defaultCountry;
+		const baseUrl = SEARCH_BASE_BY_COUNTRY[country] || SEARCH_BASE_BY_COUNTRY.argentina;
+		const query = decodeURIComponent(String(productTitle || "")).trim();
+		const searchUrl = `${baseUrl}/${query}`;
+
+		const response = await axios.get(searchUrl, {
+			headers: REQUEST_HEADERS,
+			timeout: 12000,
+		});
 		const html = response.data;
 		const $ = cheerio.load(html);
 
-		const productList: any = [];
-		$(".ui-search-layout .ui-search-layout__item").each((index, element) => {
-			const product = $(element);
-			console.log("product", product);
+		const domProducts = parseDomProducts($);
+		const ldProducts = parseLdJsonProducts($);
 
-			const title = product.find(".ui-search-item__title").text().trim();
-			const url = product.find("a.ui-search-link").attr("href") || "";
-			let priceLabel = product.find(".andes-money-amount").attr("aria-label");
+		const ldByUrl = new Map(ldProducts.map((product) => [product.url, product]));
 
-			if (priceLabel && priceLabel.includes("Antes")) {
-				priceLabel = priceLabel.replace("Antes: ", "");
-			}
-
-			let price = "";
-			if (priceLabel) {
-				price = priceLabel.replace(" pesos", "");
-			} else {
-				const priceElement = product.find(
-					".andes-money-amount.ui-search-price__part"
-				);
-				price = priceElement.attr("aria-label") || "";
-			}
-
-			const pricesLabel = product.find(".andes-money-amount__fraction");
-
-			const pricesArray: number[] = [];
-			pricesLabel.each((idx, fractionElement) => {
-				const priceText = $(fractionElement)
-					.text()
-					.replace(/\./g, "")
-					.replace(",", ".");
-				const numericPrice = parseFloat(priceText);
-				pricesArray.push(numericPrice);
-			});
-
-			let currentPrice = 0;
-			let originalPrice = 0;
-
-			if (pricesArray.length === 2) {
-				currentPrice = pricesArray[0];
-			} else if (pricesArray.length === 3) {
-				originalPrice = pricesArray[0];
-				currentPrice = pricesArray[1];
-			} else if (pricesArray.length === 1) {
-				currentPrice = pricesArray[0];
-			}
-
-			const currency = product
-				.find(".andes-money-amount__currency-symbol")
-				.first()
-				.text();
-
-			const freeShipping = product
-				.find(".ui-search-item__shipping.ui-search-item__shipping--free")
-				.text();
-
-			const image = product
-				.find(".ui-search-result-image__element")
-				.attr("data-src");
-
-			const features = product
-				.find(".ui-search-item__group__element.ui-search-item__variations-text")
-				.text();
-
-			const isBestSeller = product
-				.find(".ui-search-styled-label.ui-search-item__highlight-label__text")
-				.text();
-
-			productList.push({
-				url,
-				title,
-				currentPrice,
-				originalPrice,
-				image,
-				freeShipping,
-				currency,
-				features,
-				isBestSeller,
-			});
+		// Complete missing images (and fallback values) with JSON-LD payload.
+		const mergedFromDom = domProducts.map((product) => {
+			const fromLd = ldByUrl.get(product.url);
+			return {
+				...product,
+				image: product.image || fromLd?.image || "",
+				currentPrice: product.currentPrice || fromLd?.currentPrice || 0,
+				currency: product.currency || fromLd?.currency || "$",
+			};
 		});
 
-		return productList;
+		// Add products that only exist in JSON-LD and were not parsed from DOM.
+		const domUrls = new Set(mergedFromDom.map((product) => product.url));
+		const ldOnly = ldProducts.filter((product) => !domUrls.has(product.url));
+
+		return [...mergedFromDom, ...ldOnly].filter(
+			(product) => product.title && product.url && product.currentPrice > 0
+		);
 	} catch (error: any) {
 		throw new Error(`Failed to scrape ML search product: ${error.message}`);
 	}
