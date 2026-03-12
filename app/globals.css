@@ -28,6 +28,10 @@
   scroll-behavior: smooth;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .pixel-perfect-home {
   --background: 0 0% 100%;
   --foreground: 0 0% 7%;

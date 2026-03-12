@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import toast from "react-hot-toast";
 import { Bell, KeyRound, Search, Sparkles, TrendingDown, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/pixel-perfect-page-main/button";
 import { formatNumber } from "@/lib/utils";
@@ -61,7 +62,13 @@ function calculateSaving(product: DashboardProduct) {
   return diff > 0 ? diff : 0;
 }
 
+function getProductDetailsHref(product: DashboardProduct) {
+  const encodedUrl = encodeURIComponent(product.url || "");
+  return `/products/${product.id}?url=${encodedUrl}`;
+}
+
 export default function ProfileDashboardClient({ user, products, metrics }: Props) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<DashboardProduct[]>(products);
@@ -229,7 +236,15 @@ export default function ProfileDashboardClient({ user, products, metrics }: Prop
                   return (
                     <tr
                       key={item.id}
-                      className="border-b border-border/50 last:border-b-0"
+                      className="border-b border-border/50 last:border-b-0 cursor-pointer hover:bg-section-grey/60 transition-colors"
+                      onClick={() => router.push(getProductDetailsHref(item))}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          router.push(getProductDetailsHref(item));
+                        }
+                      }}
+                      tabIndex={0}
                     >
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-3 min-w-0">
@@ -240,7 +255,7 @@ export default function ProfileDashboardClient({ user, products, metrics }: Prop
                           />
                           <div className="min-w-0">
                             <Link
-                              href={`/products/${item.id}`}
+                              href={getProductDetailsHref(item)}
                               className="block text-sm font-medium text-foreground line-clamp-1 hover:underline"
                             >
                               {item.title}
@@ -262,12 +277,16 @@ export default function ProfileDashboardClient({ user, products, metrics }: Prop
                         )}
                       </td>
                       <td className="px-3 py-3">
-                        <label className="inline-flex items-center gap-2 text-sm text-foreground">
+                        <label
+                          className="inline-flex items-center gap-2 text-sm text-foreground"
+                          onClick={(event) => event.stopPropagation()}
+                        >
                           <input
                             type="checkbox"
                             className="h-4 w-4 accent-[var(--primary)]"
                             checked={item.isFollowing}
                             disabled={isPending && activeToggleId === item.id}
+                            onClick={(event) => event.stopPropagation()}
                             onChange={(e) =>
                               handleToggleAlert(item.id, e.target.checked)
                             }

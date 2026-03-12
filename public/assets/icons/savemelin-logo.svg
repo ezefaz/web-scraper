@@ -14,7 +14,7 @@
     <path d="M32.8 12.5H38.2" stroke="#E29656" stroke-width="1.6" stroke-linecap="round"/>
   </g>
 
-  <text x="68" y="38" fill="#E29656" font-family="Aspekta, Satoshi, Inter, sans-serif" font-weight="700" font-size="34" letter-spacing="-0.02em">
+  <text x="68" y="32" dominant-baseline="middle" fill="#E29656" font-family="Aspekta, Satoshi, Inter, sans-serif" font-weight="700" font-size="34" letter-spacing="-0.02em">
     savemelin
   </text>
 </svg>

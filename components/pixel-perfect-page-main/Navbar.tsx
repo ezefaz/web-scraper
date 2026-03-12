@@ -8,7 +8,12 @@ import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "./button";
 
-const navLinks = ["Como funciona", "Servicios", "Precios", "Destacado"];
+const navLinks = [
+  { label: "Como funciona", href: "/#como-funciona" },
+  { label: "Servicios", href: "/#servicios" },
+  { label: "Precios", href: "/#precios" },
+  { label: "Destacado", href: "/#destacado" },
+];
 
 export default function PixelPerfectNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -22,7 +27,7 @@ export default function PixelPerfectNavbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-background border-b-[0.5px]">
-      <div className="w-full max-w-[90rem] mx-auto px-10 md:px-6 py-4 flex flex-row items-center justify-start gap-8 min-h-20">
+      <div className="w-full max-w-[90rem] mx-auto p-12 md:px-6 py-4 flex flex-row items-center justify-start gap-8 min-h-20">
         <div className="flex items-center gap-10 min-w-0">
           <Link href="/" className="flex items-center pr-6 h-full">
             <Image
@@ -37,11 +42,11 @@ export default function PixelPerfectNavbar() {
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <a
-                key={link}
-                href="#"
+                key={link.label}
+                href={link.href}
                 className="text-base text-muted-foreground hover:text-foreground transition-colors"
               >
-                {link}
+                {link.label}
               </a>
             ))}
           </div>
@@ -101,16 +106,16 @@ export default function PixelPerfectNavbar() {
           isMobileMenuOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="max-w-[90rem] mx-10 md:mx-auto px-4 md:px-6 py-4 bg-background border-x border-border">
+        <div className="max-w-[90rem] mx-auto padding-global py-5 bg-background border-x border-border">
           <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <a
-                key={link}
-                href="#"
-                className="text-base text-muted-foreground hover:text-foreground transition-colors py-1"
+                key={link.label}
+                href={link.href}
+                className="text-base text-muted-foreground hover:text-foreground m-auto  transition-colors py-1"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                {link}
+                {link.label}
               </a>
             ))}
           </div>

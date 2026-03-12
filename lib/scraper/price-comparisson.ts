@@ -32,6 +32,9 @@ type RawProduct = {
 
 const LOG_TAG = '[PRICE_COMPARISON]';
 const PRICE_COMPARISON_DEBUG = process.env.PRICE_COMPARISON_DEBUG === 'true';
+const MIN_RELATIVE_PRICE_RATIO = 0.35;
+const MAX_RELATIVE_PRICE_RATIO = 1.6;
+const MIN_TOKEN_OVERLAP_SCORE = 0.45;
 
 const SEARCH_BASE_BY_COUNTRY: Record<Country, string> = {
   argentina: 'https://listado.mercadolibre.com.ar',
@@ -46,6 +49,90 @@ const REQUEST_HEADERS = {
   Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
   'Accept-Language': 'es-AR,es;q=0.9,en;q=0.8',
   Referer: 'https://www.mercadolibre.com/',
+};
+
+const ACCESSORY_KEYWORDS = [
+  'funda',
+  'fundas',
+  'case',
+  'cover',
+  'protector',
+  'proteccion',
+  'film',
+  'hidrogel',
+  'vidrio',
+  'templado',
+  'glass',
+  'auricular',
+  'auriculares',
+  'headset',
+  'cargador',
+  'charger',
+  'cable',
+  'teclado',
+  'keyboard',
+  'stylus',
+  'lapiz',
+  'pen',
+  'estuche',
+  'carcasa',
+  'adapter',
+  'adaptador',
+  'soporte',
+  'holder',
+  'dock',
+];
+
+const STOPWORDS = new Set([
+  'de',
+  'del',
+  'la',
+  'el',
+  'los',
+  'las',
+  'para',
+  'con',
+  'por',
+  'en',
+  'y',
+  'or',
+  'the',
+  'a',
+  'an',
+  'inch',
+  'inches',
+  'tipo',
+  'compatible',
+  'for',
+]);
+
+const normalizeForComparison = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const tokenizeForComparison = (value: string) =>
+  normalizeForComparison(value)
+    .split(' ')
+    .filter((token) => token.length >= 2 && !STOPWORDS.has(token));
+
+const hasAccessoryKeyword = (value: string) => {
+  const normalized = normalizeForComparison(value);
+  return ACCESSORY_KEYWORDS.some((keyword) => normalized.includes(keyword));
+};
+
+const getTokenOverlapScore = (query: string, candidate: string) => {
+  const queryTokens = Array.from(new Set(tokenizeForComparison(query)));
+  const candidateTokenSet = new Set(tokenizeForComparison(candidate));
+
+  if (queryTokens.length === 0 || candidateTokenSet.size === 0) return 0;
+
+  const overlap = queryTokens.filter((token) => candidateTokenSet.has(token)).length;
+  return overlap / queryTokens.length;
 };
 
 const logInfo = (requestId: string, message: string, meta?: Record<string, unknown>) => {
@@ -426,6 +513,7 @@ async function scrapePriceComparissonProductsUncached(
   }
 
   const query = cleanSearchQuery(productTitle);
+  const isAccessoryQuery = hasAccessoryKeyword(query);
 
   if (!query) {
     logInfo(requestId, 'Query is empty after normalization. Returning empty result set.', { productTitle });
@@ -518,8 +606,27 @@ async function scrapePriceComparissonProductsUncached(
     }
   });
 
-  const combinedResults = Array.from(combinedByUrl.values())
-    .filter((item) => Number.isFinite(item.price) && item.price > 0)
+  const mergedResults = Array.from(combinedByUrl.values()).filter(
+    (item) => Number.isFinite(item.price) && item.price > 0,
+  );
+
+  const strictComparableResults = mergedResults.filter((item) => {
+    if (!isAccessoryQuery && hasAccessoryKeyword(item.title)) return false;
+
+    const overlapScore = getTokenOverlapScore(query, item.title);
+    if (overlapScore < MIN_TOKEN_OVERLAP_SCORE) return false;
+
+    if (!isAccessoryQuery && productPrice > 0) {
+      const ratio = item.price / productPrice;
+      if (ratio < MIN_RELATIVE_PRICE_RATIO || ratio > MAX_RELATIVE_PRICE_RATIO) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  const combinedResults = strictComparableResults
     .sort((a, b) => a.price - b.price)
     .slice(0, 40);
 
@@ -537,6 +644,14 @@ async function scrapePriceComparissonProductsUncached(
       })),
     });
     return combinedResults;
+  }
+
+  if (strictComparableResults.length === 0) {
+    logInfo(requestId, 'No strict comparable results after relevance filters', {
+      mergedCount: mergedResults.length,
+      isAccessoryQuery,
+      query,
+    });
   }
 
   logError(requestId, 'No results from local or Google Shopping. Returning empty result set.', {

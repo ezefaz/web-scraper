@@ -27,7 +27,9 @@ export default function PixelPerfectPage() {
         <div className="border-t border-border/70">
           <PixelPerfectHeroSection />
         </div>
-        <PixelPerfectPlatformSection />
+        <div id="como-funciona" className="scroll-mt-24">
+          <PixelPerfectPlatformSection />
+        </div>
         <img
           src={SECTION_DIVIDER_SRC}
           alt=""
@@ -35,7 +37,7 @@ export default function PixelPerfectPage() {
           className="relative z-[70] block w-full h-auto select-none pointer-events-none"
           loading="lazy"
         />
-        <div className="border border-border/70">
+        <div id="servicios" className="border border-border/70 scroll-mt-24">
           <PixelPerfectSolutionSection />
         </div>
         <img
@@ -45,7 +47,7 @@ export default function PixelPerfectPage() {
           className="relative z-[70] block w-full h-auto select-none pointer-events-none"
           loading="lazy"
         />
-        <div className="border-t border-border/70">
+        <div id="precios" className="border-t border-border/70 scroll-mt-24">
           <PixelPerfectUseCasesSection />
         </div>
         <img
@@ -55,7 +57,7 @@ export default function PixelPerfectPage() {
           className="relative z-[70] block w-full h-auto select-none pointer-events-none"
           loading="lazy"
         />
-        <div className="border-t border-border/70">
+        <div id="destacado" className="border-t border-border/70 scroll-mt-24">
           <PixelPerfectFeaturesTabSection />
         </div>
         <img

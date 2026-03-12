@@ -23,14 +23,23 @@ import { ExternalLink, History, Package, Sparkles } from 'lucide-react';
 
 type Props = {
   params: { id: string };
+  searchParams?: { url?: string };
 };
 
-const ProductDetailsPage = async ({ params: { id } }: Props) => {
+const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
   const currentUser = await getCurrentUser();
   const foundedProduct = await getProductById(id);
   const userProduct = currentUser?.products?.find((product: any) => product._id.toString() === id);
+  const fallbackUrl = (() => {
+    if (!searchParams?.url) return "";
+    try {
+      return decodeURIComponent(searchParams.url).trim();
+    } catch {
+      return searchParams.url.trim();
+    }
+  })();
 
-  const productUrl = foundedProduct?.url || userProduct?.url;
+  const productUrl = foundedProduct?.url || userProduct?.url || fallbackUrl;
   if (!productUrl) redirect('/');
 
   const product: ProductType = await getProductByURL(productUrl);
