@@ -6,6 +6,7 @@
 
 export const publicRoutes = [
   "/",
+  "/pixel-perfect-page-main",
   "/new-verification",
   "/api/cron",
   "/api/meli",
@@ -20,6 +21,7 @@ export const publicRoutes = [
  * @type {string[]}
  */
 export const publicRoutePrefixes = [
+  "/pixel-perfect-page-main/",
   "/products/",
   "/products/internacional/",
   "/products/international/",

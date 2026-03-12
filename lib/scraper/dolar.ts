@@ -2,8 +2,9 @@
 
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { runCachedSearch } from "../search/query-cache";
 
-export async function scrapeDolarValue() {
+async function scrapeDolarValueUncached() {
 	// bright data proxy configuration
 	const username = String(process.env.BRIGHT_DATA_USERNAME);
 	const password = String(process.env.BRIGHT_DATA_PASSWORD);
@@ -40,4 +41,14 @@ export async function scrapeDolarValue() {
 	} catch (error: any) {
 		throw new Error(`Failed to scrape usd dolar value: ${error.message}`);
 	}
+}
+
+export async function scrapeDolarValue() {
+	return runCachedSearch({
+		namespace: "dolar-blue-value",
+		params: { market: "ar-blue" },
+		ttlMs: 15 * 60 * 1000,
+		emptyTtlMs: 2 * 60 * 1000,
+		execute: async () => scrapeDolarValueUncached(),
+	});
 }

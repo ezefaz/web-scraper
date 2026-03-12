@@ -26,6 +26,7 @@ const ProductSearchCard = ({ product }: Props) => {
     );
   const shouldUseLocalDetail = source === 'mercadolibre' || isMercadoLibreUrl;
   const domain = product?.domain || '';
+  const storeName = product?.storeName || '';
   const trustScore = Number(product?.trustScore) || 0;
   const trustLabel = product?.trustLabel || (trustScore >= 80 ? 'Alta' : trustScore >= 60 ? 'Media' : 'Baja');
   const showTrustBadge = source === 'google-shopping' && !isMercadoLibreUrl && trustScore > 0;
@@ -37,7 +38,11 @@ const ProductSearchCard = ({ product }: Props) => {
           <span className='text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400'>
             {sourceLabel}
           </span>
-          {domain ? <span className='text-[11px] text-slate-400 dark:text-slate-500'>{domain}</span> : null}
+          {storeName ? (
+            <span className='text-[11px] text-slate-400 dark:text-slate-500'>{storeName}</span>
+          ) : domain ? (
+            <span className='text-[11px] text-slate-400 dark:text-slate-500'>{domain}</span>
+          ) : null}
         </div>
         {hasDiscount ? (
           <span className='rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'>

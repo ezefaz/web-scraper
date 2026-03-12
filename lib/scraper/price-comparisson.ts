@@ -3,6 +3,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { getCurrentUser } from '../actions';
+import { resolveSearchRequester, runCachedSearch } from '../search/query-cache';
 import { scrapeDolarValue } from './dolar';
 import { scrapeGoogleShoppingProducts } from './google-shopping';
 import { getDomainFromUrl, getDomainTrustIndex, getTrustLabel, TrustLabel } from './trust-score';
@@ -17,6 +18,7 @@ interface PriceComparisonProduct {
   dolarPrice: number;
   source: 'mercadolibre' | 'google-shopping';
   domain: string;
+  storeName?: string;
   trustScore: number;
   trustLabel: TrustLabel;
 }
@@ -408,7 +410,11 @@ const fetchFromHtml = async (country: Country, candidate: string, priceThreshold
   return [] as RawProduct[];
 };
 
-export async function scrapePriceComparissonProducts(productTitle: string, productPrice: number) {
+async function scrapePriceComparissonProductsUncached(
+  productTitle: string,
+  productPrice: number,
+  country: Country,
+) {
   const requestId = Math.random().toString(36).slice(2, 10);
 
   if (!productTitle || !Number.isFinite(productPrice) || productPrice <= 0) {
@@ -419,8 +425,6 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
     return [] as PriceComparisonProduct[];
   }
 
-  const user = await getCurrentUser();
-  const country = (user?.country as Country) || 'argentina';
   const query = cleanSearchQuery(productTitle);
 
   if (!query) {
@@ -540,4 +544,36 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
     queryCandidates,
   });
   return [] as PriceComparisonProduct[];
+}
+
+export async function scrapePriceComparissonProducts(productTitle: string, productPrice: number) {
+  const user = await getCurrentUser();
+  const country = (user?.country as Country) || 'argentina';
+  const query = cleanSearchQuery(productTitle);
+  const normalizedPrice = Math.max(1, Math.round(Number(productPrice) || 0));
+
+  if (!query || normalizedPrice <= 0) {
+    return [] as PriceComparisonProduct[];
+  }
+
+  const requester = await resolveSearchRequester(user?.email || user?.id || null);
+
+  return runCachedSearch({
+    namespace: 'price-comparison',
+    params: {
+      query: query.toLowerCase(),
+      country,
+      productPrice: normalizedPrice,
+    },
+    ttlMs: 5 * 60 * 1000,
+    emptyTtlMs: 60 * 1000,
+    rateLimit: {
+      identifier: requester,
+      scope: 'price-comparison',
+      limit: 10,
+      windowMs: 60 * 1000,
+    },
+    execute: async () =>
+      scrapePriceComparissonProductsUncached(query, normalizedPrice, country),
+  });
 }

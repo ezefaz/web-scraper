@@ -4,6 +4,10 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 import { getCurrentUser } from "../actions";
 import { getDomainTrustIndex, getTrustLabel } from "./trust-score";
+import {
+	resolveSearchRequester,
+	runCachedSearch,
+} from "../search/query-cache";
 
 type Country = "argentina" | "uruguay" | "brasil" | "colombia";
 
@@ -362,12 +366,9 @@ const mergeSearchResults = (domProducts: SearchProduct[], ldProducts: SearchProd
 	return Array.from(byUrl.values());
 };
 
-export async function scrapeProductSearchPageML(productTitle: any) {
-	const user = await getCurrentUser();
+async function scrapeProductSearchPageMLUncached(productTitle: any, country: Country) {
 	const requestId = Math.random().toString(36).slice(2, 10);
 	try {
-		const defaultCountry: Country = "argentina";
-		const country = (user?.country as Country) || defaultCountry;
 		const baseUrl = SEARCH_BASE_BY_COUNTRY[country] || SEARCH_BASE_BY_COUNTRY.argentina;
 		const rawQuery = decodeURIComponent(String(productTitle || "")).trim();
 		if (!rawQuery) return [];
@@ -470,4 +471,32 @@ export async function scrapeProductSearchPageML(productTitle: any) {
 		});
 		return [];
 	}
+}
+
+export async function scrapeProductSearchPageML(productTitle: any) {
+	const user = await getCurrentUser();
+	const country = (user?.country as Country) || "argentina";
+	const rawQuery = decodeURIComponent(String(productTitle || "")).trim();
+	const normalizedQuery = normalizeQueryText(rawQuery);
+
+	if (!normalizedQuery) return [];
+
+	const requester = await resolveSearchRequester(user?.email || user?.id || null);
+
+	return runCachedSearch({
+		namespace: "ml-search-page",
+		params: {
+			query: normalizedQuery.toLowerCase(),
+			country,
+		},
+		ttlMs: 10 * 60 * 1000,
+		emptyTtlMs: 2 * 60 * 1000,
+		rateLimit: {
+			identifier: requester,
+			scope: "ml-search-page",
+			limit: 20,
+			windowMs: 60 * 1000,
+		},
+		execute: async () => scrapeProductSearchPageMLUncached(normalizedQuery, country),
+	});
 }

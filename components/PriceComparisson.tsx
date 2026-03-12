@@ -27,6 +27,7 @@ interface Product {
   dolarPrice: number;
   source: 'mercadolibre' | 'google-shopping';
   domain: string;
+  storeName?: string;
   trustScore: number;
   trustLabel: 'Alta' | 'Media' | 'Baja';
 }
@@ -151,7 +152,11 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                         </TableCell>
                         <TableCell className='text-left'>
                           <Text>{product.title}</Text>
-                          <Text className='text-xs text-gray-500'>{product.domain}</Text>
+                          {product.storeName ? (
+                            <Text className='text-xs text-gray-500'>{product.storeName}</Text>
+                          ) : (
+                            <Text className='text-xs text-gray-500'>{product.domain}</Text>
+                          )}
                         </TableCell>
                         <TableCell className='text-center'>
                           <Text>${formatNumber(itemPrice)}</Text>
@@ -165,14 +170,18 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                           <Text>${formatNumber(product.dolarPrice)}</Text>
                         </TableCell>
                         <TableCell className='text-center'>
-                          <BadgeDelta
-                            deltaType={trustDeltaType(product.trustScore)}
-                            isIncreasePositive={true}
-                            size='xs'
-                            className='text-sm'
-                          >
-                            {`${product.trustLabel} (${product.trustScore})`}
-                          </BadgeDelta>
+                          {product.source === 'google-shopping' ? (
+                            <BadgeDelta
+                              deltaType={trustDeltaType(product.trustScore)}
+                              isIncreasePositive={true}
+                              size='xs'
+                              className='text-sm'
+                            >
+                              {`${product.trustLabel} (${product.trustScore})`}
+                            </BadgeDelta>
+                          ) : (
+                            <Text className='text-xs text-gray-400'>Confiable</Text>
+                          )}
                         </TableCell>
                         <TableCell className='w-1/6 sm:w-auto'>
                           <div className='flex gap-2'>

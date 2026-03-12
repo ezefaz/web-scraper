@@ -3,6 +3,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { getCurrentUser } from '../actions';
+import { resolveSearchRequester, runCachedSearch } from '../search/query-cache';
 import { getDomainFromUrl, getDomainTrustIndex, getTrustLabel, TrustLabel } from './trust-score';
 
 type Country = 'argentina' | 'brasil' | 'colombia' | 'uruguay';
@@ -15,6 +16,7 @@ export interface GoogleShoppingComparisonProduct {
   dolarPrice: number;
   source: 'google-shopping';
   domain: string;
+  storeName: string;
   trustScore: number;
   trustLabel: TrustLabel;
 }
@@ -31,6 +33,7 @@ export interface GoogleShoppingSearchProduct {
   isBestSeller: string;
   source: 'google-shopping';
   domain: string;
+  storeName: string;
   trustScore: number;
   trustLabel: TrustLabel;
 }
@@ -80,6 +83,9 @@ const REQUEST_HEADERS = {
 
 const GOOGLE_SEARCH_URL = (gl: string, candidate: string) =>
   `https://www.google.com/search?tbm=shop&hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`;
+
+const GOOGLE_UDM_SHOPPING_URL = (gl: string, candidate: string) =>
+  `https://www.google.com/search?udm=28&hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`;
 
 const GOOGLE_SHOPPING_URL = (gl: string, candidate: string) =>
   `https://www.google.com/shopping?hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`;
@@ -269,6 +275,20 @@ const getImageFromSrcset = (srcset?: string) => {
   return first.split(' ')[0] || '';
 };
 
+const cleanStoreName = (value: string) =>
+  value
+    .replace(/\s+/g, ' ')
+    .replace(/^(Desde|From)\s+/i, '')
+    .replace(/^[·\-:]+\s*/g, '')
+    .trim();
+
+const extractDomainHint = (value: string) => {
+  const match = String(value || '')
+    .toLowerCase()
+    .match(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}\b/);
+  return match?.[0] || '';
+};
+
 const cleanQuery = (title: string) =>
   title
     .replace(/[-_]+/g, ' ')
@@ -304,6 +324,7 @@ const parseGoogleShoppingFromMarkdown = (
   query: string,
   maxPrice: number,
   dolarValue: number,
+  requestId?: string,
 ) => {
   const items: GoogleShoppingComparisonProduct[] = [];
   const seen = new Set<string>();
@@ -390,13 +411,28 @@ const parseGoogleShoppingFromMarkdown = (
       dolarPrice: price / validDolarValue,
       source: 'google-shopping',
       domain,
+      storeName: domain,
       trustScore,
       trustLabel: getTrustLabel(trustScore),
     });
   }
 
-  return items.sort((a, b) => a.price - b.price).slice(0, 30);
+  const sorted = items.sort((a, b) => a.price - b.price).slice(0, 30);
+  if (requestId) {
+    logInfo(requestId, 'Markdown parse summary', {
+      totalLines: lines.length,
+      totalResults: sorted.length,
+      sample: sorted.slice(0, 3).map((item) => ({
+        title: item.title,
+        price: item.price,
+        domain: item.domain,
+        url: item.url,
+      })),
+    });
+  }
+  return sorted;
 };
+
 
 const parseGoogleShoppingDom = (
   $: any,
@@ -410,6 +446,9 @@ const parseGoogleShoppingDom = (
   const validDolarValue = Number.isFinite(dolarValue) && dolarValue > 0 ? dolarValue : 1;
 
   const cardSelectors = [
+    'div.wOPJ9c[id^="pve_"]',
+    'product-viewer-entrypoint > div.wOPJ9c',
+    'li.I8iMf > div[jsname="dQK82e"]',
     '.sh-dgr__grid-result',
     '.sh-dlr__list-result',
     '.i0X6df',
@@ -425,26 +464,144 @@ const parseGoogleShoppingDom = (
   const selected = cardSelectors.find((selector) => $(selector).length > 0);
   if (!selected) return items;
 
+  const stats = {
+    totalCards: 0,
+    missingTitle: 0,
+    missingUrl: 0,
+    invalidDomain: 0,
+    invalidPrice: 0,
+    overMaxPrice: 0,
+    lowSimilarity: 0,
+    duplicate: 0,
+    accepted: 0,
+  };
+
+  const extractStoreName = (card: any) => {
+    const storeText =
+      card.find('.WJMUdc').first().text().trim()
+      || card.find('.rw5ecc').first().text().trim()
+      || card.find('.aULzUe').first().text().trim()
+      || card.find('.IuHnof').first().text().trim()
+      || card.find('.E5ocAb').first().text().trim()
+      || card.find('[data-merchant-name]').first().attr('data-merchant-name')
+      || card.find('[data-merchant]').first().attr('data-merchant')
+      || '';
+    const ariaLabel =
+      card.find('[aria-label*="Desde"]').first().attr('aria-label')
+      || card.find('[aria-label*="From"]').first().attr('aria-label')
+      || '';
+    const fromMatch = ariaLabel ? ariaLabel.match(/(?:Desde|From)\s+([^·,]+)/i) : null;
+    const merged = cleanStoreName(String(fromMatch?.[1] || storeText || ''));
+    return merged;
+  };
+
+  const collectUrlCandidates = (card: any) => {
+    const candidates: string[] = [];
+    const cardAttrs = [
+      'data-href',
+      'data-url',
+      'data-merchant-url',
+      'data-redirect',
+      'data-share-url',
+      'data-lpage',
+      'data-offer-url',
+      'data-shop-url',
+      'data-destination-url',
+      'data-merchant-link-url',
+    ];
+    cardAttrs.forEach((attr) => {
+      const value = card.attr(attr);
+      if (value) candidates.push(String(value));
+    });
+
+    card.find('a[href]').each((_: any, el: any) => {
+      const value = $(el).attr('href');
+      if (value) candidates.push(String(value));
+    });
+
+    card.find('[data-href]').each((_: any, el: any) => {
+      const value = $(el).attr('data-href');
+      if (value) candidates.push(String(value));
+    });
+
+    card.find('[data-url], [data-merchant-url], [data-lpage], [data-offer-url], [data-shop-url]').each((_: any, el: any) => {
+      cardAttrs.forEach((attr) => {
+        const value = $(el).attr(attr);
+        if (value) candidates.push(String(value));
+      });
+    });
+
+    const rawCardUrls = String(card.html() || '').match(/https?:\/\/[^"'\\\s<>)]+/g) || [];
+    candidates.push(...rawCardUrls);
+
+    return candidates
+      .map((candidate) => normalizeUrl(String(candidate)))
+      .filter(Boolean);
+  };
+
+  const collectImageCandidates = (card: any) => {
+    const candidates: string[] = [];
+
+    card.find('img').each((_: any, element: any) => {
+      const imageNode = $(element);
+      const values = [
+        imageNode.attr('src'),
+        imageNode.attr('data-src'),
+        imageNode.attr('data-lzy_src'),
+        getImageFromSrcset(imageNode.attr('srcset')),
+      ];
+
+      values.forEach((value) => {
+        const normalized = toHttps(String(value || ''));
+        if (!normalized) return;
+        candidates.push(normalized);
+      });
+    });
+
+    return candidates.filter(Boolean);
+  };
+
   $(selected).each((_: any, element: any) => {
+    stats.totalCards += 1;
     const card = $(element);
+    const storeName = extractStoreName(card);
+    const accessibleLabel = card.find('[aria-label]').first().attr('aria-label') || '';
 
     const title =
-      card.find('.tAxDx').first().text().trim()
+      card.find('.gkQHve').first().text().trim()
+      || card.find('[title]').first().attr('title')
+      || card.find('.SsM98d').first().text().trim()
+      || card.find('.tAxDx').first().text().trim()
       || card.find('.Xjkr3b').first().text().trim()
       || card.find('h3').first().text().trim()
       || card.find('a[role="link"]').first().text().trim()
       || '';
 
-    const rawUrl =
-      card.find('a.shntl').first().attr('href')
-      || card.find('a.Lq5OHe').first().attr('href')
-      || card.find('a[href]').first().attr('href')
+    const urlCandidates = collectUrlCandidates(card);
+    const inferredDomain =
+      extractDomainHint(storeName)
+      || extractDomainHint(accessibleLabel)
+      || extractDomainHint(card.text());
+    const inferredUrl = inferredDomain ? `https://${inferredDomain}` : '';
+    const preferredUrl = urlCandidates.find((candidate) => {
+      const domain = getDomainFromUrl(candidate);
+      return !!domain && isAllowedOtherStoreDomain(domain);
+    }) || '';
+    const fallbackUrl = preferredUrl
+      || urlCandidates.find((candidate) => {
+        const domain = getDomainFromUrl(candidate);
+        return !!domain && !isGoogleOwnedDomain(domain) && !isLocalDomain(domain);
+      })
+      || inferredUrl
       || '';
-    const url = normalizeUrl(String(rawUrl));
+    const url = fallbackUrl;
     const domain = getDomainFromUrl(url);
 
     const priceText =
-      card.find('.a8Pemb').first().text().trim()
+      card.find('.zxVpA .lmQWe').first().text().trim()
+      || card.find('.lmQWe').first().text().trim()
+      || card.find('.FG68Ac').first().attr('aria-label')
+      || card.find('.a8Pemb').first().text().trim()
       || card.find('.e10twf').first().text().trim()
       || card.find('.kHxwFf').first().text().trim()
       || card.find('[class*="T14wmb"]').first().text().trim()
@@ -452,21 +609,43 @@ const parseGoogleShoppingDom = (
       || '';
     const price = parsePrice(String(priceText));
 
-    const imageNode = card.find('img').first();
-    const image = toHttps(
-      imageNode.attr('src')
-      || imageNode.attr('data-src')
-      || getImageFromSrcset(imageNode.attr('srcset'))
-      || '',
-    );
+    const imageCandidates = collectImageCandidates(card);
+    const image =
+      imageCandidates.find((candidate) => /^https?:\/\//i.test(candidate) && !/favicon/i.test(candidate) && !candidate.startsWith('blob:'))
+      || imageCandidates.find((candidate) => !candidate.startsWith('data:') && !/favicon/i.test(candidate))
+      || imageCandidates[0]
+      || '';
 
-    if (!title || !url || !domain || !Number.isFinite(price) || price <= 0) return;
-    if (!isAllowedOtherStoreDomain(domain)) return;
-    if (price > maxPrice * 1.8) return;
+    if (!title) {
+      stats.missingTitle += 1;
+      return;
+    }
+    if (!url) {
+      stats.missingUrl += 1;
+      return;
+    }
+    if (!domain || !isAllowedOtherStoreDomain(domain)) {
+      stats.invalidDomain += 1;
+      return;
+    }
+    if (!Number.isFinite(price) || price <= 0) {
+      stats.invalidPrice += 1;
+      return;
+    }
+    if (price > maxPrice * 1.8) {
+      stats.overMaxPrice += 1;
+      return;
+    }
 
     const similarity = getTitleSimilarity(originalQuery, title);
-    if (similarity < 0.35) return;
-    if (seen.has(url)) return;
+    if (similarity < 0.35) {
+      stats.lowSimilarity += 1;
+      return;
+    }
+    if (seen.has(url)) {
+      stats.duplicate += 1;
+      return;
+    }
     seen.add(url);
 
     const trustScore = getDomainTrustIndex(domain, 'google-shopping');
@@ -479,15 +658,21 @@ const parseGoogleShoppingDom = (
       dolarPrice: price / validDolarValue,
       source: 'google-shopping',
       domain,
+      storeName,
       trustScore,
       trustLabel: getTrustLabel(trustScore),
     });
+    stats.accepted += 1;
   });
+
+  if (requestId) {
+    logInfo(requestId, 'DOM parse summary', stats);
+  }
 
   return items;
 };
 
-export async function scrapeGoogleShoppingProducts(
+async function scrapeGoogleShoppingProductsUncached(
   productTitle: string,
   productPrice: number,
   country: Country,
@@ -528,7 +713,11 @@ export async function scrapeGoogleShoppingProducts(
   });
 
   for (const candidate of queryCandidates) {
-    const urls = [GOOGLE_SEARCH_URL(gl, candidate), GOOGLE_SHOPPING_URL(gl, candidate)];
+    const urls = [
+      GOOGLE_UDM_SHOPPING_URL(gl, candidate),
+      GOOGLE_SEARCH_URL(gl, candidate),
+      GOOGLE_SHOPPING_URL(gl, candidate),
+    ];
     for (const strategy of requestStrategies) {
       for (const searchUrl of urls) {
         try {
@@ -552,6 +741,7 @@ export async function scrapeGoogleShoppingProducts(
             pageTitle: $('title').text().trim().slice(0, 120),
             htmlLength: html.length,
             hasEnableJs: /enablejs|httpservice\/retry\/enablejs/i.test(html),
+            hasCaptcha: /captcha|unusual traffic|verify you are a human/i.test(html),
           });
 
           if (items.length > 0) {
@@ -570,39 +760,80 @@ export async function scrapeGoogleShoppingProducts(
     }
   }
 
-  // Fallback for JS-only responses: fetch rendered markdown mirror and parse card lines.
+  // Fallback for JS-only responses: fetch rendered markdown mirrors from Google endpoints.
   for (const candidate of queryCandidates) {
-    const renderedUrl = `https://r.jina.ai/http://www.google.com/search?tbm=shop&hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`;
-    try {
-      logInfo(requestId, 'Trying rendered fallback (r.jina.ai)', { candidate, renderedUrl });
-      const response = await axios.get(renderedUrl, {
-        headers: REQUEST_HEADERS,
-        timeout: 15000,
-      });
-      const markdown = String(response.data || '');
-      const fallbackItems = parseGoogleShoppingFromMarkdown(markdown, query, productPrice, dolarValue);
+    const renderedCandidates = [
+      `https://r.jina.ai/http://www.google.com/search?tbm=shop&hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`,
+      `https://r.jina.ai/http://www.google.com/search?udm=28&hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`,
+      `https://r.jina.ai/http://www.google.com/shopping/search?hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`,
+      `https://r.jina.ai/http://shopping.google.com/search?hl=es&gl=${gl}&q=${encodeURIComponent(candidate)}`,
+    ];
 
-      logInfo(requestId, 'Rendered fallback parsed', {
-        candidate,
-        status: response.status,
-        totalResults: fallbackItems.length,
-      });
+    for (const renderedUrl of renderedCandidates) {
+      try {
+        logInfo(requestId, 'Trying rendered Google fallback (r.jina.ai)', { candidate, renderedUrl });
+        const response = await axios.get(renderedUrl, {
+          headers: REQUEST_HEADERS,
+          timeout: 15000,
+        });
+        const markdown = String(response.data || '');
+        const fallbackItems = parseGoogleShoppingFromMarkdown(markdown, query, productPrice, dolarValue, requestId);
 
-      if (fallbackItems.length > 0) return fallbackItems;
-    } catch (error: any) {
-      logError(requestId, 'Rendered fallback failed', {
-        candidate,
-        status: error?.response?.status,
-        message: error?.message,
-      });
+        logInfo(requestId, 'Rendered Google fallback parsed', {
+          candidate,
+          renderedUrl,
+          status: response.status,
+          totalResults: fallbackItems.length,
+        });
+
+        if (fallbackItems.length > 0) return fallbackItems;
+      } catch (error: any) {
+        logError(requestId, 'Rendered Google fallback failed', {
+          candidate,
+          renderedUrl,
+          status: error?.response?.status,
+          message: error?.message,
+        });
+      }
     }
   }
 
-  logError(requestId, 'No Google Shopping results after direct + fallback attempts', {
+  logError(requestId, 'No Google Shopping results after direct + Google fallback attempts', {
     query,
     queryCandidates,
   });
   return [];
+}
+
+export async function scrapeGoogleShoppingProducts(
+  productTitle: string,
+  productPrice: number,
+  country: Country,
+  dolarValue: number,
+): Promise<GoogleShoppingComparisonProduct[]> {
+  const query = cleanQuery(productTitle);
+  const normalizedPrice = Math.max(1, Math.round(Number(productPrice) || 0));
+  const normalizedDolarValue = Number.isFinite(dolarValue) && dolarValue > 0
+    ? Number(dolarValue.toFixed(4))
+    : 1;
+
+  if (!query || normalizedPrice <= 0) {
+    return [];
+  }
+
+  return runCachedSearch({
+    namespace: 'google-shopping-products',
+    params: {
+      query: query.toLowerCase(),
+      productPrice: normalizedPrice,
+      country,
+      dolarValue: normalizedDolarValue,
+    },
+    ttlMs: 10 * 60 * 1000,
+    emptyTtlMs: 2 * 60 * 1000,
+    execute: async () =>
+      scrapeGoogleShoppingProductsUncached(query, normalizedPrice, country, normalizedDolarValue),
+  });
 }
 
 export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Promise<GoogleShoppingSearchProduct[]> {
@@ -611,43 +842,86 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
   const query = decodeURIComponent(String(productTitle || '')).trim();
   if (!query) return [];
 
-  const comparisonItems = await scrapeGoogleShoppingProducts(
-    query,
-    Number.MAX_SAFE_INTEGER / 1000,
-    country,
-    1,
-  );
+  const requestId = Math.random().toString(36).slice(2, 10);
+  logInfo(requestId, 'Starting Google Shopping search scrape', { query, country });
+  const requester = await resolveSearchRequester(user?.email || user?.id || null);
 
-  const sanitized = comparisonItems.filter((item) => {
-    const domain = getDomainFromUrl(item.url) || item.domain;
-    if (!domain) return false;
-    return isAllowedOtherStoreDomain(domain);
-  });
+  return runCachedSearch({
+    namespace: 'google-shopping-search-page',
+    params: {
+      query: query.toLowerCase(),
+      country,
+    },
+    ttlMs: 10 * 60 * 1000,
+    emptyTtlMs: 2 * 60 * 1000,
+    rateLimit: {
+      identifier: requester,
+      scope: 'google-shopping-search-page',
+      limit: 20,
+      windowMs: 60 * 1000,
+    },
+    execute: async () => {
+      const comparisonItems = await scrapeGoogleShoppingProducts(
+        query,
+        Number.MAX_SAFE_INTEGER / 1000,
+        country,
+        1,
+      );
 
-  const strict = sanitized.filter((item) => {
-    const domain = getDomainFromUrl(item.url) || item.domain;
-    return isLikelyPublicStoreDomain(domain);
-  });
+      logInfo(requestId, 'Raw Google Shopping search items', {
+        totalResults: comparisonItems.length,
+        sample: comparisonItems.slice(0, 3).map((item) => ({
+          title: item.title,
+          price: item.price,
+          domain: item.domain,
+          url: item.url,
+        })),
+      });
 
-  const selected = strict.length > 0 ? strict : sanitized;
+      const sanitized = comparisonItems.filter((item) => {
+        const domain = getDomainFromUrl(item.url) || item.domain;
+        if (!domain) return false;
+        return isAllowedOtherStoreDomain(domain);
+      });
 
-  return selected.map((item) => {
-    const domain = getDomainFromUrl(item.url) || item.domain;
-    const trustScore = getDomainTrustIndex(domain, 'google-shopping');
-    return {
-      url: item.url,
-      title: item.title,
-      currentPrice: item.price,
-      originalPrice: 0,
-      image: item.image,
-      freeShipping: '',
-      currency: CURRENCY_BY_COUNTRY[country] || '$',
-      features: '',
-      isBestSeller: '',
-      source: 'google-shopping' as const,
-      domain,
-      trustScore,
-      trustLabel: getTrustLabel(trustScore),
-    };
+      const strict = sanitized.filter((item) => {
+        const domain = getDomainFromUrl(item.url) || item.domain;
+        return isLikelyPublicStoreDomain(domain);
+      });
+
+      const selected = strict.length > 0 ? strict : sanitized;
+
+      logInfo(requestId, 'Filtered Google Shopping search items', {
+        sanitizedCount: sanitized.length,
+        strictCount: strict.length,
+        selectedCount: selected.length,
+        sample: selected.slice(0, 3).map((item) => ({
+          title: item.title,
+          price: item.price,
+          domain: item.domain,
+        })),
+      });
+
+      return selected.map((item) => {
+        const domain = getDomainFromUrl(item.url) || item.domain;
+        const trustScore = getDomainTrustIndex(domain, 'google-shopping');
+        return {
+          url: item.url,
+          title: item.title,
+          currentPrice: item.price,
+          originalPrice: 0,
+          image: item.image,
+          freeShipping: '',
+          currency: CURRENCY_BY_COUNTRY[country] || '$',
+          features: '',
+          isBestSeller: '',
+          source: 'google-shopping' as const,
+          domain,
+          storeName: item.storeName || domain,
+          trustScore,
+          trustLabel: getTrustLabel(trustScore),
+        };
+      });
+    },
   });
 }

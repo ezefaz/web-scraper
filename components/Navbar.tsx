@@ -22,7 +22,12 @@ const Navbar = () => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useCurrentUser();
+  const isPixelPerfectHome = pathname === "/pixel-perfect-page-main";
   const isLanding = pathname === "/";
+
+  if (isPixelPerfectHome) {
+    return null;
+  }
 
   return (
     <header className="fixed top-0 z-50 w-full border-b border-black/10 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-black/70">
