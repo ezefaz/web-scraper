@@ -1,28 +1,25 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import CardWrapper from '../CardWrapper';
-import { SyncLoader } from 'react-spinners';
-import { useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { newVerification } from '@/app/actions/new-verification';
-import FormSuccess from './FormSuccess';
-import FormError from './FormError';
+import CardWrapper from "../CardWrapper";
+import { SyncLoader } from "react-spinners";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { newVerification } from "@/app/actions/new-verification";
+import FormSuccess from "./FormSuccess";
+import FormError from "./FormError";
 
-type Props = {};
-
-const NewVerificationForm = (props: Props) => {
+const NewVerificationForm = () => {
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
   const searchParams = useSearchParams();
 
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   const onSubmit = useCallback(async () => {
     if (success || error) return;
 
     if (!token) {
-      setError('Missing token!');
+      setError("Falta el token de verificación.");
       return;
     }
 
@@ -32,7 +29,7 @@ const NewVerificationForm = (props: Props) => {
         setError(data.error);
       })
       .catch(() => {
-        setError('Algo salio mal!');
+        setError("Algo salió mal durante la verificación.");
       });
   }, [token, success, error]);
 
@@ -42,18 +39,20 @@ const NewVerificationForm = (props: Props) => {
 
   return (
     <CardWrapper
-      HeaderLabel='Confirmando tu verificación...'
-      backButtonHref='/sign-in'
-      backButtonLabel='Volver a Iniciar Sesion'
+      HeaderLabel="Confirmando tu verificación..."
+      backButtonHref="/sign-in"
+      backButtonLabel="Volver a iniciar sesión"
     >
-      <div className='flex justify-center mb-6 mt-5'>
-        <Image src='/assets/icons/savemelin3.svg' width={120} height={100} alt='Logo' />
+      <p className="text-sm text-muted-foreground leading-relaxed">
+        Estamos validando el enlace de verificación para activar tu cuenta.
+        Este proceso puede tardar unos segundos.
+      </p>
+      <div className="flex items-center w-full justify-center mt-10 mb-8">
+        {!success && !error && <SyncLoader color="#e29656" size={8} />}
       </div>
-      <div className='flex items-center w-full justify-center mt-12 mb-12'>
-        {!success && !error && <SyncLoader color='#e29656' />}
-        <FormSuccess message={success} />
-        {!success && <FormError message={error} />}
-      </div>
+
+      <FormSuccess message={success} />
+      {!success && <FormError message={error} />}
     </CardWrapper>
   );
 };

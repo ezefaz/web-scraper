@@ -1,13 +1,17 @@
-import ResetForm from '@/components/auth/ResetForm';
+import AuthPageShell from "@/components/auth/AuthPageShell";
+import ResetForm from "@/components/auth/ResetForm";
 
-type Props = {};
-
-const ResetPage = (props: Props) => {
+export default function ResetPage() {
   return (
-    <div>
+    <AuthPageShell
+      badge="Recuperación de acceso"
+      title="Recupera tu cuenta de SaveMelin"
+      description="Te enviamos un enlace seguro para restablecer tu contraseña y volver a seguir precios en minutos."
+      ctaHref="/sign-in"
+      ctaLabel="Volver a iniciar sesión"
+      withDataBackground
+    >
       <ResetForm />
-    </div>
+    </AuthPageShell>
   );
-};
-
-export default ResetPage;
+}

@@ -8,7 +8,7 @@ import CardWrapper from "../CardWrapper";
 import FormError from "./FormError";
 import FormSuccess from "./FormSuccess";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { login } from "@/app/actions/login";
 import { Social } from "./Social";
 import { useSearchParams } from "next/navigation";
@@ -23,10 +23,19 @@ const LoginForm = () => {
 
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
+  const saveProductUrl = searchParams.get("saveProductUrl");
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "El correo es utilizado con otro proveedor"
       : "";
+
+  const signUpHref = useMemo(() => {
+    const params = new URLSearchParams();
+    if (callbackUrl) params.set("callbackUrl", callbackUrl);
+    if (saveProductUrl) params.set("saveProductUrl", saveProductUrl);
+    const query = params.toString();
+    return query ? `/sign-up?${query}` : "/sign-up";
+  }, [callbackUrl, saveProductUrl]);
 
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
@@ -62,7 +71,16 @@ const LoginForm = () => {
   };
 
   return (
-    <CardWrapper HeaderLabel="Bienvenido de nuevo" backButtonHref="/sign-up" backButtonLabel="¿No tienes una cuenta? Crear cuenta">
+    <CardWrapper
+      HeaderLabel="Bienvenido de nuevo"
+      backButtonHref={signUpHref}
+      backButtonLabel="¿No tienes una cuenta? Crear cuenta"
+    >
+      {saveProductUrl && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          Inicia sesión para guardar este producto en tus seguidos.
+        </p>
+      )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <div className="space-y-1">
           <label htmlFor="email" className="block text-sm text-muted-foreground">

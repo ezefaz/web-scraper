@@ -15,9 +15,9 @@ export default function PixelPerfectHeroSection() {
               </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] font-bold leading-[1.08] tracking-tight text-foreground mb-8">
-              Segui precios, compará productos y compra al{" "}
-              <span className="text-primary">menor precio</span>
+            <h1 className="text-5xl sm:text-5xl lg:text-[4rem] font-bold leading-[1.08] tracking-tight text-foreground mb-8">
+              Agrega productos, compará valores y comprá al{" "}
+              <span className="text-primary italic">menor precio</span>
             </h1>
 
             {/* <p className="text-base text-muted-foreground leading-relaxed mb-8 max-w-md">

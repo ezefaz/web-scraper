@@ -1,15 +1,17 @@
-import NewVerificationForm from '@/components/auth/NewVerificationForm';
+import AuthPageShell from "@/components/auth/AuthPageShell";
+import NewVerificationForm from "@/components/auth/NewVerificationForm";
 
-import CardWrapper from '@/components/CardWrapper';
-
-type Props = {};
-
-const NewVerificationPage = (props: Props) => {
+export default function NewVerificationPage() {
   return (
-    <div className='flex justify-center w-full mt-40 items-center'>
+    <AuthPageShell
+      badge="Verificación de cuenta"
+      title="Estamos validando tu cuenta"
+      description="Confirmamos tu email para activar alertas, productos guardados y seguimiento completo de precios."
+      ctaHref="/sign-in"
+      ctaLabel="Ir a iniciar sesión"
+      withDataBackground
+    >
       <NewVerificationForm />
-    </div>
+    </AuthPageShell>
   );
-};
-
-export default NewVerificationPage;
+}

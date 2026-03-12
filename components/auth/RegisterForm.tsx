@@ -1,7 +1,7 @@
 "use client";
 
 import * as z from "zod";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterSchema } from "@/schemas";
@@ -13,15 +13,28 @@ import { TbEyeFilled } from "react-icons/tb";
 import { IoMdEyeOff } from "react-icons/io";
 import { Social } from "./Social";
 import { BsCart } from "react-icons/bs";
+import { useSearchParams } from "next/navigation";
 
 const mercadolibreAuthUrl: string =
   "https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://savemelin.com/";
 
 const RegisterForm = () => {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
+  const saveProductUrl = searchParams.get("saveProductUrl");
+
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
   const [isVisible, setIsVisible] = useState(false);
+
+  const signInHref = useMemo(() => {
+    const params = new URLSearchParams();
+    if (callbackUrl) params.set("callbackUrl", callbackUrl);
+    if (saveProductUrl) params.set("saveProductUrl", saveProductUrl);
+    const query = params.toString();
+    return query ? `/sign-in?${query}` : "/sign-in";
+  }, [callbackUrl, saveProductUrl]);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -57,7 +70,16 @@ const RegisterForm = () => {
   };
 
   return (
-    <CardWrapper HeaderLabel="Crea tu cuenta" backButtonHref="/sign-in" backButtonLabel="¿Ya tienes una cuenta? Iniciar sesión">
+    <CardWrapper
+      HeaderLabel="Crea tu cuenta"
+      backButtonHref={signInHref}
+      backButtonLabel="¿Ya tienes una cuenta? Iniciar sesión"
+    >
+      {saveProductUrl && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          Crea tu cuenta para guardar este producto y empezar su seguimiento.
+        </p>
+      )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <div className="space-y-1">
           <label htmlFor="email" className="block text-sm text-muted-foreground">

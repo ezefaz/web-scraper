@@ -7,39 +7,53 @@ import { scrapeMLProduct } from "@/lib/scraper";
 import { ProductType } from "@/types";
 
 export const createProduct = async (productUrl: string) => {
-  if (!productUrl) return;
+  const normalizedUrl = productUrl?.trim();
+  if (!normalizedUrl) {
+    return { error: "URL de producto inválida." };
+  }
 
   try {
     await connectToDb();
 
-    const data: any = await scrapeMLProduct(productUrl);
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      return {
+        requiresAuth: true,
+        error: "Necesitas una cuenta para guardar productos.",
+      };
+    }
+
+    const data: any = await scrapeMLProduct(normalizedUrl);
+    if (!data?.url) {
+      return { error: "No pudimos obtener información del producto." };
+    }
 
     const existingProduct = await Product.findOne({ url: data.url });
-    const currentUser = await getCurrentUser();
-
     const isProductAlreadyAdded =
       currentUser?.products?.some((product: ProductType) => product.url === data.url) ?? false;
 
-    if (existingProduct && currentUser && !isProductAlreadyAdded) {
-      await currentUser.products.push(existingProduct);
-      await currentUser.save();
-
-      return { message: "El producto fue añadido correctamente." };
+    if (isProductAlreadyAdded) {
+      return {
+        alreadySaved: true,
+        message: "Este producto ya estaba en tus guardados.",
+      };
     }
 
-    const newProduct = new Product(data);
-    await newProduct.save();
+    const productToSave = existingProduct ?? (await Product.create(data));
+    const productSnapshot = {
+      ...data,
+      isFollowing: true,
+    };
+    currentUser.products.push(productSnapshot);
+    await currentUser.save();
 
-    if (currentUser && !isProductAlreadyAdded) {
-      await currentUser.products.push(newProduct);
-
-      await currentUser.save();
-
-      return { message: "El producto fue añadido correctamente." };
-    } else {
-      return { error: "El producto no pudo ser añadido o esta duplicado." };
-    }
+    return {
+      success: true,
+      message: "El producto fue añadido correctamente.",
+      productId: String(productToSave._id),
+    };
   } catch (error) {
     console.log("[CREATE_PRODUCT_ERROR]", error);
+    return { error: "No pudimos guardar el producto. Intenta nuevamente." };
   }
 };

@@ -74,10 +74,7 @@ export default function PixelPerfectFooter() {
           <div className="p-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8">
               <div className="lg:col-span-2 flex flex-col gap-6 lg:pr-10">
-                <Link
-                  href="/"
-                  className="flex items-center gap-2"
-                >
+                <Link href="/" className="flex items-center gap-2">
                   <Image
                     src="/assets/icons/savemelin-logo.svg"
                     alt="SaveMelin"
@@ -87,8 +84,8 @@ export default function PixelPerfectFooter() {
                   />
                 </Link>
                 <p className="text-sm text-muted-foreground max-w-sm">
-                  SaveMelin te ayuda a comprar mejor: segui precios, compara
-                  opciones y eligi el mejor momento para ahorrar.
+                  SaveMelin te ayuda a comprar mejor: agrega productos, compara
+                  precios y eligi el mejor momento para ahorrar.
                 </p>
                 <div className="flex items-center gap-3">
                   <a

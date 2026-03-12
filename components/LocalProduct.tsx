@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import {
   CheckCircle2,
   ExternalLink,
@@ -41,8 +42,10 @@ const isValidMLProductUrl = (url: string) => {
 
 const LocalProduct = () => {
   const router = useRouter();
+  const { status } = useSession();
   const searchParams = useSearchParams();
   const productURL = searchParams.get('productUrl') ?? '';
+  const autoSave = searchParams.get('autoSave') === '1';
   const decodedProductURL = useMemo(() => {
     try {
       return decodeURIComponent(productURL).trim();
@@ -53,6 +56,8 @@ const LocalProduct = () => {
 
   const [productData, setProductData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [autoSaveAttempted, setAutoSaveAttempted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -82,13 +87,58 @@ const LocalProduct = () => {
     fetchData();
   }, [decodedProductURL]);
 
+  useEffect(() => {
+    setAutoSaveAttempted(false);
+  }, [decodedProductURL, autoSave]);
+
   const handleSubmit = useCallback(
     async (productUrl: string) => {
-      await createProduct(productUrl);
-      router.push('/user-products');
+      const normalizedUrl = productUrl?.trim();
+      if (!normalizedUrl) return;
+
+      const callbackUrl = `/products/local?productUrl=${encodeURIComponent(
+        normalizedUrl,
+      )}&autoSave=1`;
+
+      if (status !== 'authenticated') {
+        router.push(`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}&saveProductUrl=${encodeURIComponent(normalizedUrl)}`);
+        return;
+      }
+
+      setIsSaving(true);
+      setErrorMessage('');
+      try {
+        const result: any = await createProduct(normalizedUrl);
+
+        if (result?.requiresAuth) {
+          router.push(`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}&saveProductUrl=${encodeURIComponent(normalizedUrl)}`);
+          return;
+        }
+
+        if (result?.success || result?.alreadySaved) {
+          router.push('/user-products');
+          return;
+        }
+
+        setErrorMessage(
+          result?.error ?? 'No pudimos guardar el producto en este momento.',
+        );
+      } catch (error) {
+        console.error('[SAVE_PRODUCT_FROM_LOCAL_PAGE]', error);
+        setErrorMessage('No pudimos guardar el producto en este momento.');
+      } finally {
+        setIsSaving(false);
+      }
     },
-    [router]
+    [router, status],
   );
+
+  useEffect(() => {
+    if (!autoSave || autoSaveAttempted || status !== 'authenticated' || !productData?.url || isSaving) return;
+
+    setAutoSaveAttempted(true);
+    handleSubmit(productData.url);
+  }, [autoSave, autoSaveAttempted, handleSubmit, isSaving, productData?.url, status]);
 
   const statCards = useMemo(() => {
     if (!productData) return [];
@@ -153,18 +203,36 @@ const LocalProduct = () => {
                     <Store className='h-3.5 w-3.5 text-primary' />
                     {extractSellerName(productData.storeName || 'Tienda oficial')}
                   </span>
-                  {productData.isFreeShipping && (
-                    <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
-                      <Truck className='h-3.5 w-3.5 text-primary' />
-                      Envío gratis
-                    </span>
-                  )}
-                  {productData.isFreeReturning && (
-                    <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
-                      <RotateCcw className='h-3.5 w-3.5 text-primary' />
-                      Devolución gratis
-                    </span>
-                  )}
+                  <span
+                    className={`inline-flex items-center gap-1 border px-2.5 py-1 text-xs ${
+                      productData.isFreeShipping
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                        : 'border-red-200 bg-red-50 text-red-700'
+                    }`}
+                  >
+                    <Truck
+                      className={`h-3.5 w-3.5 ${
+                        productData.isFreeShipping ? 'text-emerald-600' : 'text-red-600'
+                      }`}
+                    />
+                    {productData.isFreeShipping ? 'Envío gratis' : 'Envío con cargo'}
+                  </span>
+                  <span
+                    className={`inline-flex items-center gap-1 border px-2.5 py-1 text-xs ${
+                      productData.isFreeReturning
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                        : 'border-red-200 bg-red-50 text-red-700'
+                    }`}
+                  >
+                    <RotateCcw
+                      className={`h-3.5 w-3.5 ${
+                        productData.isFreeReturning ? 'text-emerald-600' : 'text-red-600'
+                      }`}
+                    />
+                    {productData.isFreeReturning
+                      ? 'Devolución gratis'
+                      : 'Devolución con cargo'}
+                  </span>
                   {productData.status && (
                     <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
                       <CheckCircle2 className='h-3.5 w-3.5 text-primary' />
@@ -203,12 +271,22 @@ const LocalProduct = () => {
                   </Button>
                   <Button
                     variant='secondary'
+                    disabled={isSaving || status === 'loading'}
                     onClick={() => handleSubmit(productData.url)}
                   >
-                    Agregar a seguimiento
+                    {isSaving
+                      ? 'Guardando...'
+                      : status === 'authenticated'
+                        ? 'Guardar producto'
+                        : 'Crear cuenta y guardar'}
                     <ShoppingBag className='h-4 w-4' />
                   </Button>
                 </div>
+                {status !== 'authenticated' && (
+                  <p className='mt-3 text-xs text-muted-foreground'>
+                    Para guardar este producto en tu lista, crea tu cuenta o inicia sesión.
+                  </p>
+                )}
 
                 <Link
                   href={decodedProductURL}

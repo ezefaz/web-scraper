@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Asterisk, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import PixelPerfectFooter from "@/components/pixel-perfect-page-main/Footer";
+import PixelPerfectNavbar from "@/components/pixel-perfect-page-main/Navbar";
 
 interface AuthPageShellProps {
   badge: string;
@@ -23,19 +24,10 @@ const AuthPageShell = ({
 }: AuthPageShellProps) => {
   return (
     <main className="pixel-perfect-home relative min-h-screen bg-background text-foreground">
-      <header className="border-b border-border/70">
-        <div className="max-w-[94rem] mx-auto padding-global border-x border-border/70 py-4">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Asterisk className="w-5 h-5 text-primary" strokeWidth={2.6} />
-            <span className="text-lg font-semibold tracking-tight">
-              datashake
-            </span>
-          </Link>
-        </div>
-      </header>
+      <PixelPerfectNavbar />
 
-      <div className="max-w-[94rem] mx-auto padding-global border-x border-border/70">
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-69px)]">
+      <div className="max-w-[90rem] mx-auto padding-global border-x border-border/70">
+        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[calc(100vh-80px)]">
           <section className="relative overflow-hidden [container-type:inline-size] border-b lg:border-b-0 lg:border-r border-border/70 bg-section-grey p-6 lg:p-8 flex flex-col justify-between">
             {withDataBackground && (
               <>

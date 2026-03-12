@@ -26,9 +26,9 @@ export default function PixelPerfectNavbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-background border-b-[0.5px]">
-      <div className="w-full max-w-[90rem] mx-auto p-12 md:px-6 py-4 flex flex-row items-center justify-start gap-8 min-h-20">
-        <div className="flex items-center gap-10 min-w-0">
+    <nav className="sticky top-0 z-50 bg-background border-b-[0.5px] border-border">
+      <div className="w-full max-w-[90rem] mx-auto  flex flex-row items-center justify-start gap-8 min-h-20 px-12 lg:px-6 py-4">
+        <div className="flex items-center min-w-0">
           <Link href="/" className="flex items-center pr-6 h-full">
             <Image
               src="/assets/icons/savemelin-logo.svg"
@@ -106,7 +106,7 @@ export default function PixelPerfectNavbar() {
           isMobileMenuOpen ? "max-h-[28rem] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="max-w-[90rem] mx-auto padding-global py-5 bg-background border-x border-border">
+        <div className="max-w-[90rem] mx-auto border-x border-border bg-background px-6 py-5">
           <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <a
