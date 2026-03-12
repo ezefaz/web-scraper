@@ -13,7 +13,6 @@ export const publicRoutes = [
   "/products",
   "/products/local",
   "/privacy-policy",
-  "/profile/business",
 ];
 
 /**
@@ -54,4 +53,4 @@ export const apiAuthPrefix = "/api/auth";
  * @type {string}
  */
 
-export const DEFAULT_LOGIN_REDIRECT = "/profile/business";
+export const DEFAULT_LOGIN_REDIRECT = "/";

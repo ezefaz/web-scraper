@@ -1,13 +1,11 @@
-import React from 'react';
-// import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import Modal from '@/components/Modal';
-import PriceInfoCard from '@/components/PriceInfoCard';
-import ProductCard from '@/components/ProductCard';
+import PixelPerfectNavbar from '@/components/pixel-perfect-page-main/Navbar';
+import PixelPerfectFooter from '@/components/pixel-perfect-page-main/Footer';
+import Searchbar from '@/components/Searchbar';
 import BarChart from '@/components/charts/BarChart';
-
-import { getCurrentUser, getProductById, getProductByURL, getSimilarProducts } from '@/lib/actions';
+import DolarBasedChart from '@/components/charts/LineChart';
+import ScraperButton from '@/components/ScraperButton';
 import {
   formatNumber,
   formatUSD,
@@ -18,23 +16,18 @@ import {
   getMonthlyData,
   getWeeklyData,
 } from '@/lib/utils';
-import { ProductType, UserType } from '@/types';
-import DolarBasedChart from '@/components/charts/LineChart';
-import { Badge, Card, Tab, TabGroup, TabList } from '@tremor/react';
-import ScraperButton from '@/components/ScraperButton';
-import ProductTabs from '@/components/ProductTabs';
-
-import { Image, Skeleton } from '@nextui-org/react';
-import ProductBadges from '@/components/ProductBadges';
+import { getCurrentUser, getProductById, getProductByURL, getSimilarProducts } from '@/lib/actions';
+import { ProductType } from '@/types';
+import { Button } from '@/components/pixel-perfect-page-main/button';
+import { ExternalLink, History, Package, Sparkles } from 'lucide-react';
 
 type Props = {
   params: { id: string };
 };
 
-const ProductDetails = async ({ params: { id } }: Props) => {
+const ProductDetailsPage = async ({ params: { id } }: Props) => {
   const currentUser = await getCurrentUser();
   const foundedProduct = await getProductById(id);
-
   const userProduct = currentUser?.products?.find((product: any) => product._id.toString() === id);
 
   const productUrl = foundedProduct?.url || userProduct?.url;
@@ -42,262 +35,273 @@ const ProductDetails = async ({ params: { id } }: Props) => {
 
   const product: ProductType = await getProductByURL(productUrl);
   if (!product) redirect('/');
-  // const product: ProductType = await getProductById(id);
 
-  const isFollowing = currentUser?.products?.some(
-    (product: ProductType) => product.url === productUrl && product.isFollowing
+  const {
+    currentDolar,
+    priceHistory = [],
+    currentPrice,
+    dolarHistory = [],
+    originalPrice,
+    currency,
+    title,
+    image,
+    storeName,
+    status,
+    isFreeShipping,
+    isFreeReturning,
+    category,
+    averagePrice,
+    highestPrice,
+    lowestPrice,
+  } = product;
+
+  const dolarValue = Number(currentDolar?.value || 0);
+  const scrapedDolarDate = currentDolar?.date;
+  const priceBasedOnDolar = dolarValue > 0 ? currentPrice / dolarValue : 0;
+
+  const lastPrices = priceHistory.map((item: any) => item?.price).filter((price: any) => typeof price === 'number');
+  const lastDates = priceHistory.map((item: any) => item?.date).filter(Boolean);
+  const uniquePrices = Array.from(new Set(lastPrices));
+  const uniqueDolarValues = Array.from(
+    new Set(dolarHistory.map((item: any) => Number(item?.value || 0)).filter((value: number) => value > 0)),
   );
+  const uniqueDolarDatesArray = Array.from(new Set(dolarHistory.map((item: any) => item?.date).filter(Boolean)));
 
-  const { currentDolar, priceHistory, currentPrice, dolarHistory, originalPrice, currency } = product;
-
-  const dolarValue = Number(currentDolar.value);
-  const scrapedDolarDate = currentDolar.date;
-
-  const priceBasedOnDolar = currentPrice / dolarValue;
-
-  const productHistory = priceHistory;
-
-  const lastDolarValue: Array<Number> = [];
-  const lastDolarDates: Array<Date> = [];
-
-  dolarHistory.forEach((p) => {
-    if (p.value) {
-      lastDolarValue.push(p.value);
-      lastDolarDates.push(p.date);
-    }
-  });
-
-  const dolarSet = new Set();
-  const uniqueDolarValue: Array<number | Number> = [];
-
-  for (const price of lastDolarValue) {
-    if (!dolarSet.has(price)) {
-      dolarSet.add(price);
-      uniqueDolarValue.push(price);
-    }
-  }
-
-  const uniqueDolarDatesSet = new Set(lastDolarDates);
-
-  const uniqueDolarDatesArray = Array.from(uniqueDolarDatesSet);
-
-  // Inicializa los arreglos lastPrices y lastDates
-  const lastPrices: Array<Number> = [];
-  const lastDates: Array<Date> = [];
-
-  // Extrae los precios y fechas de updatedPriceHistory
-  productHistory.forEach((p) => {
-    lastPrices.push(p.price);
-    lastDates.push(p.date);
-  });
-
-  // Filter the dates that are equal, removing the hours.
-
-  const priceSet = new Set();
-  const uniquePrices = [];
-
-  for (const price of lastPrices) {
-    if (!priceSet.has(price)) {
-      priceSet.add(price);
-      uniquePrices.push(price);
-    }
-  }
-
-  // const formattedDates = lastDates.map((date) => date.toISOString().slice(0, 10));
-  // const uniqueDatesSet = new Set(formattedDates);
-
-  // const uniqueDatesArray: Array<string | Date> = Array.from(uniqueDatesSet);
-
-  // const weeklyData = getWeeklyData(priceHistory, currentPrice, originalPrice);
   const monthlyData = getMonthlyData(priceHistory, currency);
-
   const weeklyData = getWeeklyData(priceHistory);
-
+  const productAnualData = getAnnualMonthlyData(priceHistory, currency);
   const dolarWeeklyData = getCurrentWeekDolarData(dolarHistory, currentPrice);
   const dolarMonthlyData = getCurrentMonthlyDolarData(dolarHistory, currentPrice);
-
   const dolarAnualData = getAnnualDolarData(currentPrice, dolarHistory);
 
-  const productAnualData = getAnnualMonthlyData(priceHistory, currency);
-
   const similarProducts = await getSimilarProducts(id);
+  const hasDiscount = Number(originalPrice || 0) > Number(currentPrice || 0);
 
   return (
-    <div className='product-container mt-16' id='information'>
-      {' '}
-      <ProductTabs />
-      <div className='flex gap-10 sm:cap-5 xl:flex-row flex-col'>
-        <div className='flex flex-row mr-8 h-[max-content]'>
-          {product.image ? (
-            <Card
-              decoration='bottom'
-              decorationColor='orange'
-              className='md:w-[50%] flex justify-center m-auto ml-4 lg:w-full'
-            >
-              <Image src={product.image} isZoomed alt={product.title} width={450} height={450} />
-            </Card>
-          ) : (
-            <Skeleton>
-              {' '}
-              <Card decoration='bottom' decorationColor='orange'></Card>
-            </Skeleton>
-          )}
-        </div>
-        <div className='flex-1 flex flex-col'>
-          <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
-            <div className='flex flex-col gap-3'>
-              <p className='text-[28px] hover:text-primary transition-colors duration-300'>{product.title}</p>
-              <Link
-                href={product.url}
-                target='_blank'
-                className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300 dark:text-white'
-              >
-                Visitar Producto
-              </Link>
-              <p>Vendido por: {product.storeName ? product.storeName : ''}</p>
-            </div>
+    <div className='pixel-perfect-home relative min-h-screen bg-background text-foreground'>
+      <div
+        aria-hidden
+        className='pointer-events-none absolute inset-y-0 z-[60] border-l border-border/50'
+        style={{ left: 'max(calc((100vw - 94rem) / 2 + 2.5rem), 2.5rem)' }}
+      />
+      <div
+        aria-hidden
+        className='pointer-events-none absolute inset-y-0 z-[60] border-r border-border/50'
+        style={{ right: 'max(calc((100vw - 94rem) / 2 + 2.5rem), 2.5rem)' }}
+      />
+
+      <PixelPerfectNavbar />
+
+      <section className='border-y border-border/70'>
+        <div className='max-w-[94rem] mx-auto padding-global border-x border-border/70 py-6 lg:py-7'>
+          <div className='grid grid-cols-1 px-12 gap-6 items-end'>
+            <Searchbar initialValue={title} />
           </div>
-          <div className='product-info'>
-            <div className='flex flex-col gap-2'>
-              <p className='text-[34px] text-secondary font-bold dark:text-white hover:text-primary  '>{`${
-                product.currency
-              } ${formatNumber(currentPrice)}`}</p>
-              <p className='text-[21px] text-black opacity-50 line-through dark:text-white'>
-                {product.currentPrice !== product.originalPrice
-                  ? `${product.currency} ${formatNumber(product.originalPrice)}`
-                  : ''}
-              </p>
+        </div>
+      </section>
+
+      <section>
+        <div className='max-w-[94rem] mx-auto padding-global border-x border-border/70'>
+          <div className='py-12 lg:py-14'>
+            <div id='information' className='border border-border/70 bg-section-grey p-6 md:p-8 lg:p-10'>
+              <div className='grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-8 lg:gap-10'>
+                <div className='border border-border/70 bg-background p-4'>
+                  <div className='aspect-square w-full overflow-hidden bg-white'>
+                    <img src={image} alt={title} className='h-full w-full object-contain' />
+                  </div>
+                </div>
+
+                <div className='min-w-0'>
+                  <div className='flex flex-wrap items-center gap-2 mb-3'>
+                    <span className='inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                      {storeName || 'Marketplace'}
+                    </span>
+                    {category && (
+                      <span className='inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                        {category}
+                      </span>
+                    )}
+                    {status && (
+                      <span className='inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                        {status}
+                      </span>
+                    )}
+                    {isFreeShipping && (
+                      <span className='inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                        Envío gratis
+                      </span>
+                    )}
+                    {isFreeReturning && (
+                      <span className='inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                        Devolución gratis
+                      </span>
+                    )}
+                  </div>
+
+                  <h1 className='text-2xl md:text-3xl font-semibold leading-tight text-foreground max-w-4xl'>
+                    {title}
+                  </h1>
+
+                  <div className='mt-5 flex flex-wrap items-end gap-x-4 gap-y-2'>
+                    <p className='text-3xl md:text-4xl font-semibold text-foreground'>
+                      {currency} {formatNumber(currentPrice)}
+                    </p>
+                    {hasDiscount && (
+                      <p className='text-lg text-muted-foreground line-through'>
+                        {currency} {formatNumber(originalPrice)}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className='mt-8 flex flex-wrap gap-3'>
+                    <Link href={product.url} target='_blank'>
+                      <Button variant='primary'>
+                        <span className='inline-flex items-center gap-2'>
+                          Comprar ahora
+                          <ExternalLink className='h-4 w-4' />
+                        </span>
+                      </Button>
+                    </Link>
+                    <Link href='/user-products'>
+                      <Button variant='secondary'>
+                        <span className='inline-flex items-center gap-2'>Ver mis productos</span>
+                      </Button>
+                    </Link>
+                  </div>
+
+                  <Link
+                    href={product.url}
+                    target='_blank'
+                    className='mt-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors'
+                  >
+                    Ver publicación original
+                    <ExternalLink className='h-3.5 w-3.5' />
+                  </Link>
+                </div>
+              </div>
             </div>
-            <ProductBadges
-              stars={product.stars}
-              reviewsCount={product.reviewsCount}
-              stockAvailable={product.stockAvailable}
-              isFreeReturning={product.isFreeReturning}
-              isFreeShipping={product.isFreeShipping}
-              status={product.status}
-            />
-            <div className='flex flex-col gap-10 m-auto'>
-              {/* <div className='flex flex-col gap-5'>
-                {product.description.length > 2 && (
-                  <>
-                    <h3 className='text-2xl text-secondary font-semibold'>Descripción</h3>
-                    <div className='flex flex-col gap-4'>{product?.description?.split('/n')}</div>
-                  </>
+
+            <div className='mt-8 border border-border/70 bg-background p-6 md:p-8'>
+              <div className='mb-5 flex items-center gap-2'>
+                <Package className='h-4 w-4 text-primary' />
+                <h2 className='text-lg md:text-xl font-medium text-foreground'>Resumen de precios</h2>
+              </div>
+              <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4'>
+                <div className='border border-border/70 bg-section-grey p-4'>
+                  <p className='text-xs uppercase tracking-wide text-muted-foreground'>Precio actual</p>
+                  <p className='mt-2 text-lg font-semibold text-foreground'>
+                    {currency} {formatNumber(currentPrice)}
+                  </p>
+                </div>
+                <div className='border border-border/70 bg-section-grey p-4'>
+                  <p className='text-xs uppercase tracking-wide text-muted-foreground'>Precio promedio</p>
+                  <p className='mt-2 text-lg font-semibold text-foreground'>
+                    {currency} {formatNumber(averagePrice)}
+                  </p>
+                </div>
+                <div className='border border-border/70 bg-section-grey p-4'>
+                  <p className='text-xs uppercase tracking-wide text-muted-foreground'>Precio más alto</p>
+                  <p className='mt-2 text-lg font-semibold text-foreground'>
+                    {currency} {formatNumber(highestPrice)}
+                  </p>
+                </div>
+                <div className='border border-border/70 bg-section-grey p-4'>
+                  <p className='text-xs uppercase tracking-wide text-muted-foreground'>Precio más bajo</p>
+                  <p className='mt-2 text-lg font-semibold text-foreground'>
+                    {currency} {formatNumber(lowestPrice)}
+                  </p>
+                </div>
+                <div className='border border-border/70 bg-section-grey p-4'>
+                  <p className='text-xs uppercase tracking-wide text-muted-foreground'>Valor en USD</p>
+                  <p className='mt-2 text-lg font-semibold text-foreground'>
+                    {priceBasedOnDolar > 0 ? formatUSD(priceBasedOnDolar) : 'N/A'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div id='history' className='mt-8 border border-border/70 bg-background p-6 md:p-8'>
+              <div className='mb-6 flex items-center gap-2'>
+                <History className='h-4 w-4 text-primary' />
+                <h2 className='text-2xl md:text-3xl font-semibold text-foreground'>Historial de precios</h2>
+              </div>
+              <div className='grid grid-cols-1 xl:grid-cols-2 gap-6'>
+                <BarChart
+                  productTitle={title}
+                  priceHistory={uniquePrices}
+                  dateHistory={lastDates}
+                  lowestPrice={lowestPrice}
+                  highestPrice={highestPrice}
+                  monthlyData={monthlyData}
+                  weeklyData={weeklyData}
+                  anualData={productAnualData}
+                  currency={currency}
+                />
+                {currentUser?.country === 'argentina' ? (
+                  <DolarBasedChart
+                    currentPrice={currentPrice}
+                    dolarValue={dolarValue}
+                    dolarDate={scrapedDolarDate}
+                    dolarDates={uniqueDolarDatesArray as Array<Date>}
+                    dolarValues={uniqueDolarValues}
+                    weeklyData={dolarWeeklyData}
+                    monthlyData={dolarMonthlyData}
+                    anualData={dolarAnualData}
+                  />
+                ) : (
+                  <div className='border border-border/70 bg-section-grey p-6 text-sm text-muted-foreground'>
+                    El análisis en dólar está disponible para usuarios con perfil de Argentina.
+                  </div>
                 )}
-              </div> */}
-              <button className='btn w-fit m-auto flex items-center justify-center gap-2 min-w-[200px]'>
-                <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
-                <Link href={product.url} target='_blank' className='text-base text-white'>
-                  Comprar Ahora
-                </Link>
-              </button>
+              </div>
             </div>
-          </div>
 
-          <div className='my-7 w-full flex flex-col-2 gap-5'>
-            <div className='flex mr-5 m-auto gap-6 flex-wrap'>
-              <PriceInfoCard
-                title='Precio Actual'
-                iconSrc='/assets/icons/price-tag.svg'
-                value={` ${product.currency} ${formatNumber(currentPrice)}`}
-                borderColor='neutral'
-              />
-              <PriceInfoCard
-                title='Precio Promedio'
-                iconSrc='/assets/icons/chart.svg'
-                value={`${product.currency} ${formatNumber(product.averagePrice)}`}
-                borderColor='blue'
-              />
-              <PriceInfoCard
-                title='Precio Mayor'
-                iconSrc='/assets/icons/arrow-up.svg'
-                value={`${product.currency} ${formatNumber(product.highestPrice)}`}
-                borderColor='red'
-              />
-              <PriceInfoCard
-                title='Precio Menor'
-                iconSrc='/assets/icons/arrow-down.svg'
-                value={`${product.currency} ${formatNumber(product.lowestPrice)}`}
-                borderColor='green'
-              />
-              <PriceInfoCard
-                title='Valor Actual en Dolar'
-                iconSrc='/assets/icons/arrow-down.svg'
-                value={`${formatUSD(priceBasedOnDolar)}`}
-                borderColor='red'
-              />
+            <div id='priceCompare' className='mt-8 border border-border/70 bg-background p-6 md:p-8'>
+              <div className='mb-6'>
+                <p className='text-sm text-primary font-medium'>Comparación inteligente</p>
+                <h2 className='mt-1 text-2xl md:text-3xl font-semibold text-foreground'>
+                  Alternativas más baratas para este producto
+                </h2>
+                <p className='mt-2 text-sm md:text-base text-muted-foreground'>
+                  Comparamos precios locales y de otros sitios para mostrarte oportunidades reales de ahorro.
+                </p>
+              </div>
+              <ScraperButton productTitle={title} productPrice={currentPrice} />
             </div>
-          </div>
 
-          {currentUser && !isFollowing && <Modal productUrl={product.url} />}
-        </div>
-      </div>
-      <div id='history'></div>
-      <div className='mx-auto max-w-[510px] text-center mb-2'>
-        <div id='comparisson'></div>
-        <span className='block text-lg font-semibold text-primary'>Graficos</span>
-        <h1 className=' text-3xl mr-3 font-bold head-text  sm:text-1xl md:text-[40px] dark:text-white'>
-          Historial de Precios
-        </h1>
-      </div>
-      <div className='flex flex-col lg:flex-row  gap-20 mt-10 w-full'>
-        <div className='w-full m-auto lg:w-[50%]'>
-          <BarChart
-            productTitle={product.title}
-            priceHistory={uniquePrices}
-            dateHistory={lastDates}
-            lowestPrice={product.lowestPrice}
-            highestPrice={product.highestPrice}
-            monthlyData={monthlyData}
-            weeklyData={weeklyData}
-            anualData={productAnualData}
-            currency={currency}
-          />
-        </div>
-        {currentUser?.country === 'argentina' ? (
-          <div className='w-full lg:w-[50%]'>
-            <DolarBasedChart
-              currentPrice={currentPrice}
-              dolarValue={dolarValue}
-              dolarDate={scrapedDolarDate}
-              dolarDates={uniqueDolarDatesArray}
-              dolarValues={uniqueDolarValue}
-              weeklyData={dolarWeeklyData}
-              monthlyData={dolarMonthlyData}
-              anualData={dolarAnualData}
-            />
+            {similarProducts && similarProducts.length > 0 && (
+              <div className='mt-8 border border-border/70 bg-background p-6 md:p-8' id='trending'>
+                <div className='mb-6 flex items-center gap-2'>
+                  <Sparkles className='h-4 w-4 text-primary' />
+                  <h2 className='text-2xl md:text-3xl font-semibold text-foreground'>Otros productos relacionados</h2>
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4'>
+                  {similarProducts.map((item: any) => (
+                    <Link
+                      key={item._id?.toString()}
+                      href={`/products/${item._id}`}
+                      className='group border border-border/70 bg-section-grey p-4 flex flex-col gap-3 hover:bg-background transition-colors'
+                    >
+                      <div className='h-40 bg-background border border-border/70 overflow-hidden'>
+                        <img src={item.image} alt={item.title} className='h-full w-full object-contain p-2' />
+                      </div>
+                      <p className='text-sm text-muted-foreground'>{item.category || 'Producto'}</p>
+                      <p className='text-base font-medium text-foreground line-clamp-2'>{item.title}</p>
+                      <p className='text-lg font-semibold text-foreground'>
+                        {item.currency} {formatNumber(item.currentPrice)}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        ) : null}
-      </div>
-      <div className='mx-auto max-w-[510px] text-center mb-2'>
-        <div id='priceCompare'></div>
-        <span className='block text-lg font-semibold text-primary'>Precios</span>
-        <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
-          Comparación de Precios
-        </h1>
+        </div>
+      </section>
 
-        <p className='pt-2 text-muted'>Comparamos precios locales y de otras tiendas, ordenados de menor a mayor.</p>
-      </div>
-      <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-full'>
-        <ScraperButton productTitle={product.title} productPrice={product.currentPrice} />
-      </div>
-      {similarProducts && similarProducts?.length > 0 && (
-        <div className='py-14 flex flex-col gap-2 w-full' id='trending'>
-          <div className='mx-auto max-w-[510px] text-center mb-2'>
-            {/* <span className='block text-lg font-semibold text-primary'>Graficos</span> */}
-            <h1 className=' text-3xl font-bold head-text sm:text-1xl md:text-[40px] dark:text-white'>
-              Otros Productos
-            </h1>
-          </div>
-          <div className='flex flex-wrap gap-10 mt-7 w-full'>
-            {similarProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        </div>
-      )}
+      <PixelPerfectFooter />
     </div>
   );
 };
 
-export default ProductDetails;
+export default ProductDetailsPage;

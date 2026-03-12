@@ -75,14 +75,15 @@ export default function PixelPerfectFooter() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-10 lg:gap-8">
               <div className="lg:col-span-2 flex flex-col gap-6 lg:pr-10">
                 <Link
-                  href="/pixel-perfect-page-main"
+                  href="/"
                   className="flex items-center gap-2"
                 >
                   <Image
-                    src="/assets/icons/savemelin3.svg"
+                    src="/assets/icons/savemelin-logo.svg"
                     alt="SaveMelin"
-                    width={130}
-                    height={62}
+                    width={186}
+                    height={38}
+                    className="h-9 w-auto"
                   />
                 </Link>
                 <p className="text-sm text-muted-foreground max-w-sm">

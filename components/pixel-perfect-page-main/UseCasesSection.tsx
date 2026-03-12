@@ -209,7 +209,9 @@ function CompetitiveMockup() {
     <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
       <div className="flex items-center gap-1 mb-2">
         <div className="w-2 h-2 bg-primary rounded-sm animate-[pulse_2.5s_ease-in-out_infinite]" />
-        <span className="text-muted-foreground">Seguimiento activo: 12 productos</span>
+        <span className="text-muted-foreground">
+          Seguimiento activo: 12 productos
+        </span>
       </div>
       <div className="bg-background rounded-lg p-3 flex-1">
         <div className="space-y-2">
@@ -289,7 +291,9 @@ function KycMockup() {
           <span className="font-medium text-foreground">Competencia</span>
           <span className="text-muted-foreground text-[9px]">actualizado</span>
         </div>
-        <p className="font-bold text-foreground mb-0.5">Promedio mercado: $1.861.300</p>
+        <p className="font-bold text-foreground mb-0.5">
+          Promedio mercado: $1.861.300
+        </p>
         <p className="text-primary text-[9px] animate-[pulse_2.8s_ease-in-out_infinite]">
           Ventaja actual: +1.7% mejor precio
         </p>
@@ -322,7 +326,9 @@ function ComplianceMockup() {
         />
         <div>
           <p className="text-sm font-medium">Escaneo de seguridad</p>
-          <p className="text-[10px] text-background/80">SSL, reputacion, antiguedad y riesgo</p>
+          <p className="text-[10px] text-background/80">
+            SSL, reputacion, antiguedad y riesgo
+          </p>
         </div>
       </div>
     </div>
@@ -334,7 +340,9 @@ function ReportingMockup() {
     <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
       <div className="bg-background rounded-lg p-3 flex-1 overflow-hidden">
         <div className="flex items-center justify-between mb-1">
-          <span className="font-semibold text-foreground">Comparativa AR vs US</span>
+          <span className="font-semibold text-foreground">
+            Comparativa AR vs US
+          </span>
           <span className="text-muted-foreground text-[9px]">actual</span>
         </div>
         <p className="font-bold text-foreground text-[11px] mb-1">
@@ -359,7 +367,9 @@ function ReportingMockup() {
           </div>
         </div>
         <div className="border-t border-border pt-1.5 flex items-center justify-between">
-          <p className="text-[9px] text-muted-foreground font-medium">Mejor opcion</p>
+          <p className="text-[9px] text-muted-foreground font-medium">
+            Mejor opcion
+          </p>
           <p className="text-[9px] text-primary font-semibold animate-[pulse_3s_ease-in-out_infinite]">
             Comprar local
           </p>

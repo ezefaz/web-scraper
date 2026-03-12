@@ -1,9 +1,11 @@
 "use client";
 
-import { Asterisk, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signOut, useSession } from "next-auth/react";
 import { Button } from "./button";
 
 const navLinks = ["Como funciona", "Servicios", "Precios", "Destacado"];
@@ -11,16 +13,26 @@ const navLinks = ["Como funciona", "Servicios", "Precios", "Destacado"];
 export default function PixelPerfectNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-background border-b-[0.5px]">
       <div className="w-full max-w-[90rem] mx-auto px-10 md:px-6 py-4 flex flex-row items-center justify-start gap-8 min-h-20">
         <div className="flex items-center gap-10 min-w-0">
-          <Link href="/" className="flex items-center gap-1.5 pr-10 h-full">
-            <Asterisk className="w-7 h-7 text-primary" strokeWidth={3} />
-            <span className="text-xl font-bold tracking-tight text-foreground">
-              datashake
-            </span>
+          <Link href="/" className="flex items-center pr-6 h-full">
+            <Image
+              src="/assets/icons/savemelin-logo.svg"
+              alt="SaveMelin"
+              width={170}
+              height={34}
+              priority
+              className="h-8 w-auto md:h-9"
+            />
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
@@ -35,20 +47,37 @@ export default function PixelPerfectNavbar() {
           </div>
         </div>
         <div className="hidden md:flex items-center gap-3 ml-auto">
-          <Button
-            variant="secondary"
-            size="default"
-            onClick={() => router.push("/sign-in")}
-          >
-            Ingresar
-          </Button>
-          <Button
-            variant="primary"
-            size="default"
-            onClick={() => router.push("/sign-up")}
-          >
-            Comenzar
-          </Button>
+          {isAuthenticated ? (
+            <>
+              <Button
+                variant="secondary"
+                size="default"
+                onClick={() => router.push("/profile")}
+              >
+                Mi cuenta
+              </Button>
+              <Button variant="primary" size="default" onClick={handleSignOut}>
+                Cerrar sesión
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="secondary"
+                size="default"
+                onClick={() => router.push("/sign-in")}
+              >
+                Ingresar
+              </Button>
+              <Button
+                variant="primary"
+                size="default"
+                onClick={() => router.push("/sign-up")}
+              >
+                Comenzar
+              </Button>
+            </>
+          )}
         </div>
         <button
           type="button"
@@ -86,28 +115,57 @@ export default function PixelPerfectNavbar() {
             ))}
           </div>
           <div className="mt-4 pt-4 border-t border-border flex flex-col gap-3">
-            <Button
-              variant="secondary"
-              size="default"
-              className="w-full"
-              onClick={() => {
-                setIsMobileMenuOpen(false);
-                router.push("/sign-in");
-              }}
-            >
-              Ingresar
-            </Button>
-            <Button
-              variant="primary"
-              size="default"
-              className="w-full"
-              onClick={() => {
-                setIsMobileMenuOpen(false);
-                router.push("/sign-up");
-              }}
-            >
-              Comenzar
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button
+                  variant="secondary"
+                  size="default"
+                  className="w-full"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    router.push("/profile");
+                  }}
+                >
+                  Mi cuenta
+                </Button>
+                <Button
+                  variant="primary"
+                  size="default"
+                  className="w-full"
+                  onClick={async () => {
+                    setIsMobileMenuOpen(false);
+                    await handleSignOut();
+                  }}
+                >
+                  Cerrar sesión
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="secondary"
+                  size="default"
+                  className="w-full"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    router.push("/sign-in");
+                  }}
+                >
+                  Ingresar
+                </Button>
+                <Button
+                  variant="primary"
+                  size="default"
+                  className="w-full"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    router.push("/sign-up");
+                  }}
+                >
+                  Comenzar
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -15,6 +15,8 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const pathname = nextUrl.pathname;
 
+  const isBusinessRoute =
+    pathname.startsWith('/business') || pathname.startsWith('/profile/business');
   const isApiRoute = pathname.startsWith('/api');
   const isPublicRoute =
     publicRoutes.includes(pathname) ||
@@ -24,6 +26,11 @@ export default auth((req) => {
   // Keep API routes accessible and let each handler enforce its own auth rules.
   if (isApiRoute) {
     return null;
+  }
+
+  // Temporarily hide business area routes.
+  if (isBusinessRoute) {
+    return Response.redirect(new URL('/', nextUrl));
   }
 
   if (isAuthRoute) {

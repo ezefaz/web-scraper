@@ -1,164 +1,94 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition, useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { getCurrentUser } from "@/lib/actions";
+import PixelPerfectNavbar from "@/components/pixel-perfect-page-main/Navbar";
+import PixelPerfectFooter from "@/components/pixel-perfect-page-main/Footer";
+import ProfileDashboardClient from "@/components/profile/ProfileDashboardClient";
 
-import { SettingsSchema, validCountries } from "@/schemas";
-import {
-	Card,
-	CardHeader,
-	CardBody,
-	CardFooter,
-	Select,
-	SelectItem,
-	Avatar,
-} from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
-import { settings } from "@/app/actions/settings";
-import { Input } from "@nextui-org/react";
-import { useCurrentUser } from "@/hooks/use-current-user";
-import FormError from "@/components/auth/FormError";
-import FormSuccess from "@/components/auth/FormSuccess";
+const verticalLineOffset = "max(calc((100vw - 94rem) / 2 + 2.5rem), 2.5rem)";
 
-const ProfilePage = () => {
-	const user: any = useCurrentUser();
-
-	const [error, setError] = useState<string | undefined>();
-	const [success, setSuccess] = useState<string | undefined>();
-	const { update } = useSession();
-	const [isPending, startTransition] = useTransition();
-
-	const {
-		handleSubmit,
-		register,
-		setValue,
-		formState: { errors, isDirty },
-	} = useForm<z.infer<typeof SettingsSchema>>({
-		resolver: zodResolver(SettingsSchema),
-		defaultValues: {
-			password: "",
-			newPassword: "",
-			name: user?.name || "",
-			email: user?.email || "",
-			role: user?.role || "USER",
-			country: user?.country || "argentina",
-		},
-	});
-
-	useEffect(() => {
-		setValue("name", user?.name || "");
-		setValue("email", user?.email || "");
-		setValue("role", user?.role || "USER");
-		setValue("country", user?.country || "argentina");
-	}, [user, setValue]);
-
-	const onSubmit = (values: z.infer<typeof SettingsSchema>) => {
-		startTransition(() => {
-			settings(values)
-				.then((data) => {
-					if (data.error) {
-						setError(data.error);
-					}
-
-					if (data.success) {
-						update();
-						setSuccess(data.success);
-					}
-				})
-				.catch(() => setError("Algo salio mal!"));
-		});
-	};
-
-	return (
-		<Card className='w-[600px]'>
-			<CardHeader>
-				<p className='text-2xl font-semibold text-center'>⚙️ Perfil</p>
-			</CardHeader>
-			<CardBody>
-				<form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
-					<div className='space-y-4'>
-						<div>
-							<label>Nombre</label>
-							<Input
-								defaultValue={user.name}
-								{...register("name")}
-								disabled={isPending}
-							/>
-						</div>
-						{user?.isOAuth === false && (
-							<>
-								<div>
-									<label>Email</label>
-									<Input
-										defaultValue={user.email}
-										{...register("email")}
-										type='email'
-										disabled={isPending}
-									/>
-									{errors.email && (
-										<span className='text-red-500'>{errors.email.message}</span>
-									)}
-								</div>
-								<div>
-									<label>Contraseña</label>
-									<Input
-										{...register("password")}
-										placeholder='******'
-										type='password'
-										disabled={isPending}
-									/>
-									{errors.password && (
-										<span className='text-red-500'>
-											{errors.password.message}
-										</span>
-									)}
-								</div>
-								<div>
-									<label>Nueva Contraseña</label>
-									<Input
-										{...register("newPassword")}
-										placeholder='******'
-										type='password'
-										disabled={isPending}
-									/>
-								</div>
-								{errors.newPassword && (
-									<span className='text-red-500'>
-										{errors.newPassword.message}
-									</span>
-								)}
-							</>
-						)}
-						<div>
-							<label>País</label>
-							<Select
-								{...register("country")}
-								defaultSelectedKeys={[user?.country]}
-								disabled={isPending}
-								label='Seleccionar País'>
-								{validCountries.map((country) => (
-									<SelectItem key={country} value={country}>
-										{country.charAt(0).toUpperCase() + country.slice(1)}
-									</SelectItem>
-								))}
-							</Select>
-							{errors.country && (
-								<span className='text-red-500'>{errors.country.message}</span>
-							)}
-						</div>
-					</div>
-					<FormError message={error} />
-					<FormSuccess message={success} />
-					<Button disabled={isPending || !isDirty} type='submit'>
-						Guardar
-					</Button>
-				</form>
-			</CardBody>
-		</Card>
-	);
+type DashboardProduct = {
+  id: string;
+  title: string;
+  image: string;
+  currency: string;
+  currentPrice: number;
+  originalPrice: number;
+  isFollowing: boolean;
+  category: string;
+  url: string;
 };
 
-export default ProfilePage;
+export default async function ProfilePage() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const validCountries = ["argentina", "brasil", "colombia", "uruguay"] as const;
+  const selectedCountry = validCountries.includes(user.country)
+    ? user.country
+    : "argentina";
+
+  const productsRaw = Array.isArray(user.products) ? user.products : [];
+
+  const products: DashboardProduct[] = productsRaw.map((product: any) => ({
+    id: String(product._id),
+    title: product.title || "Producto sin título",
+    image: product.image || "/assets/icons/bag.svg",
+    currency: product.currency || "$",
+    currentPrice: Number(product.currentPrice || 0),
+    originalPrice: Number(product.originalPrice || 0),
+    isFollowing: Boolean(product.isFollowing),
+    category: product.category || "General",
+    url: product.url || "",
+  }));
+
+  const accumulatedSavings = products.reduce((total: number, product) => {
+    const diff = product.originalPrice - product.currentPrice;
+    return diff > 0 ? total + diff : total;
+  }, 0);
+
+  const metrics = {
+    savedProducts: products.length,
+    alertsEnabled: products.filter((item) => item.isFollowing).length,
+    productsWithDiscount: products.filter(
+      (item) => item.originalPrice > item.currentPrice
+    ).length,
+    accumulatedSavings,
+  };
+
+  return (
+    <div className="pixel-perfect-home relative min-h-screen bg-background text-foreground">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 z-[60] border-l border-border/50"
+        style={{ left: verticalLineOffset }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 z-[60] border-r border-border/50"
+        style={{ right: verticalLineOffset }}
+      />
+
+      <PixelPerfectNavbar />
+
+      <section className="border-y border-border/70">
+        <div className="max-w-[94rem] mx-auto padding-global border-x border-border/70">
+          <ProfileDashboardClient
+            user={{
+              name: user.name || "Usuario",
+              email: user.email || "",
+              country: selectedCountry,
+            }}
+            products={products}
+            metrics={metrics}
+          />
+        </div>
+      </section>
+
+      <PixelPerfectFooter />
+    </div>
+  );
+}

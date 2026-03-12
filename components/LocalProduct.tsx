@@ -1,20 +1,23 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-
-import { Badge, Card } from '@tremor/react';
-import { Image, Skeleton } from '@nextui-org/react';
-import { PiKeyReturn } from 'react-icons/pi';
-import { MdOutlineProductionQuantityLimits } from 'react-icons/md';
-
-import PriceInfoCard from './PriceInfoCard';
+import {
+  CheckCircle2,
+  ExternalLink,
+  Loader2,
+  Package,
+  RotateCcw,
+  ShoppingBag,
+  Store,
+  Truck,
+} from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
-import ProductBadges from './ProductBadges';
 import { scrapeMLProductDetail } from '@/lib/scraper/mercadolibre-product-detail';
 import ScraperButton from './ScraperButton';
 import { createProduct } from '@/app/actions/create-product';
+import { Button } from '@/components/pixel-perfect-page-main/button';
 
 const mercadolibreDomains = [
   'mercadolibre.com',
@@ -31,42 +34,53 @@ const isValidMLProductUrl = (url: string) => {
     const hostname = parsedUrl.hostname;
 
     return mercadolibreDomains.some((domain: string) => hostname.includes(domain));
-  } catch (error) {
+  } catch {
     return false;
   }
 };
 
 const LocalProduct = () => {
   const router = useRouter();
-
   const searchParams = useSearchParams();
-  const productURL: any = searchParams.get('productUrl');
-  const [productData, setProductData] = useState<any>();
+  const productURL = searchParams.get('productUrl') ?? '';
+  const decodedProductURL = useMemo(() => {
+    try {
+      return decodeURIComponent(productURL).trim();
+    } catch {
+      return productURL.trim();
+    }
+  }, [productURL]);
+
+  const [productData, setProductData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
+      const url = decodedProductURL?.trim();
+      if (!url || !isValidMLProductUrl(url)) {
+        setProductData(null);
+        setErrorMessage('Ingresá una URL válida de Mercado Libre para ver el detalle del producto.');
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      setErrorMessage('');
       try {
-        const url = productURL?.trim();
-        if (!url || !isValidMLProductUrl(url)) {
-          setProductData(undefined);
-          return;
-        }
-
         const data: any = await scrapeMLProductDetail(url);
-
         setProductData(data);
       } catch (error) {
         console.error('Error scraping product:', error);
+        setErrorMessage('No pudimos obtener el detalle del producto en este momento.');
+        setProductData(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (productURL) {
-      fetchData();
-      return;
-    }
-
-    setProductData(undefined);
-  }, [productURL]);
+    fetchData();
+  }, [decodedProductURL]);
 
   const handleSubmit = useCallback(
     async (productUrl: string) => {
@@ -76,240 +90,173 @@ const LocalProduct = () => {
     [router]
   );
 
+  const statCards = useMemo(() => {
+    if (!productData) return [];
+    const currency = productData.currency || '$';
+    return [
+      {
+        label: 'Precio actual',
+        value: `${currency} ${formatNumber(productData.currentPrice)}`,
+      },
+      {
+        label: 'Precio promedio',
+        value: `${currency} ${formatNumber(productData.averagePrice)}`,
+      },
+      {
+        label: 'Precio más alto',
+        value: `${currency} ${formatNumber(productData.highestPrice)}`,
+      },
+      {
+        label: 'Precio más bajo',
+        value: `${currency} ${formatNumber(productData.lowestPrice)}`,
+      },
+    ];
+  }, [productData]);
+
+  const hasDiscount = Boolean(
+    productData &&
+      Number(productData.currentPrice || 0) > 0 &&
+      Number(productData.originalPrice || 0) > 0 &&
+      Number(productData.currentPrice) < Number(productData.originalPrice),
+  );
+
   return (
-    <div className='mt-40'>
-      {productData ? (
-        <>
-          <div className='flex gap-10  sm:cap-5 xl:flex-row flex-col'>
-            <div className='flex flex-row flex-col m-8 h-[max-content]'>
-              <Card decoration='bottom' decorationColor='orange'>
-                <Image src={productData.image} isZoomed alt={productData.title} width={400} height={400} />
-              </Card>
-              <button
-                className='btn w-fit mt-4 flex items-center justify-center gap-2 min-w-[200px] text-base text-white m-auto'
-                onClick={() => handleSubmit(productData.url)}
-              >
-                <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
-                Agregar Producto
-              </button>
-            </div>
-
-            <div className='flex-1 flex flex-col'>
-              <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
-                <div className='flex flex-col gap-3'>
-                  <p className='text-[28px] hover:text-primary transition-colors duration-300'>{productData.title}</p>
-                  <Link
-                    href={productURL}
-                    target='_blank'
-                    className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300 dark:text-white'
-                  >
-                    Visitar Producto
-                  </Link>
-                  <span className='font-bold dark:text-gray-200'>
-                    Vendido por: {extractSellerName(productData.storeName)}
-                  </span>
-                </div>
-              </div>
-
-              <div className='product-info'>
-                <div className='flex flex-col gap-2'>
-                  <p className='text-[34px] text-secondary font-bold dark:text-white hover:text-primary  '>
-                    {productData.currency} {formatNumber(productData.currentPrice)}
-                  </p>
-                  <p className='text-[21px] text-black opacity-50 line-through dark:text-white'>
-                    {productData.currentPrice !== productData.originalPrice
-                      ? `${productData.currency} ${formatNumber(productData.originalPrice)}`
-                      : ''}
-                  </p>
-                </div>
-                <ProductBadges
-                  stars={productData.stars}
-                  reviewsCount={productData.reviewsCount}
-                  stockAvailable={productData.stockAvailable}
-                  isFreeReturning={productData.isFreeReturning}
-                  isFreeShipping={productData.isFreeShipping}
-                  status={productData.status}
-                />
-                <p className='text-sm md:text-base lg:text-sm w-[70%] m-2'>{productData.refurbishedMessage}</p>
-                <div className='flex flex-col gap-10 m-auto'>
-                  {/* <div className='flex flex-col gap-5'>
-                      {productData[0].description.length > 2 && (
-                        <>
-                          <h3 className='text-2xl text-secondary font-semibold'>Descripción</h3>
-                          <div className='flex flex-col gap-4'>{product?.description?.split('/n')}</div>
-                        </>
-                      )}
-                    </div> */}
-                  <button className='btn w-fit m-auto flex items-center justify-center gap-2 min-w-[200px]'>
-                    <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
-                    <Link href={productURL} target='_blank' className='text-base text-white'>
-                      Comprar Ahora
-                    </Link>
-                  </button>
-                </div>
-              </div>
-
-              <div className='my-7 w-full flex flex-col-2 gap-5'>
-                <div className='flex mr-5 m-auto gap-6 flex-wrap'>
-                  <PriceInfoCard
-                    title='Precio Actual'
-                    iconSrc='/assets/icons/price-tag.svg'
-                    value={` ${productData.currency} ${formatNumber(productData.currentPrice)}`}
-                    borderColor='neutral'
-                  />
-                  <PriceInfoCard
-                    title='Precio Promedio'
-                    iconSrc='/assets/icons/chart.svg'
-                    value={`${productData.currency} ${formatNumber(productData.averagePrice)}`}
-                    borderColor='blue'
-                  />
-                  <PriceInfoCard
-                    title='Precio Mayor'
-                    iconSrc='/assets/icons/arrow-up.svg'
-                    value={`${productData.currency} ${formatNumber(productData.highestPrice)}`}
-                    borderColor='red'
-                  />
-                  <PriceInfoCard
-                    title='Precio Menor'
-                    iconSrc='/assets/icons/arrow-down.svg'
-                    value={`${productData.currency} ${formatNumber(productData.lowestPrice)}`}
-                    borderColor='green'
-                  />
-                  {/* <PriceInfoCard
-                  title='Valor Actual en Dolar'
-                  iconSrc='/assets/icons/arrow-down.svg'
-                  value={`${formatUSD(priceBasedOnDolar)}`}
-                  borderColor='red'
-                /> */}
-                </div>
-              </div>
-              {/* {currentUser && !isFollowing && <Modal productUrl={productData[0].url} />} */}
-            </div>
-          </div>
-          <div className='mx-auto max-w-[510px] text-center mb-2 mt-40'>
-            <div id='priceCompare'></div>
-            <span className='block text-lg font-semibold text-primary'>Precios</span>
-            <h1 className=' text-3xl font-bold head-text sm:text-1xl  md:text-[40px] dark:text-white'>
-              Comparación de Precios
-            </h1>
-
-            <p className='pt-2 text-muted'>Te mostramos productos de al menos un 10% menor al valor.</p>
-          </div>
-          <div className='flex justify-center m-auto gap-10 xl:flex-row flex-row w-20 w-full'>
-            <ScraperButton productTitle={productData.title} productPrice={productData.currentPrice} />
-          </div>
-        </>
-      ) : (
-        <div className='flex gap-10  sm:cap-5 xl:flex-row flex-col'>
-          <div className='flex flex-row flex-col m-8 h-[max-content]'>
-            <Skeleton className='rounded-lg'>
-              <Card decoration='bottom' decorationColor='orange'>
-                <Image src='' isZoomed width={400} height={400} />
-              </Card>
-            </Skeleton>
-          </div>
-          <div className='flex-1 flex flex-col'>
-            <div className='flex justify-between items-start gap-5 flex-wrap pt-6'>
-              <div className='flex flex-col gap-3'>
-                <Skeleton className=' rounded-lg'>
-                  <p className='text-[28px] hover:text-primary transition-colors duration-300'></p>
-                </Skeleton>
-                <Skeleton className='rounded-lg'>
-                  <Link
-                    href={'#'}
-                    target='_blank'
-                    className='text-base text-black opacity-50 hover:opacity-75 transition-opacity duration-300 dark:text-white'
-                  >
-                    Visitar Producto
-                  </Link>
-                </Skeleton>
-                <Skeleton className=' rounded-lg'>
-                  <p></p>
-                </Skeleton>
-              </div>
-            </div>
-
-            <div className='product-info'>
-              <div className='flex flex-col gap-2'>
-                <Skeleton className=' rounded-lg'>
-                  <p className='text-[34px] text-secondary font-bold dark:text-white hover:text-primary  '></p>
-                </Skeleton>
-                <Skeleton className=' rounded-lg'>
-                  <p className='text-[21px] text-black opacity-50 line-through dark:text-white'></p>
-                </Skeleton>
-              </div>
-              <div className='flex mr-5 m-auto gap-6 flex-wrap'>
-                <Skeleton className='rounded-lg'>
-                  <Badge icon={MdOutlineProductionQuantityLimits} color='green'></Badge>
-                </Skeleton>
-                <Skeleton className='rounded-lg'>
-                  <Badge icon={PiKeyReturn} color='blue'></Badge>
-                </Skeleton>
-              </div>
-              <Skeleton className='rounded-lg'>
-                <Skeleton className='text-sm md:text-base lg:text-sm w-[70%] m-2'></Skeleton>
-              </Skeleton>
-              <div className='flex flex-col gap-10 m-auto'>
-                {/* <div className='flex flex-col gap-5'>
-                      {productData[0].description.length > 2 && (
-                        <>
-                          <h3 className='text-2xl text-secondary font-semibold'>Descripción</h3>
-                          <div className='flex flex-col gap-4'>{product?.description?.split('/n')}</div>
-                        </>
-                      )}
-                    </div> */}
-                {/* <Skeleton className=' rounded-lg'> */}
-                <Skeleton className='btn w-fit m-auto flex items-center justify-center gap-2 min-w-[200px]'>
-                  <Image src='/assets/icons/bag.svg' alt='check' width={22} height={22} />
-                  <Link href='' target='_blank' className='text-base text-white'>
-                    Comprar Ahora
-                  </Link>
-                </Skeleton>
-                {/* </Skeleton> */}
-              </div>
-            </div>
-
-            <div className='my-7 w-full flex flex-col-2 gap-5'>
-              <div className='flex mr-5 m-auto gap-6 flex-wrap'>
-                <Skeleton className=' rounded-lg'>
-                  <PriceInfoCard
-                    title='Precio Mayor'
-                    iconSrc='/assets/icons/arrow-up.svg'
-                    value={''}
-                    borderColor='red'
-                  />
-                </Skeleton>
-                <Skeleton className=' rounded-lg'>
-                  <PriceInfoCard
-                    title='Precio Mayor'
-                    iconSrc='/assets/icons/arrow-up.svg'
-                    value={''}
-                    borderColor='red'
-                  />
-                </Skeleton>
-
-                <Skeleton className=' rounded-lg'>
-                  <PriceInfoCard
-                    title='Precio Mayor'
-                    iconSrc='/assets/icons/arrow-up.svg'
-                    value={''}
-                    borderColor='red'
-                  />
-                </Skeleton>
-                <Skeleton className=' rounded-lg'>
-                  <PriceInfoCard
-                    title='Precio Mayor'
-                    iconSrc='/assets/icons/arrow-up.svg'
-                    value={''}
-                    borderColor='red'
-                  />
-                </Skeleton>
-              </div>
-            </div>
-
-            {/* {currentUser && !isFollowing && <Modal productUrl={productData[0].url} />} */}
+    <div className='py-12 lg:py-14'>
+      {isLoading ? (
+        <div className='border border-border/70 bg-section-grey p-8 lg:p-10'>
+          <div className='flex items-center justify-center gap-3 text-muted-foreground'>
+            <Loader2 className='h-5 w-5 animate-spin text-primary' />
+            <p className='text-base'>Cargando detalle del producto...</p>
           </div>
         </div>
+      ) : !productData ? (
+        <div className='border border-border/70 bg-section-grey p-8 lg:p-10'>
+          <p className='text-base text-muted-foreground'>{errorMessage}</p>
+        </div>
+      ) : (
+        <>
+          <div className='border border-border/70 bg-section-grey p-6 md:p-8 lg:p-10'>
+            <div className='grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-8 lg:gap-10'>
+              <div className='border border-border/70 bg-background p-4'>
+                <div className='aspect-square w-full overflow-hidden bg-white'>
+                  <img
+                    src={productData.image}
+                    alt={productData.title}
+                    className='h-full w-full object-contain'
+                  />
+                </div>
+              </div>
+
+              <div className='min-w-0'>
+                <div className='flex flex-wrap items-center gap-2 mb-3'>
+                  <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                    <Store className='h-3.5 w-3.5 text-primary' />
+                    {extractSellerName(productData.storeName || 'Tienda oficial')}
+                  </span>
+                  {productData.isFreeShipping && (
+                    <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                      <Truck className='h-3.5 w-3.5 text-primary' />
+                      Envío gratis
+                    </span>
+                  )}
+                  {productData.isFreeReturning && (
+                    <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                      <RotateCcw className='h-3.5 w-3.5 text-primary' />
+                      Devolución gratis
+                    </span>
+                  )}
+                  {productData.status && (
+                    <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
+                      <CheckCircle2 className='h-3.5 w-3.5 text-primary' />
+                      {productData.status}
+                    </span>
+                  )}
+                </div>
+
+                <h1 className='text-2xl md:text-3xl font-semibold leading-tight text-foreground max-w-4xl'>
+                  {productData.title}
+                </h1>
+
+                <div className='mt-5 flex flex-wrap items-end gap-x-4 gap-y-2'>
+                  <p className='text-3xl md:text-4xl font-semibold text-foreground'>
+                    {productData.currency} {formatNumber(productData.currentPrice)}
+                  </p>
+                  {hasDiscount && (
+                    <p className='text-lg text-muted-foreground line-through'>
+                      {productData.currency} {formatNumber(productData.originalPrice)}
+                    </p>
+                  )}
+                </div>
+
+                <p className='mt-4 text-sm md:text-base text-muted-foreground max-w-3xl'>
+                  {productData.refurbishedMessage ||
+                    'Revisá el historial de precios y compará opciones antes de comprar.'}
+                </p>
+
+                <div className='mt-8 flex flex-wrap gap-3'>
+                  <Button
+                    variant='primary'
+                    onClick={() => window.open(productData.url, '_blank')}
+                  >
+                    Comprar ahora
+                    <ExternalLink className='h-4 w-4' />
+                  </Button>
+                  <Button
+                    variant='secondary'
+                    onClick={() => handleSubmit(productData.url)}
+                  >
+                    Agregar a seguimiento
+                    <ShoppingBag className='h-4 w-4' />
+                  </Button>
+                </div>
+
+                <Link
+                  href={decodedProductURL}
+                  target='_blank'
+                  className='mt-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors'
+                >
+                  Ver publicación original
+                  <ExternalLink className='h-3.5 w-3.5' />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className='mt-8 border border-border/70 bg-background p-6 md:p-8'>
+            <div className='mb-5 flex items-center gap-2'>
+              <Package className='h-4 w-4 text-primary' />
+              <h2 className='text-lg md:text-xl font-medium text-foreground'>
+                Resumen de precios
+              </h2>
+            </div>
+            <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'>
+              {statCards.map((card) => (
+                <div key={card.label} className='border border-border/70 bg-section-grey p-4'>
+                  <p className='text-xs uppercase tracking-wide text-muted-foreground'>
+                    {card.label}
+                  </p>
+                  <p className='mt-2 text-lg font-semibold text-foreground'>{card.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className='mt-8 border border-border/70 bg-background p-6 md:p-8'>
+            <div className='mb-6'>
+              <p className='text-sm text-primary font-medium'>Comparación inteligente</p>
+              <h2 className='mt-1 text-2xl md:text-3xl font-semibold text-foreground'>
+                Alternativas más baratas para este producto
+              </h2>
+              <p className='mt-2 text-sm md:text-base text-muted-foreground'>
+                SaveMelin busca opciones en múltiples sitios y destaca oportunidades de ahorro reales.
+              </p>
+            </div>
+            <ScraperButton
+              productTitle={productData.title}
+              productPrice={Number(productData.currentPrice) || 0}
+            />
+          </div>
+        </>
       )}
     </div>
   );

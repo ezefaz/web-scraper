@@ -1,42 +1,31 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter, Space_Grotesk } from 'next/font/google';
-import { Analytics } from '@vercel/analytics/react';
-import { Toaster } from 'react-hot-toast';
-import ClientOnly from '@/components/ClientOnly';
+import { Inter } from 'next/font/google';
 import { auth } from '@/auth';
-import { SessionProvider } from 'next-auth/react';
-import { Providers } from './providers';
+import ClientProviders from './client-providers';
 
 const inter = Inter({ subsets: ['latin'] });
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-});
 
 export const metadata: Metadata = {
   title: 'SaveMelin',
   description: 'Ahorra dinero en la compra de tus productos favoritos.',
+  icons: {
+    icon: '/assets/icons/savemelin-favicon.svg',
+    shortcut: '/assets/icons/savemelin-favicon.svg',
+    apple: '/assets/icons/savemelin-favicon.svg',
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
 
   return (
-    <SessionProvider session={session}>
-      <html lang='es'>
-        <body className={inter.className}>
-          <main className='overflow-x-hidden'>
-            <ClientOnly>
-              <Providers>
-                <Toaster position='top-center' reverseOrder={false} />
-                {children}
-                <Analytics />
-              </Providers>
-            </ClientOnly>
-          </main>
-        </body>
-      </html>
-    </SessionProvider>
+    <html lang='es'>
+      <body className={inter.className}>
+        <main className='overflow-x-hidden'>
+          <ClientProviders session={session}>{children}</ClientProviders>
+        </main>
+      </body>
+    </html>
   );
 }

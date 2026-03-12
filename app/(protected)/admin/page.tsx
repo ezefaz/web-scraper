@@ -6,14 +6,14 @@ import { UserRole } from "@/types";
 type Props = {};
 
 const AdminPage = async (props: Props) => {
-	return (
-		<div className='w-[80%]'>
-			<RoleGate allowedRole={UserRole.ADMIN}>
-				<FormSuccess message='Estas habilitado para ver este contenido.' />
-				<AdminDashboard />
-			</RoleGate>
-		</div>
-	);
+  return (
+    <div className="w-[80%]">
+      <RoleGate allowedRole={UserRole.ADMIN}>
+        <FormSuccess message="Estas habilitado para ver este contenido." />
+        <AdminDashboard />
+      </RoleGate>
+    </div>
+  );
 };
 
 export default AdminPage;
