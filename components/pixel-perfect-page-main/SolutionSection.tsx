@@ -15,29 +15,33 @@ import { waveBars } from "./visuals";
 const stats = [
   {
     icon: CheckCircle,
-    label: "98.3% uptime",
-    description: "Proven reliability across sources with proactive monitoring",
+    label: "Insertar link o producto",
+    description:
+      "Búsqueda a partir de multiples fuentes confiables y actualizadas",
   },
   {
     icon: Shield,
-    label: "Enterprise security",
+    label: "Análisis de seguridad de compra",
     description:
-      "Encryption at every step with compliance-ready infrastructure",
+      "Te brindamos un índice de confiabilidad de la pagina para que puedas comprar con tranquilidad",
   },
   {
     icon: BarChart3,
-    label: "Massive scale",
-    description: "Scale your workflow to hundreds of millions of daily fetches",
+    label: "Seguir producto",
+    description:
+      "Si la compra no es inminente, puedes seguir el producto para recibir alertas de cambios en su precio o disponibilidad",
   },
   {
     icon: Award,
-    label: "Industry standard",
-    description: "Proven reliability across sources with proactive monitoring",
+    label: "Mejor precio garantizado",
+    description:
+      "A partir de nuestro análisis, te recomendamos el mejor momento para comprar el producto que deseas",
   },
   {
     icon: MonitorSpeaker,
-    label: "Earned media coverage",
-    description: "Detect conversations outside channels you own",
+    label: "Ahorro masivo mensual",
+    description:
+      "Masivamente generas un ahorro significativo a largo plazo, cuidando tu bolsillo",
   },
 ];
 
@@ -51,16 +55,17 @@ export default function PixelPerfectSolutionSection() {
           <div className="flex items-center gap-2 mb-4">
             <span className="text-primary">⊢</span>
             <span className="text-sm font-medium text-primary">
-              The Solution
+              La solución
             </span>
             <span className="text-primary">⊣</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-tight tracking-tight text-foreground mb-4 max-w-lg">
-            Get the most complete data to power your insights
+            Te avisamos el mejor momento de comprar el producto que deseas
           </h2>
           <p className="text-base text-muted-foreground leading-relaxed max-w-lg">
-            Datashake provides the reliable foundation of public data that your
-            business has always needed.
+            Savemelin te provee con la mejor información y estadisticas para
+            comprar al mejor precio, siguiendo una evolución del precio del
+            producto y de los diferentes paginas de compra.
           </p>
         </div>
 
@@ -70,7 +75,7 @@ export default function PixelPerfectSolutionSection() {
             className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-10 scale-100"
             style={{ backgroundImage: "url('/assets/images/hero2.png')" }}
           />
-          <div className="absolute inset-0 flex items-end gap-[3px] px-8 pb-32 pt-6 opacity-30">
+          <div className="absolute inset-0 flex items-end  gap-[3px] px-8 pt-6 opacity-30">
             {bars.map((height, index) => (
               <div
                 key={index}
@@ -82,33 +87,33 @@ export default function PixelPerfectSolutionSection() {
 
           <div className="absolute left-4 top-1/4 space-y-16">
             <span className="border border-primary/50 text-primary text-xs px-2 py-1 rounded-sm flex items-center gap-1 w-fit bg-foreground/80">
-              Review Sites{" "}
+              Sitios escaneados{" "}
               <span className="text-[10px] bg-primary/20 px-1 rounded">
-                150+
+                50+
               </span>
             </span>
             <span className="border border-primary/50 text-primary text-xs px-2 py-1 rounded-sm flex items-center gap-1 w-fit bg-foreground/80">
-              Social Media{" "}
+              Ofertas encontradas{" "}
               <span className="text-[10px] bg-primary/20 px-1 rounded">
                 10+
               </span>
             </span>
             <span className="border border-primary/50 text-primary text-xs px-2 py-1 rounded-sm flex items-center gap-1 w-fit bg-foreground/80">
-              Online Forums{" "}
+              Ofertas reales{" "}
               <span className="text-[10px] bg-primary/20 px-1 rounded">9</span>
             </span>
           </div>
 
           <div className="absolute right-4 top-8 bg-background/95 rounded-lg p-4 text-xs shadow-lg">
-            <p className="font-medium text-foreground mb-1">Search Result</p>
-            <p className="text-foreground font-bold">
-              384,585{" "}
-              <span className="font-normal text-muted-foreground">results</span>
+            <p className="font-medium text-foreground mb-1">
+              Resultados totales
             </p>
-            <div className="flex gap-3 mt-2 text-muted-foreground">
-              <span>Export as</span>
-              <span className="text-foreground font-medium">API</span>
-            </div>
+            <p className="text-foreground font-bold">
+              312{" "}
+              <span className="font-normal text-muted-foreground">
+                resultados
+              </span>
+            </p>
           </div>
 
           <div className="relative z-10 max-w-md mx-auto py-16 px-4">
@@ -116,65 +121,71 @@ export default function PixelPerfectSolutionSection() {
               <div className="flex items-center gap-2 mb-5">
                 <Asterisk className="w-5 h-5 text-primary" strokeWidth={3} />
                 <span className="font-semibold text-foreground text-sm">
-                  Datashake Engine
+                  Búsqueda por Savemelin
                 </span>
               </div>
 
               <div className="border border-border rounded-lg p-3 mb-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Search className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-foreground">&quot;coca-cola&quot;</span>
-                  <span className="text-primary text-xs font-medium bg-primary/10 px-1.5 py-0.5 rounded">
-                    OR
+                  <span className="text-foreground">
+                    &quot;Cafetera barista para casa&quot;
                   </span>
-                  <span className="text-foreground">&quot;pepsi&quot;</span>
                   <span className="text-primary text-xs font-medium bg-primary/10 px-1.5 py-0.5 rounded">
-                    AND
+                    O
                   </span>
-                  <span className="text-foreground">&quot;unhealthy&quot;</span>
+                  <span className="text-foreground">
+                    &quot;Cafetera espresso para casa&quot;
+                  </span>
+                  <span className="text-primary text-xs font-medium bg-primary/10 px-1.5 py-0.5 rounded">
+                    O
+                  </span>
+                  <span className="text-foreground">
+                    &quot;Cafetera espresso doméstica&quot;
+                  </span>
                 </div>
                 <div className="h-16" />
               </div>
 
               <div className="border border-border rounded-lg px-3 py-2.5 flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-foreground font-medium">This Week</span>
-                  <span className="text-muted-foreground">5 Jan - 11 Jan</span>
+                  <span className="text-foreground font-medium">
+                    Esta semana
+                  </span>
+                  <span className="text-muted-foreground">
+                    5 Enero - 11 Enero
+                  </span>
                 </div>
                 <Calendar className="w-4 h-4 text-muted-foreground" />
               </div>
 
               <div className="text-center">
-                <p className="text-xs text-muted-foreground mb-2">Parameters</p>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Parámeteros
+                </p>
                 <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-                  <span className="text-foreground font-medium">URL</span>
-                  <span className="text-foreground font-medium">Keyword</span>
-                  <span className="text-foreground font-medium">Hashtag</span>
-                  <span className="text-foreground font-medium">
-                    Author Name
-                  </span>
-                  <span className="text-foreground font-medium">
-                    Boolean Search
-                  </span>
+                  <span className="text-foreground font-medium">Seguridad</span>
+                  <span className="text-foreground font-medium">Precio</span>
+                  <span className="text-foreground font-medium">Oferta</span>
+                  <span className="text-foreground font-medium">Envio</span>
+                  <span className="text-foreground font-medium">Garantía</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mb-16">
+        <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mt-16 mb-16">
           <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
-            We unify 150+ social media and online review sources into one
-            resilient API, standardizing formats and absorbing platform shifts
-            so your pipelines never fail. Data arrives analysis-ready while your
-            team expands coverage without compounding complexity. Infrastructure
-            engineered for the decisions that define your businesses success.
+            La prioridad es cuidar tu bolsillo. Sabemos la importancia y el
+            impacto que puede generar el ahorro a largo plazo, por eso juntamos
+            una serie de servicios para maximizarlo.
           </p>
           <Button
             variant="heroDashed"
             className="whitespace-nowrap flex-shrink-0"
           >
-            See Datashake in action
+            Ver Savemelin en acción
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>

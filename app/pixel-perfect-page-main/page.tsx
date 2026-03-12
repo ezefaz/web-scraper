@@ -35,7 +35,9 @@ export default function PixelPerfectPage() {
           className="relative z-[70] block w-full h-auto select-none pointer-events-none"
           loading="lazy"
         />
-        <PixelPerfectSolutionSection />
+        <div className="border border-border/70">
+          <PixelPerfectSolutionSection />
+        </div>
         <img
           src={SECTION_DIVIDER_SRC}
           alt=""

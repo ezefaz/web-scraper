@@ -5,55 +5,54 @@ import { waveBars } from "./visuals";
 const useCases = [
   {
     mockup: "crisis",
-    title: "Crisis Monitoring & Risk Detection",
+    title: "Detección de ofertas falsas",
     description:
       "Detect potential crises before they escalate. Monitor reputation threats, product issues, and negative sentiment spikes in real-time across all channels.",
   },
   {
     mockup: "trend",
-    title: "Trend Detection",
+    title: "Detección del mejor precio",
     description:
       "Identify emerging trends before they become mainstream. Track conversation volume and topic evolution across any source you need.",
   },
   {
     mockup: "rfp",
-    title: "Win Competitive RFPs",
+    title: "Resultados de múltiples sitios",
     description:
       "Win enterprise contracts with deep coverage from 150+ sources that becomes the deciding factor in RFP evaluations.",
   },
   {
     mockup: "deals",
-    title: "Close More Deals",
+    title: "Ahorro masivo",
     description:
       "Close more deals when you integrate Datashake data. Get access to coverage that becomes undeniable competitive differentiation",
   },
   {
     mockup: "competitive",
-    title: "Competitive Analysis",
-    description:
-      "Track competitive activity across all channels simultaneously. Monitor pricing, promotions, product launches, and more to compete smarter.",
+    title: "Seguimiento de productos",
+    description: "",
   },
   {
     mockup: "retain",
-    title: "Retain Enterprise Customers",
+    title: "Historial de precios de los productos",
     description:
       "Retains your most valuable enterprise customers by delivering the comprehensive data your clients need across global markets.",
   },
   {
     mockup: "kyc",
-    title: "Due Diligence & KYC",
+    title: "Análisis de precios de competencia",
     description:
-      "Finance teams strengthen KYC processes and risk assessment with comprehensive social and review data.",
+      "Si sos vendedor, podes utilizar la plataforma para comparar precios de tus productos.",
   },
   {
     mockup: "compliance",
-    title: "Regulatory Compliance",
+    title: "Reporte de seguridad del sitio",
     description:
-      "Pharmaceutical companies monitor adverse events and post-market surveillance through complete coverage that manual monitoring can't match.",
+      "Realizamos un análisis del sitio web para verificar que tan confiable es y evitar problemas en tus compras.",
   },
   {
     mockup: "reporting",
-    title: "Client Reporting",
+    title: "Comparación local e internacional",
     description:
       "Agencies deliver stronger client insights with comprehensive data coverage, flexible access, and predictable pricing.",
   },
@@ -379,18 +378,20 @@ export default function PixelPerfectUseCasesSection() {
             <div className="flex items-center gap-2 mb-4">
               <span className="text-primary">⊢</span>
               <span className="text-sm font-medium text-primary">
-                Power Your Data
+                Mejora tu experiencia de compra
               </span>
               <span className="text-primary">⊣</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-foreground max-w-md">
-              What global companies use Datashake for
+              Los motivos por los que debes usar Savemelin para comprar al mejor
+              precio
             </h2>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed max-w-md lg:pt-8">
-            From trend detection and crisis monitoring to competitive
-            intelligence and risk assessment — we support all your use cases
-            with the most comprehensive data coverage available.
+            Desde evolución de precios, detección de ofertas falsas y resultados
+            de múltiples sitios — soportamos todas las instancias desde que
+            buscas el producto hasta que realizas la compra para que tengas la
+            mejor información posible.
           </p>
         </div>
 
