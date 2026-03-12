@@ -119,7 +119,7 @@
   border: 0.5px none var(--border);
   color: var(--grey-v2);
   background-color: #0000;
-  min-height: 50px;
+  min-height: 46px;
 }
 
 /* Pixel-perfect dashed CTA: fewer, thicker dashes; turns solid on hover (same color). */

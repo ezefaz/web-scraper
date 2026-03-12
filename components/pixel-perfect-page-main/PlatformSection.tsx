@@ -53,14 +53,14 @@ export default function PixelPerfectPlatformSection() {
             {trustedBrands.map((brand) => (
               <article
                 key={brand.name}
-                className="min-h-[10.5rem] lg:min-h-[11.5rem] px-6 py-6 lg:px-10 lg:py-7 flex flex-col items-center justify-center text-center gap-3 lg:gap-4"
+                className="min-h-[7.5rem] lg:min-h-[8.5rem] px-6 py-6 lg:px-10 lg:py-7 flex flex-col items-center justify-center text-center gap-3 lg:gap-4"
               >
                 <div className="h-10 lg:h-12 flex items-center justify-center text-muted-foreground/80">
                   <span className={brand.logoClassName}>{brand.name}</span>
                 </div>
-                <p className="text-[0.95rem] lg:text-[1.02rem] text-muted-foreground">
+                {/* <p className="text-[0.95rem] lg:text-[1.02rem] text-muted-foreground">
                   {brand.subtitle}
-                </p>
+                </p> */}
               </article>
             ))}
           </div>

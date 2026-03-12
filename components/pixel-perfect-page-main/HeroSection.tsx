@@ -29,16 +29,24 @@ export default function PixelPerfectHeroSection() {
               <Searchbar />
             </div>
 
-            <div className="mt-6 flex items-center gap-4 flex-wrap">
-              <Button variant="hero">
-                Comenzar a ahorrar
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-4 sm:flex-wrap">
+              <Button
+                variant="hero"
+                className="w-full h-11 px-3 text-sm sm:w-auto sm:h-12 sm:px-8 sm:text-base"
+              >
+                Quiero ahorrar
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
-              <Button variant="secondary">Ver funcionalidades</Button>
+              <Button
+                variant="secondary"
+                className="w-full h-11 px-3 text-sm sm:w-auto sm:h-auto sm:px-0 sm:text-base"
+              >
+                Ver funcionalidades
+              </Button>
             </div>
           </div>
 
-          <div className="hidden lg:block">
+          <div className="lg:block">
             <PixelPerfectDataVisualization />
           </div>
         </div>

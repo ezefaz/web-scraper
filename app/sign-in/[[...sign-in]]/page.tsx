@@ -9,6 +9,7 @@ export default function Page() {
       description="Seguí productos, monitoreá cambios de precios y compará oportunidades en segundos."
       ctaHref="/sign-up"
       ctaLabel="Crear cuenta"
+      withDataBackground
     >
       <LoginForm />
     </AuthPageShell>

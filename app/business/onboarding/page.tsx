@@ -10,7 +10,7 @@ const steps = [
     type: "done",
     title: "Ingresa con tu cuenta de Mercadolibre",
     description:
-      "Para comenzar, necesitamos que nos brindes permiso con tu cuenta de Mercadolibre iniciando sesión.",
+      "Para Quiero Ahorrar, necesitamos que nos brindes permiso con tu cuenta de Mercadolibre iniciando sesión.",
     href: "#",
   },
   {

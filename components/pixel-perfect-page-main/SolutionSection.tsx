@@ -75,7 +75,7 @@ export default function PixelPerfectSolutionSection() {
             className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-10 scale-100"
             style={{ backgroundImage: "url('/assets/images/hero2.png')" }}
           />
-          <div className="absolute inset-0 flex items-end  gap-[3px] px-8 pt-6 opacity-30">
+          <div className="absolute inset-0 flex items-end  gap-[3px] px-8 pt-6 opacity-70">
             {bars.map((height, index) => (
               <div
                 key={index}
@@ -182,7 +182,7 @@ export default function PixelPerfectSolutionSection() {
             una serie de servicios para maximizarlo.
           </p>
           <Button
-            variant="heroDashed"
+            variant="secondary"
             className="whitespace-nowrap flex-shrink-0"
           >
             Ver Savemelin en acción

@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { BellRing, CheckCircle2, Search, Store, TrendingDown } from "lucide-react";
+import {
+  BellRing,
+  CheckCircle2,
+  Search,
+  Store,
+  TrendingDown,
+} from "lucide-react";
 
 const INITIAL_PRICE = 2_199_999;
 const FINAL_PRICE = 1_799_999;
@@ -9,7 +15,9 @@ const OTHER_SITE_A_PRICE = 1_869_999;
 const OTHER_SITE_B_PRICE = 1_909_999;
 
 function formatArs(value: number) {
-  return `$${Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+  return `$${Math.round(value)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
 }
 
 export default function PixelPerfectDataVisualization() {
@@ -98,8 +106,10 @@ export default function PixelPerfectDataVisualization() {
         const totalLength = Math.hypot(dx, dy) || 1;
         const ux = dx / totalLength;
         const uy = dy / totalLength;
-        const dashLength = line.id === "trunk" || line.id === "drop-main" ? 1.1 : 1.3;
-        const gapLength = line.id === "trunk" || line.id === "drop-main" ? 0.85 : 1;
+        const dashLength =
+          line.id === "trunk" || line.id === "drop-main" ? 1.1 : 1.3;
+        const gapLength =
+          line.id === "trunk" || line.id === "drop-main" ? 0.85 : 1;
         const stride = dashLength + gapLength;
 
         const segments: Array<{
@@ -130,7 +140,14 @@ export default function PixelPerfectDataVisualization() {
   const resultFlowLines = useMemo(
     () => [
       { id: "to-summary", x1: 50, y1: 49.2, x2: 50, y2: 59.5, delay: 120 },
-      { id: "to-recommendation", x1: 50, y1: 65.6, x2: 50, y2: 70.5, delay: 260 },
+      {
+        id: "to-recommendation",
+        x1: 50,
+        y1: 65.6,
+        x2: 50,
+        y2: 70.5,
+        delay: 260,
+      },
     ],
     [],
   );
@@ -315,7 +332,9 @@ export default function PixelPerfectDataVisualization() {
       >
         <div className="mb-[0.82cqw] flex items-center gap-[0.55cqw]">
           <Store className="h-[1.45cqw] w-[1.45cqw] text-primary" />
-          <p className="text-[1.65cqw] font-medium text-foreground">Mercado Libre</p>
+          <p className="text-[1.65cqw] font-medium text-foreground">
+            Mercado Libre
+          </p>
           <span className="text-[1.05cqw] text-muted-foreground">hace 4h</span>
         </div>
 
@@ -347,7 +366,9 @@ export default function PixelPerfectDataVisualization() {
               <span
                 key={index}
                 className={`w-[0.62cqw] rounded-t-[0.12cqw] transition-[height] duration-500 ${
-                  index === trendBars.length - 1 ? "bg-primary" : "bg-foreground/20"
+                  index === trendBars.length - 1
+                    ? "bg-primary"
+                    : "bg-foreground/20"
                 }`}
                 style={{
                   height: `${dropActive ? height : 28}%`,
@@ -393,9 +414,7 @@ export default function PixelPerfectDataVisualization() {
       >
         <div className="mb-[0.52cqw] flex items-center gap-[0.42cqw]">
           <Store className="h-[1.12cqw] w-[1.12cqw] text-muted-foreground" />
-          <p className="text-[1.22cqw] font-medium text-foreground">
-            Cetrogar
-          </p>
+          <p className="text-[1.22cqw] font-medium text-foreground">Cetrogar</p>
         </div>
         <p className="mb-[0.45cqw] text-[1.16cqw] leading-[1.2] text-muted-foreground">
           iPhone 17 Pro 256GB

@@ -20,7 +20,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   primary:
     "bg-primary text-primary-foreground h-10 px-5 text-sm font-medium rounded-md hover:bg-primary/90",
   secondary:
-    "bg-transparent text-foreground border border-border h-10 px-5 text-sm font-medium rounded-md hover:bg-muted/50",
+    "button is-secondary relative bg-transparent px-0 py-0 text-base font-normal rounded-none hover:bg-transparent btn-hero-dashed",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -30,8 +30,7 @@ const sizeClasses: Record<ButtonSize, string> = {
   icon: "h-10 w-10",
 };
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
 }

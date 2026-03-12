@@ -7,89 +7,94 @@ const useCases = [
     mockup: "crisis",
     title: "Detección de ofertas falsas",
     description:
-      "Detect potential crises before they escalate. Monitor reputation threats, product issues, and negative sentiment spikes in real-time across all channels.",
+      "Savemelin identifica publicaciones con precios atípicos, tiendas no confiables y patrones sospechosos para ayudarte a evitar estafas antes de comprar.",
   },
   {
     mockup: "trend",
     title: "Detección del mejor precio",
     description:
-      "Identify emerging trends before they become mainstream. Track conversation volume and topic evolution across any source you need.",
+      "Comparamos precios en tiempo real y detectamos el punto de compra más conveniente para que pagues menos por el mismo producto.",
   },
   {
     mockup: "rfp",
     title: "Resultados de múltiples sitios",
     description:
-      "Win enterprise contracts with deep coverage from 150+ sources that becomes the deciding factor in RFP evaluations.",
+      "Reunimos resultados de marketplaces, tiendas oficiales y ecommerce en una sola vista para que tomes decisiones rápidas y con contexto completo.",
   },
   {
     mockup: "deals",
     title: "Ahorro masivo",
     description:
-      "Close more deals when you integrate Datashake data. Get access to coverage that becomes undeniable competitive differentiation",
+      "Activá alertas de baja de precio y oportunidades de descuento para comprar en el momento exacto y maximizar tu ahorro mensual.",
   },
   {
     mockup: "competitive",
     title: "Seguimiento de productos",
-    description: "",
+    description:
+      "Guardá productos clave y monitoreá cambios de precio, disponibilidad y promociones sin tener que buscar manualmente todos los días.",
   },
   {
     mockup: "retain",
     title: "Historial de precios de los productos",
     description:
-      "Retains your most valuable enterprise customers by delivering the comprehensive data your clients need across global markets.",
+      "Visualizá la evolución histórica de cada precio para saber si una oferta es real o si conviene esperar una mejor oportunidad.",
   },
   {
     mockup: "kyc",
     title: "Análisis de precios de competencia",
     description:
-      "Si sos vendedor, podes utilizar la plataforma para comparar precios de tus productos.",
+      "Si vendés online, compará tus precios contra la competencia y ajustá tu estrategia para mantener margen sin perder conversiones.",
   },
   {
     mockup: "compliance",
     title: "Reporte de seguridad del sitio",
     description:
-      "Realizamos un análisis del sitio web para verificar que tan confiable es y evitar problemas en tus compras.",
+      "Evaluamos señales de confianza del sitio, reputación del vendedor y riesgos de compra para que operes con mayor seguridad.",
   },
   {
     mockup: "reporting",
     title: "Comparación local e internacional",
     description:
-      "Agencies deliver stronger client insights with comprehensive data coverage, flexible access, and predictable pricing.",
+      "Contrastá precios locales e internacionales en la misma búsqueda para elegir la opción más rentable según costo final y tiempos de entrega.",
   },
 ];
 
 function CrisisMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex flex-col">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="w-4 h-4 text-amber-500" />
         <span className="text-xs font-semibold text-foreground">
-          Potential Risk
+          Oferta sospechosa
         </span>
       </div>
       <div className="bg-background rounded-lg p-3 text-xs flex-1">
         <p className="text-muted-foreground font-medium mb-1">
-          Social Platform
+          Publicacion detectada
         </p>
         <p className="text-foreground font-semibold text-[11px] mb-1">
-          Ethical Concerns Dominate Discussions.
+          iPhone 17 Pro 256GB - $999.999
         </p>
         <p className="text-muted-foreground text-[10px] leading-relaxed mb-3">
-          The ethical implications of AI, including bias, misuse, and potential
-          threats, are central themes in the conversations.
+          Precio 58% por debajo del promedio de mercado, dominio nuevo y sin
+          reputacion validada.
         </p>
         <div className="flex gap-6 border-t border-border pt-2">
           <div>
-            <p className="text-[10px] text-muted-foreground">Audience</p>
-            <p className="text-xs font-bold text-foreground">151.1K</p>
+            <p className="text-[10px] text-muted-foreground">Riesgo</p>
+            <p className="text-xs font-bold text-amber-600 animate-[pulse_2.8s_ease-in-out_infinite]">
+              Alto
+            </p>
           </div>
           <div>
-            <p className="text-[10px] text-muted-foreground">Likes</p>
-            <p className="text-xs font-bold text-foreground">137.2K</p>
+            <p className="text-[10px] text-muted-foreground">Diferencia</p>
+            <p className="text-xs font-bold text-foreground animate-[pulse_2.6s_ease-in-out_infinite]">
+              -58%
+            </p>
           </div>
           <div>
-            <p className="text-[10px] text-muted-foreground">Resonance</p>
-            <p className="text-xs font-bold text-primary">High</p>
+            <p className="text-[10px] text-muted-foreground">Accion</p>
+            <p className="text-xs font-bold text-primary">Bloquear</p>
           </div>
         </div>
       </div>
@@ -99,22 +104,22 @@ function CrisisMockup() {
 
 function TrendMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex flex-col">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col">
       <div className="flex items-center gap-4 mb-3 text-[10px]">
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-blue-500 rounded-sm" />
-          <span className="text-foreground font-medium">Current</span>
+          <div className="w-2 h-2 bg-foreground/30 rounded-sm" />
+          <span className="text-foreground font-medium">Historico</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 bg-primary rounded-sm" />
-          <span className="text-foreground font-medium">Predicted</span>
+          <span className="text-foreground font-medium">Mejor precio</span>
         </div>
       </div>
-      <p className="text-[10px] text-muted-foreground mb-1">
-        89,3948 in volume
+      <p className="text-[10px] text-muted-foreground mb-1 animate-[pulse_3.2s_ease-in-out_infinite]">
+        Precio promedio: $1.889.400
       </p>
-      <p className="text-[10px] text-muted-foreground mb-2">
-        293,488 in volume
+      <p className="text-[10px] text-muted-foreground mb-2 animate-[pulse_2.2s_ease-in-out_infinite]">
+        Minimo detectado: $1.799.999
       </p>
       <div className="flex-1 relative">
         <svg
@@ -123,17 +128,17 @@ function TrendMockup() {
           preserveAspectRatio="none"
         >
           <polyline
-            points="0,50 30,45 60,48 90,30 120,35 140,20 160,25 200,15"
+            points="0,20 30,24 60,27 90,33 120,36 140,42 160,46 200,52"
             fill="none"
-            stroke="hsl(217, 91%, 60%)"
+            stroke="hsl(220 14% 65%)"
             strokeWidth="2"
           />
-          <polyline
-            points="140,20 160,30 180,22 200,28"
-            fill="none"
-            stroke="hsl(var(--primary))"
-            strokeWidth="2"
-            strokeDasharray="4 2"
+          <circle
+            cx="200"
+            cy="52"
+            r="4"
+            fill="hsl(var(--primary))"
+            className="animate-[pulse_2.5s_ease-in-out_infinite]"
           />
         </svg>
       </div>
@@ -143,58 +148,31 @@ function TrendMockup() {
 
 function RfpMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
       <div className="mb-2">
-        <span className="text-foreground font-medium">Review Sites</span>
+        <span className="text-foreground font-medium">Fuentes consultadas</span>
         <span className="ml-1 bg-primary/20 text-primary px-1 rounded text-[9px]">
-          150+
+          6
         </span>
       </div>
-      <div className="flex flex-wrap gap-1 mb-3">
-        {["E-Commerce", "Product", "Service", "Physical Shop"].map((tag) => (
-          <span
-            key={tag}
-            className="border border-border rounded px-1.5 py-0.5 text-muted-foreground"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-1 mb-3">
-        {["Product Listings", "Metadata Physical Stores"].map((tag) => (
-          <span
-            key={tag}
-            className="border border-dashed border-border rounded px-1.5 py-0.5 text-muted-foreground"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-      <div className="mb-2">
-        <span className="text-foreground font-medium">
-          Social Media Platforms
-        </span>
-        <span className="ml-1 bg-violet-100 text-violet-500 px-1 rounded text-[9px]">
-          7
-        </span>
-      </div>
-      <div className="flex flex-wrap gap-1">
+      <div className="space-y-1.5 bg-background rounded-lg p-2.5 flex-1">
         {[
-          "Posts",
-          "User Profiles",
-          "Pages",
-          "Profile Bios",
-          "Reactions",
-          "Videos",
-          "Comments",
-          "Reviews",
-        ].map((tag) => (
-          <span
-            key={tag}
-            className="border border-border rounded px-1.5 py-0.5 text-muted-foreground"
-          >
-            {tag}
-          </span>
+          "Mercado Libre",
+          "Amazon",
+          "Fravega",
+          "Cetrogar",
+          "Musimundo",
+          "Tienda oficial",
+        ].map((source, idx) => (
+          <div key={source} className="flex items-center justify-between">
+            <span className="text-muted-foreground">{source}</span>
+            <span
+              className="text-primary text-[9px] animate-[pulse_3s_ease-in-out_infinite]"
+              style={{ animationDelay: `${idx * 180}ms` }}
+            >
+              Validado
+            </span>
+          </div>
         ))}
       </div>
     </div>
@@ -203,21 +181,23 @@ function RfpMockup() {
 
 function DealsMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex flex-col justify-end">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col justify-end">
       <p className="text-[10px] text-muted-foreground self-end mb-2">
-        Deals Closed
+        Ahorro mensual
       </p>
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <div className="w-20 h-6 bg-muted rounded" />
+          <div className="w-20 h-6 bg-muted rounded animate-[pulse_3s_ease-in-out_infinite]" />
           <span className="text-[10px] text-muted-foreground">
-            Without Datashake
+            Sin Savemelin
           </span>
         </div>
         <div className="flex items-center gap-2">
           <Asterisk className="w-4 h-4 text-primary" strokeWidth={3} />
-          <div className="flex-1 h-6 bg-primary rounded" />
-          <span className="text-lg font-bold text-foreground">3x</span>
+          <div className="flex-1 h-6 bg-primary rounded animate-[pulse_2.4s_ease-in-out_infinite]" />
+          <span className="text-lg font-bold text-foreground animate-[pulse_2.2s_ease-in-out_infinite]">
+            +84k
+          </span>
         </div>
       </div>
     </div>
@@ -226,26 +206,34 @@ function DealsMockup() {
 
 function CompetitiveMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
       <div className="flex items-center gap-1 mb-2">
-        <div className="w-2 h-2 bg-primary rounded-sm" />
-        <span className="text-muted-foreground">373,478 total results</span>
+        <div className="w-2 h-2 bg-primary rounded-sm animate-[pulse_2.5s_ease-in-out_infinite]" />
+        <span className="text-muted-foreground">Seguimiento activo: 12 productos</span>
       </div>
       <div className="bg-background rounded-lg p-3 flex-1">
-        <div className="flex items-center gap-1 mb-1">
-          <span className="text-purple-500">≡</span>
-          <span className="font-semibold text-foreground">Forum Threads</span>
-          <span className="text-muted-foreground text-[9px]">2d ago</span>
-        </div>
-        <p className="font-bold text-foreground mb-1">Washing Machine</p>
-        <p className="text-muted-foreground text-[9px] leading-relaxed mb-2">
-          If you&apos;re in need of a washing machine, now is the perfect time
-          to get one! One of the best models in the market is now on sale for
-          $275 less than retail value. Don&apos;t miss out on this!
-        </p>
-        <div className="flex items-center justify-between border-t border-border pt-1.5">
-          <span className="text-muted-foreground">74 replies</span>
-          <span className="text-foreground font-medium">View all</span>
+        <div className="space-y-2">
+          {[
+            "iPhone 17 Pro 256GB",
+            "AirPods Pro 2da Gen",
+            "PlayStation 5 Slim",
+          ].map((product, idx) => (
+            <div
+              key={product}
+              className={`flex items-center justify-between rounded px-2 py-1 ${
+                idx === 0 ? "bg-primary/10" : ""
+              }`}
+            >
+              <span className="text-foreground">{product}</span>
+              <span
+                className={`text-[9px] font-medium ${
+                  idx === 0 ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                {idx === 0 ? "-18%" : "sin cambios"}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -254,7 +242,7 @@ function CompetitiveMockup() {
 
 function RetainMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex items-center justify-center">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex items-center justify-center">
       <svg viewBox="0 0 200 100" className="w-full h-full">
         <polyline
           points="10,80 30,60 50,70 70,40 90,50 110,30 130,45 150,20 170,35 190,15"
@@ -267,7 +255,15 @@ function RetainMockup() {
           const y = [80, 60, 70, 40, 50, 30, 45, 20, 35, 15][index];
 
           return (
-            <circle key={x} cx={x} cy={y} r="3" fill="hsl(var(--primary))" />
+            <circle
+              key={x}
+              cx={x}
+              cy={y}
+              r="3"
+              fill="hsl(var(--primary))"
+              className="animate-[pulse_3s_ease-in-out_infinite]"
+              style={{ animationDelay: `${index * 120}ms` }}
+            />
           );
         })}
       </svg>
@@ -277,25 +273,25 @@ function RetainMockup() {
 
 function KycMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-muted-foreground">Task</span>
+        <span className="text-muted-foreground">Tu producto</span>
         <span className="bg-primary/15 text-primary px-2 py-0.5 rounded text-[9px] font-medium">
-          ✓ Approved
+          Competitivo
         </span>
       </div>
-      <p className="text-foreground font-medium text-[11px] mb-4">
-        Hire 2 software engineers to improve face ID
+      <p className="text-foreground font-medium text-[11px] mb-4 animate-[pulse_2.9s_ease-in-out_infinite]">
+        iPhone 17 Pro 256GB - $1.829.999
       </p>
       <div className="bg-background rounded-lg p-3 mt-auto">
         <div className="flex items-center gap-1 mb-1">
           <Asterisk className="w-3 h-3 text-primary" strokeWidth={3} />
-          <span className="font-medium text-foreground">Social Media</span>
-          <span className="text-muted-foreground text-[9px]">4d ago</span>
+          <span className="font-medium text-foreground">Competencia</span>
+          <span className="text-muted-foreground text-[9px]">actualizado</span>
         </div>
-        <p className="font-bold text-foreground mb-0.5">iPhone 17 face ID</p>
-        <p className="text-muted-foreground text-[9px]">
-          Face ID feels much slower than my 14 Pro.
+        <p className="font-bold text-foreground mb-0.5">Promedio mercado: $1.861.300</p>
+        <p className="text-primary text-[9px] animate-[pulse_2.8s_ease-in-out_infinite]">
+          Ventaja actual: +1.7% mejor precio
         </p>
       </div>
     </div>
@@ -311,14 +307,23 @@ function ComplianceMockup() {
         {bars.map((height, index) => (
           <div
             key={index}
-            className="flex-1 bg-primary/60 rounded-t-sm"
-            style={{ height: `${10 + height * 70}%` }}
+            className="flex-1 bg-primary/60 rounded-t-sm animate-[pulse_2.6s_ease-in-out_infinite]"
+            style={{
+              height: `${10 + height * 70}%`,
+              animationDelay: `${index * 90}ms`,
+            }}
           />
         ))}
       </div>
       <div className="relative flex items-center gap-2 text-background">
-        <Asterisk className="w-5 h-5 text-primary" strokeWidth={3} />
-        <span className="text-sm font-medium">Scanning...</span>
+        <Asterisk
+          className="w-5 h-5 text-primary animate-[spin_2.8s_linear_infinite]"
+          strokeWidth={3}
+        />
+        <div>
+          <p className="text-sm font-medium">Escaneo de seguridad</p>
+          <p className="text-[10px] text-background/80">SSL, reputacion, antiguedad y riesgo</p>
+        </div>
       </div>
     </div>
   );
@@ -326,30 +331,37 @@ function ComplianceMockup() {
 
 function ReportingMockup() {
   return (
-    <div className="bg-secondary/50 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
+    <div className="bg-secondary/10 rounded-t-lg p-4 h-52 flex flex-col text-[10px]">
       <div className="bg-background rounded-lg p-3 flex-1 overflow-hidden">
         <div className="flex items-center justify-between mb-1">
-          <span className="font-semibold text-foreground">Report</span>
-          <span className="text-muted-foreground text-[9px]">Q4</span>
+          <span className="font-semibold text-foreground">Comparativa AR vs US</span>
+          <span className="text-muted-foreground text-[9px]">actual</span>
         </div>
         <p className="font-bold text-foreground text-[11px] mb-1">
-          Great customer response to new features
+          iPhone 17 Pro 256GB
         </p>
         <p className="text-muted-foreground text-[9px] leading-relaxed mb-2">
-          We identified an overwhelming positive response across multiple review
-          sites and social media platforms about the new features that have been
-          released. Here are some main points:
+          Comparamos precio local e internacional con envio e impuestos para
+          recomendar el costo final mas conveniente.
         </p>
-        <p className="text-primary text-[9px] font-medium mb-2">
-          11,234 mentions
-        </p>
-        <div className="border-t border-border pt-1.5">
-          <p className="text-[9px] text-muted-foreground font-medium">
-            Actions
-          </p>
-          <p className="text-[9px] text-foreground">
-            Continue pushing marketing initiative to highlight these new
-            features.
+        <div className="space-y-1.5 mb-2">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Argentina</span>
+            <span className="font-medium text-foreground animate-[pulse_3s_ease-in-out_infinite]">
+              $1.799.999
+            </span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">USA + importacion</span>
+            <span className="font-medium text-foreground animate-[pulse_3s_ease-in-out_infinite]">
+              $1.921.300
+            </span>
+          </div>
+        </div>
+        <div className="border-t border-border pt-1.5 flex items-center justify-between">
+          <p className="text-[9px] text-muted-foreground font-medium">Mejor opcion</p>
+          <p className="text-[9px] text-primary font-semibold animate-[pulse_3s_ease-in-out_infinite]">
+            Comprar local
           </p>
         </div>
       </div>
@@ -371,7 +383,7 @@ const mockupComponents: Record<string, ComponentType> = {
 
 export default function PixelPerfectUseCasesSection() {
   return (
-    <section className="p-12 bg-section-grey">
+    <section className="p-12 bg-white">
       <div className="max-w-[94rem] mx-auto padding-global">
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-16">
           <div>
@@ -387,7 +399,7 @@ export default function PixelPerfectUseCasesSection() {
               precio
             </h2>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-md lg:pt-8">
+          <p className="text-base text-muted-foreground leading-relaxed max-w-md lg:pt-8">
             Desde evolución de precios, detección de ofertas falsas y resultados
             de múltiples sitios — soportamos todas las instancias desde que
             buscas el producto hasta que realizas la compra para que tengas la
@@ -400,13 +412,17 @@ export default function PixelPerfectUseCasesSection() {
             const Mockup = mockupComponents[useCase.mockup];
 
             return (
-              <div key={index} className="bg-background flex flex-col">
+              <div
+                key={index}
+                className="flex flex-col"
+                style={{ backgroundColor: "#fafafa" }}
+              >
                 <Mockup />
                 <div className="p-5 flex-1">
-                  <h3 className="text-sm font-bold text-foreground mb-2">
+                  <h3 className="text-base font-bold text-foreground mb-2">
                     {useCase.title}
                   </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     {useCase.description}
                   </p>
                 </div>

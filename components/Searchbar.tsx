@@ -1,18 +1,33 @@
 'use client';
 
 import { scrapeAndStoreProducts } from '@/lib/actions';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { SyncLoader } from 'react-spinners';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { Input } from '@nextui-org/react';
-import { IoSearchCircleOutline } from 'react-icons/io5';
+import { Loader2, Search } from 'lucide-react';
 
-const Searchbar = () => {
+type SearchbarProps = {
+  initialValue?: string;
+  className?: string;
+  placeholder?: string;
+};
+
+const Searchbar = ({
+  initialValue = '',
+  className = '',
+  placeholder = 'Ingrese un producto o link, y comience a seguirlo!',
+}: SearchbarProps) => {
   const [searchPrompt, setSearchPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const normalizedInitialValue = useMemo(() => initialValue.trim(), [initialValue]);
+
+  useEffect(() => {
+    if (normalizedInitialValue) {
+      setSearchPrompt(normalizedInitialValue);
+    }
+  }, [normalizedInitialValue]);
 
   const mercadolibreDomains = [
     'mercadolibre.com',
@@ -58,69 +73,27 @@ const Searchbar = () => {
   };
 
   return (
-    <form className='flex flex-wrap gap-4 mt-5 sm:flex-col w-full' onSubmit={handleSubmit}>
-      <div className='flex items-center w-full'>
-        {/* <input
+    <form className={`w-full ${className}`} onSubmit={handleSubmit}>
+      <label htmlFor='global-search-input' className='text-sm text-muted-foreground'>
+        Búsqueda
+      </label>
+      <div className='mt-1.5 h-14 border border-border bg-section-grey px-3 flex items-center gap-2'>
+        <input
+          id='global-search-input'
           type='text'
           value={searchPrompt}
           onChange={(e) => setSearchPrompt(e.target.value)}
-          placeholder='Busque un producto o ingrese link del producto y comience a seguirlo!'
-          className='searchbar-input'
-        /> */}
-        {/* <button type='submit' className='searchbar-btn' disabled={searchPrompt === ''}> */}
-        {/* {isLoading ? <SyncLoader color='white' size={3} /> : <AiOutlineSearch size={20} />} */}
-        <Input
-          label='Búsqueda'
-          type='text'
-          value={searchPrompt}
-          onChange={(e) => setSearchPrompt(e.target.value)}
-          placeholder='Ingrese un producto o link, y comience a seguirlo!'
-          radius='lg'
-          classNames={{
-            label: 'text-black/50 dark:text-white/90',
-            input: [
-              'bg-transparent',
-              'text-black/90 dark:text-white/90',
-              'placeholder:text-default-700/50 dark:placeholder:text-white/60',
-            ],
-            innerWrapper: 'bg-transparent',
-            inputWrapper: [
-              'shadow-xl',
-              'bg-default-200/50',
-              'dark:bg-default/60',
-              'backdrop-blur-sm',
-              'backdrop-saturate-200',
-              'hover:bg-default-200/70',
-              'dark:hover:bg-default/70',
-              'group-data-[focused=true]:bg-default-200/50',
-              'dark:group-data-[focused=true]:bg-default/60',
-              '!cursor-text',
-              'w-full',
-              'mx-auto',
-            ],
-          }}
-          // startContent={
-          //   <IoSearchCircleOutline className='text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0' />
-          // }
-          endContent={
-            isLoading ? (
-              <SyncLoader
-                color='white'
-                size={3}
-                className='text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0'
-              />
-            ) : (
-              <button type='submit' className='cursor-pointer' disabled={searchPrompt === ''}>
-                <AiOutlineSearch
-                  size={19}
-                  className='text-black/50 mb-0.5 dark:text-white/90 text-slate-400 pointer-events-none flex-shrink-0'
-                />
-              </button>
-            )
-          }
+          placeholder={placeholder}
+          className='flex-1 bg-transparent text-base text-foreground placeholder:text-muted-foreground/80 outline-none'
         />
-
-        {/* </button> */}
+        <button
+          type='submit'
+          className='inline-flex h-9 w-9 items-center justify-center border border-border bg-background text-muted-foreground transition-colors hover:text-foreground disabled:opacity-50'
+          disabled={searchPrompt.trim() === '' || isLoading}
+          aria-label='Buscar producto'
+        >
+          {isLoading ? <Loader2 className='h-4 w-4 animate-spin' /> : <Search className='h-4 w-4' />}
+        </button>
       </div>
     </form>
   );

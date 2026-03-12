@@ -1,4 +1,3 @@
-import Navbar from '@/components/Navbar';
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
@@ -31,7 +30,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <ClientOnly>
               <Providers>
                 <Toaster position='top-center' reverseOrder={false} />
-                <Navbar />
                 {children}
                 <Analytics />
               </Providers>

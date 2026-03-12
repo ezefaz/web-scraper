@@ -1,329 +1,443 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Zap,
-  Eye,
-  Globe,
-  Target,
-  CheckSquare,
-  Star,
-  Heart,
-  Upload,
-  Image,
-} from "lucide-react";
-import { pulseHeights, waveBars } from "./visuals";
+import { useEffect, useMemo, useState } from "react";
+import { Eye, Globe, Tag, Target, Zap } from "lucide-react";
 
-const tabs = [
-  {
-    id: "speed",
-    label: "Speed",
-    icon: Zap,
-    color: "text-amber-500",
-  },
-  {
-    id: "depth",
-    label: "Depth",
-    icon: Eye,
-    color: "text-violet-500",
-  },
-  {
-    id: "coverage",
-    label: "Coverage",
-    icon: Globe,
-    color: "text-orange-500",
-  },
-  {
-    id: "relevance",
-    label: "Relevance",
-    icon: Target,
-    color: "text-purple-500",
-  },
+type TabItem = {
+  id: string;
+  label: string;
+  icon: typeof Zap;
+};
+
+type ProductCard = {
+  store: string;
+  name: string;
+  price: string;
+  oldPrice: string;
+  discount: string;
+  shipping: string;
+};
+
+type CategoryContent = {
+  title: string;
+  description: string;
+  products: ProductCard[];
+};
+
+const AUTO_SWITCH_MS = 6000;
+
+const tabs: TabItem[] = [
+  { id: "electronics", label: "Electrónica", icon: Zap },
+  { id: "fashion", label: "Vestimenta y Accesorios", icon: Eye },
+  { id: "food", label: "Alimentos", icon: Globe },
+  { id: "appliances", label: "Electrodomésticos", icon: Target },
 ];
 
-const tabContent: Record<
-  string,
-  {
-    title: string;
-    description: string;
-    bullets: string[];
-    mockup: {
-      stat: string;
-      statLabel: string;
-      mentions: string;
-      reviewText: string;
-      reviewer: string;
-      date: string;
-      stars: number;
-      likes: number;
-      shares: number;
-    };
-  }
-> = {
-  speed: {
-    title: "Get answers in seconds",
+const tabContent: Record<string, CategoryContent> = {
+  electronics: {
+    title: "Destacados en Electrónica",
     description:
-      "Access 5+ years of historical data instantly through archive search, or collect fresh conversations in real-time when you need current information. Get data how you need it, when you need it — whether you're analyzing long-term trends or responding to emerging issues.",
-    bullets: [
-      "Archive search returns results in seconds",
-      "Real-time collection for emerging topics",
+      "SaveMelin detecta en tiempo real los mejores precios publicados para productos tecnológicos y te muestra ofertas comparables entre marketplaces.",
+    products: [
+      {
+        store: "Mercado Libre",
+        name: "iPhone 17 Pro 256GB",
+        price: "$1.799.999",
+        oldPrice: "$2.199.999",
+        discount: "-18%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Amazon",
+        name: "Samsung S24 Ultra 512GB",
+        price: "$2.349.999",
+        oldPrice: "$2.799.999",
+        discount: "-16%",
+        shipping: "Full",
+      },
+      {
+        store: "eBay",
+        name: "AirPods Pro (2da gen)",
+        price: "$649.999",
+        oldPrice: "$799.999",
+        discount: "-19%",
+        shipping: "Retiro hoy",
+      },
+      {
+        store: "Google Shopping",
+        name: "PlayStation 5 Slim 1TB",
+        price: "$999.999",
+        oldPrice: "$1.169.999",
+        discount: "-14%",
+        shipping: "Entrega 24h",
+      },
+      {
+        store: "Frávega",
+        name: "Smart TV 55\" 4K",
+        price: "$739.999",
+        oldPrice: "$889.999",
+        discount: "-17%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Cetrogar",
+        name: "Notebook i7 16GB RAM",
+        price: "$1.259.999",
+        oldPrice: "$1.449.999",
+        discount: "-13%",
+        shipping: "6 cuotas",
+      },
     ],
-    mockup: {
-      stat: "5.66",
-      statLabel: "sec",
-      mentions: "89,839",
-      reviewText:
-        "Bought the iPhone 17 on launch day. Super smooth performance and a noticeable camera upgrade.",
-      reviewer: "dant903",
-      date: "July 27, 08:57",
-      stars: 5,
-      likes: 827,
-      shares: 253,
-    },
   },
-  depth: {
-    title: "Go deeper than surface-level data",
+  fashion: {
+    title: "Destacados en Vestimenta y Accesorios",
     description:
-      "Dive into granular review and social data across 150+ sources. Understand sentiment, detect patterns, and extract actionable insights from millions of data points.",
-    bullets: [
-      "Full review text and metadata extraction",
-      "Granular sentiment and attribute analysis",
+      "Comparamos variaciones de precio por talle, color y tienda para mostrarte qué publicación conviene más antes de comprar.",
+    products: [
+      {
+        store: "Mercado Libre",
+        name: "Zapatillas Running Hombre",
+        price: "$119.999",
+        oldPrice: "$154.999",
+        discount: "-22%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Amazon",
+        name: "Campera impermeable mujer",
+        price: "$94.999",
+        oldPrice: "$129.999",
+        discount: "-27%",
+        shipping: "Entrega 48h",
+      },
+      {
+        store: "eBay",
+        name: "Smartwatch deportivo",
+        price: "$84.999",
+        oldPrice: "$109.999",
+        discount: "-23%",
+        shipping: "Retiro hoy",
+      },
+      {
+        store: "Google Shopping",
+        name: "Mochila urbana 22L",
+        price: "$39.999",
+        oldPrice: "$54.999",
+        discount: "-26%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Dafiti",
+        name: "Jeans slim fit",
+        price: "$45.999",
+        oldPrice: "$58.999",
+        discount: "-21%",
+        shipping: "3 cuotas",
+      },
+      {
+        store: "Netshoes",
+        name: "Remera dry-fit",
+        price: "$21.999",
+        oldPrice: "$29.999",
+        discount: "-26%",
+        shipping: "Envío gratis",
+      },
     ],
-    mockup: {
-      stat: "2.4M",
-      statLabel: "records",
-      mentions: "142,301",
-      reviewText:
-        "The battery life improvement is incredible. Easily lasts two full days with moderate usage.",
-      reviewer: "techfan22",
-      date: "Aug 3, 14:12",
-      stars: 4,
-      likes: 1203,
-      shares: 487,
-    },
   },
-  coverage: {
-    title: "Unmatched source coverage",
+  food: {
+    title: "Destacados en Alimentos",
     description:
-      "Access data from 150+ review sites, 10+ social media platforms, and growing. One integration covers the breadth of the public web so you never miss a mention.",
-    bullets: [
-      "150+ review sites covered globally",
-      "10+ social media platforms integrated",
+      "El motor identifica promociones reales en supermercados online y te ayuda a detectar cuándo conviene stockearte.",
+    products: [
+      {
+        store: "Mercado Libre",
+        name: "Pack Yerba Mate x6",
+        price: "$26.999",
+        oldPrice: "$33.999",
+        discount: "-21%",
+        shipping: "Full",
+      },
+      {
+        store: "Amazon",
+        name: "Cápsulas de café x60",
+        price: "$19.999",
+        oldPrice: "$26.999",
+        discount: "-26%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Carrefour",
+        name: "Aceite de oliva 500ml x3",
+        price: "$16.499",
+        oldPrice: "$21.499",
+        discount: "-23%",
+        shipping: "Retiro hoy",
+      },
+      {
+        store: "Coto Digital",
+        name: "Arroz largo fino 1kg x12",
+        price: "$18.999",
+        oldPrice: "$24.999",
+        discount: "-24%",
+        shipping: "Entrega 24h",
+      },
+      {
+        store: "Jumbo",
+        name: "Leche descremada x12",
+        price: "$15.999",
+        oldPrice: "$19.999",
+        discount: "-20%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Disco",
+        name: "Atún al natural x8",
+        price: "$13.999",
+        oldPrice: "$17.499",
+        discount: "-20%",
+        shipping: "2 cuotas",
+      },
     ],
-    mockup: {
-      stat: "150+",
-      statLabel: "sources",
-      mentions: "384,589",
-      reviewText:
-        "Service has been consistently excellent across all locations. Highly recommend for families.",
-      reviewer: "sarah_m",
-      date: "June 15, 10:33",
-      stars: 5,
-      likes: 542,
-      shares: 198,
-    },
   },
-  relevance: {
-    title: "Only the data that matters",
+  appliances: {
+    title: "Destacados en Electrodomésticos",
     description:
-      "Advanced filtering and smart matching ensure you get precisely the data you need. No noise, no irrelevant results — just clean, structured data ready for analysis.",
-    bullets: [
-      "Smart deduplication and noise filtering",
-      "Precision matching by entity and topic",
+      "Monitoreamos cambios de precio diarios en línea blanca y pequeños electrodomésticos para mostrarte oportunidades de ahorro concretas.",
+    products: [
+      {
+        store: "Mercado Libre",
+        name: "Heladera No Frost 420L",
+        price: "$1.689.999",
+        oldPrice: "$2.049.999",
+        discount: "-18%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Amazon",
+        name: "Lavarropas Inverter 9kg",
+        price: "$1.099.999",
+        oldPrice: "$1.349.999",
+        discount: "-19%",
+        shipping: "Entrega 48h",
+      },
+      {
+        store: "Frávega",
+        name: "Microondas digital 28L",
+        price: "$259.999",
+        oldPrice: "$319.999",
+        discount: "-19%",
+        shipping: "Retiro hoy",
+      },
+      {
+        store: "Garbarino",
+        name: "Aspiradora ciclónica",
+        price: "$189.999",
+        oldPrice: "$239.999",
+        discount: "-20%",
+        shipping: "Envío gratis",
+      },
+      {
+        store: "Cetrogar",
+        name: "Cafetera automática",
+        price: "$329.999",
+        oldPrice: "$419.999",
+        discount: "-21%",
+        shipping: "6 cuotas",
+      },
+      {
+        store: "Google Shopping",
+        name: "Freidora de aire 6.5L",
+        price: "$219.999",
+        oldPrice: "$279.999",
+        discount: "-21%",
+        shipping: "Entrega 24h",
+      },
     ],
-    mockup: {
-      stat: "99.2",
-      statLabel: "%",
-      mentions: "56,721",
-      reviewText:
-        "Perfect match for our competitive monitoring needs. The accuracy of entity matching is outstanding.",
-      reviewer: "analyst_pro",
-      date: "Sep 1, 16:45",
-      stars: 5,
-      likes: 315,
-      shares: 127,
-    },
   },
 };
 
+function nextTabId(currentTabId: string): string {
+  const currentIndex = tabs.findIndex((tab) => tab.id === currentTabId);
+  const nextIndex = (currentIndex + 1) % tabs.length;
+  return tabs[nextIndex].id;
+}
+
 export default function PixelPerfectFeaturesTabSection() {
-  const [activeTab, setActiveTab] = useState("speed");
-  const content = tabContent[activeTab];
-  const activeTabData = tabs.find((tab) => tab.id === activeTab)!;
-  const ActiveIcon = activeTabData.icon;
-  const bars = waveBars(
-    50,
-    activeTab === "speed"
-      ? 0.4
-      : activeTab === "depth"
-        ? 1.2
-        : activeTab === "coverage"
-          ? 1.9
-          : 2.6,
+  const [activeTab, setActiveTab] = useState<string>(tabs[0].id);
+  const [progress, setProgress] = useState(0);
+  const [restartKey, setRestartKey] = useState(0);
+
+  const activeCategory = useMemo(() => tabContent[activeTab], [activeTab]);
+  const activeTabMeta = useMemo(
+    () => tabs.find((tab) => tab.id === activeTab) ?? tabs[0],
+    [activeTab],
   );
-  const pulseBars = pulseHeights(
-    20,
-    activeTab === "speed"
-      ? 0.6
-      : activeTab === "depth"
-        ? 1.4
-        : activeTab === "coverage"
-          ? 2.1
-          : 2.8,
+  const ActiveIcon = activeTabMeta.icon;
+
+  useEffect(() => {
+    let frameId = 0;
+    let startTime = 0;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const nextProgress = Math.min((elapsed / AUTO_SWITCH_MS) * 100, 100);
+      setProgress(nextProgress);
+
+      if (nextProgress >= 100) {
+        setActiveTab((current) => nextTabId(current));
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    frameId = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [activeTab, restartKey]);
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    setProgress(0);
+    setRestartKey((prev) => prev + 1);
+  };
+
+  const secondsToNextCategory = Math.max(
+    1,
+    Math.ceil((AUTO_SWITCH_MS * (100 - progress)) / 100 / 1000),
   );
 
   return (
     <section className="py-12">
       <div className="max-w-[94rem] mx-auto padding-global">
-        <div className="grid grid-cols-4 border-b border-border mb-0">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center justify-center gap-2 py-4 text-sm font-medium transition-colors cursor-pointer border-b-2 ${
-                  isActive
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon className={`w-5 h-5 ${tab.color}`} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-[500px]">
-          <div className="p-12 pr-12">
-            <div className="flex items-center gap-2 mb-4">
-              <ActiveIcon className={`w-5 h-5 ${activeTabData.color}`} />
-              <span className="text-sm font-medium text-muted-foreground">
-                {activeTabData.label}
-              </span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-foreground mb-6">
-              {content.title}
+        <div className="border border-border/70 bg-background">
+          <div className="px-6 lg:px-8 py-6 border-b border-border/70">
+            <p className="text-sm text-muted-foreground mb-2">Destacados</p>
+            <h2 className="text-2xl lg:text-3xl tracking-tight text-foreground font-semibold">
+              Productos destacados por categoría
             </h2>
-
-            <p className="text-base text-muted-foreground leading-relaxed mb-16 max-w-lg">
-              {content.description}
-            </p>
-
-            <div className="space-y-6">
-              {content.bullets.map((bullet) => (
-                <div key={bullet} className="flex items-start gap-4">
-                  <div className="w-7 h-7 rounded border border-primary/30 bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckSquare className="w-3.5 h-3.5 text-primary" />
-                  </div>
-                  <p className="text-base text-foreground">{bullet}</p>
-                </div>
-              ))}
-            </div>
           </div>
 
-          <div className="bg-secondary/40 py-8 px-8 border-l border-border">
-            <div className="flex items-end gap-[3px] h-32 mb-4 opacity-50">
-              {bars.map((height, index) => (
-                <div
-                  key={index}
-                  className="flex-1 bg-primary/40 rounded-t-sm"
-                  style={{ height: `${10 + height * 80}%` }}
-                />
-              ))}
-            </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 border-b border-border/70">
+            {tabs.map((tab, index) => {
+              const Icon = tab.icon;
+              const isActive = tab.id === activeTab;
+              const isLast = index === tabs.length - 1;
 
-            <div className="text-center mb-4">
-              <p className="text-5xl font-bold text-foreground">
-                {content.mockup.stat}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {content.mockup.statLabel}
-              </p>
-            </div>
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleTabClick(tab.id)}
+                  className={`relative px-4 py-4 lg:px-5 lg:py-5 text-left transition-colors cursor-pointer ${
+                    isLast ? "" : "border-r border-border/70"
+                  } ${
+                    isActive
+                      ? "text-foreground bg-section-grey"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4 text-primary" />
+                    <span className="text-[0.95rem] lg:text-base font-medium leading-tight">
+                      {tab.label}
+                    </span>
+                  </div>
 
-            <div className="flex justify-center gap-1 mb-6">
-              {Array.from({ length: 7 }).map((_, index) => (
-                <div key={index} className="w-3 h-5 bg-primary rounded-[1px]" />
-              ))}
-              <div className="flex items-end gap-[2px] ml-1">
-                {pulseBars.map((height, index) => (
-                  <div
-                    key={index}
-                    className="w-1 bg-primary/30 rounded-t-sm"
-                    style={{ height: `${height}px` }}
-                  />
-                ))}
-              </div>
-            </div>
+                  <span className="absolute left-0 bottom-0 h-[1px] w-full bg-border/70" />
+                  {isActive && (
+                    <span
+                      className="absolute left-0 bottom-0 h-[2px] bg-primary transition-[width] duration-100 ease-linear"
+                      style={{ width: `${progress}%` }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-            <div className="flex items-center justify-between border-b border-dashed border-border pb-4 mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-bold text-foreground">
-                  {content.mockup.mentions}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  mentions found
-                </span>
-              </div>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>Export as</span>
-                <span className="text-foreground font-medium">API Call</span>
-                <span className="text-foreground font-medium">CSV/XLS</span>
-              </div>
-            </div>
-
-            <div className="bg-background rounded-lg p-5 border border-border">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-                  <span className="font-semibold text-foreground">Review</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-primary">
-                  <Image className="w-4 h-4" />
-                  <span className="text-sm font-medium">Post</span>
-                </div>
-              </div>
-
-              <p className="text-sm text-foreground leading-relaxed mb-3">
-                {content.mockup.reviewText}
-              </p>
-
-              <div className="flex items-center gap-0.5 mb-2">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star
-                    key={index}
-                    className={`w-4 h-4 ${
-                      index < content.mockup.stars
-                        ? "fill-amber-400 text-amber-400"
-                        : "text-muted-foreground/30"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-xs font-medium text-foreground">
-                  {content.mockup.reviewer}
-                </span>
+          <div className="grid grid-cols-1 xl:grid-cols-[18rem_minmax(0,1fr)]">
+            <aside className="border-b xl:border-b-0 xl:border-r border-border/70 p-6 lg:p-8 bg-section-grey">
+              <div className="inline-flex items-center gap-2 border border-border rounded-sm px-3 py-1.5 mb-4">
+                <Tag className="w-3.5 h-3.5 text-primary" />
                 <span className="text-xs text-muted-foreground">
-                  {content.mockup.date}
+                  Actualización automática
                 </span>
               </div>
 
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Heart className="w-4 h-4" />
-                  <span className="text-xs">{content.mockup.likes}</span>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Upload className="w-4 h-4" />
-                  <span className="text-xs">{content.mockup.shares}</span>
-                </div>
+              <div className="flex items-center gap-2 mb-2">
+                <ActiveIcon className="w-4 h-4 text-primary" />
+                <span className="text-sm text-muted-foreground">
+                  {activeTabMeta.label}
+                </span>
+              </div>
+
+              <h3 className="text-xl font-semibold tracking-tight text-foreground leading-tight mb-3">
+                {activeCategory.title}
+              </h3>
+
+              <p className="text-sm leading-relaxed text-muted-foreground mb-5">
+                {activeCategory.description}
+              </p>
+
+              <div className="space-y-2 text-sm text-muted-foreground">
+                <p>
+                  <span className="text-foreground font-medium">
+                    {activeCategory.products.length}
+                  </span>{" "}
+                  productos destacados
+                </p>
+                <p>
+                  Próxima categoría en{" "}
+                  <span className="text-foreground font-medium">
+                    {secondsToNextCategory}s
+                  </span>
+                </p>
+              </div>
+            </aside>
+
+            <div className="p-6 lg:p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {activeCategory.products.map((product) => (
+                  <article
+                    key={`${activeTab}-${product.store}-${product.name}`}
+                    className="bg-section-grey border border-border/70 p-4 min-h-[11.5rem] flex flex-col gap-3"
+                  >
+                    <header className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          {product.store}
+                        </p>
+                        <p className="text-sm text-foreground font-medium leading-snug line-clamp-2 mt-1">
+                          {product.name}
+                        </p>
+                      </div>
+                      <span className="text-[11px] px-2 py-0.5 border border-primary/30 text-primary bg-primary/10">
+                        Destacado
+                      </span>
+                    </header>
+
+                    <div className="mt-auto">
+                      <div className="flex items-end gap-2 flex-wrap">
+                        <span className="text-xl font-semibold text-foreground tracking-tight">
+                          {product.price}
+                        </span>
+                        <span className="text-xs text-muted-foreground line-through">
+                          {product.oldPrice}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-2 gap-3">
+                        <span className="text-xs px-2 py-0.5 bg-primary text-primary-foreground">
+                          {product.discount}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {product.shipping}
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
               </div>
             </div>
           </div>

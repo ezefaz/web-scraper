@@ -13,7 +13,6 @@ import { login } from "@/app/actions/login";
 import { Social } from "./Social";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Input } from "@nextui-org/react";
 import { TbEyeFilled } from "react-icons/tb";
 import { IoMdEyeOff } from "react-icons/io";
 
@@ -64,50 +63,52 @@ const LoginForm = () => {
 
   return (
     <CardWrapper HeaderLabel="Bienvenido de nuevo" backButtonHref="/sign-up" backButtonLabel="¿No tienes una cuenta? Crear cuenta">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <div className="space-y-1">
-          <Input
+          <label htmlFor="email" className="block text-sm text-muted-foreground">
+            Email
+          </label>
+          <input
             id="email"
             type="email"
-            label="Email"
             autoComplete="email"
-            variant="bordered"
             disabled={isPending}
             placeholder="tu@email.com"
             {...register("email")}
-            className="w-full"
+            className="w-full h-11 border border-border bg-section-grey px-3 text-sm text-foreground placeholder:text-muted-foreground/80 focus:outline-none focus:border-foreground/30"
           />
           {errors.email && <span className="text-xs text-red-600">{errors.email.message}</span>}
         </div>
 
         <div className="space-y-1">
-          <Input
-            id="password"
-            label="Contraseña"
-            autoComplete="current-password"
-            variant="bordered"
-            disabled={isPending}
-            placeholder="••••••••"
-            {...register("password")}
-            endContent={
-              <button
-                className="focus:outline-none"
-                type="button"
-                onClick={toggleVisibility}
-                aria-label={isVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
-              >
-                {isVisible ? (
-                  <IoMdEyeOff className="pointer-events-none text-2xl text-default-400" />
-                ) : (
-                  <TbEyeFilled className="pointer-events-none text-2xl text-default-400" />
-                )}
-              </button>
-            }
-            type={isVisible ? "text" : "password"}
-            className="w-full"
-          />
+          <label htmlFor="password" className="block text-sm text-muted-foreground">
+            Contraseña
+          </label>
+          <div className="relative">
+            <input
+              id="password"
+              autoComplete="current-password"
+              disabled={isPending}
+              placeholder="••••••••"
+              {...register("password")}
+              type={isVisible ? "text" : "password"}
+              className="w-full h-11 border border-border bg-section-grey px-3 pr-10 text-sm text-foreground placeholder:text-muted-foreground/80 focus:outline-none focus:border-foreground/30"
+            />
+            <button
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              type="button"
+              onClick={toggleVisibility}
+              aria-label={isVisible ? "Ocultar contraseña" : "Mostrar contraseña"}
+            >
+              {isVisible ? (
+                <IoMdEyeOff className="pointer-events-none text-lg" />
+              ) : (
+                <TbEyeFilled className="pointer-events-none text-lg" />
+              )}
+            </button>
+          </div>
           {errors.password && <span className="text-xs text-red-600">{errors.password.message}</span>}
-          <Link href="/reset" className="inline-block text-xs font-medium text-gray-600 transition hover:text-primary">
+          <Link href="/reset" className="inline-block text-xs font-medium text-muted-foreground transition hover:text-foreground">
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
@@ -118,19 +119,21 @@ const LoginForm = () => {
         <button
           type="submit"
           disabled={isPending}
-          className="inline-flex w-full items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center bg-primary h-11 px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isPending ? "Ingresando..." : "Iniciar sesión"}
         </button>
       </form>
 
-      <div className="my-5 text-center text-xs font-medium uppercase tracking-[0.12em] text-gray-500">o continúa con</div>
+      <div className="my-4 text-center text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">
+        o continúa con
+      </div>
       <Social />
-      <p className="mt-5 text-xs text-gray-600 dark:text-gray-300">
+      <p className="mt-4 text-xs text-muted-foreground">
         Al iniciar sesión aceptas nuestra política de{" "}
         <a
           href="/privacy-policy"
-          className="font-medium text-primary underline underline-offset-4"
+          className="font-medium text-foreground underline underline-offset-4"
           target="_blank"
           rel="noopener noreferrer"
         >

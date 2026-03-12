@@ -1,12 +1,49 @@
-import ResultsCategory from '@/components/ResultsCategory';
-import React from 'react';
+import ResultsCategory from "@/components/ResultsCategory";
+import Searchbar from "@/components/Searchbar";
+import PixelPerfectFooter from "@/components/pixel-perfect-page-main/Footer";
+import PixelPerfectNavbar from "@/components/pixel-perfect-page-main/Navbar";
 
-type Props = {};
+type Props = {
+  searchParams?: {
+    search?: string;
+  };
+};
 
-const ProductSearchResultsPage = (props: Props) => {
+const ProductSearchResultsPage = ({ searchParams }: Props) => {
+  const currentQuery = decodeURIComponent(searchParams?.search ?? "")
+    .replace(/-/g, " ")
+    .trim();
+
   return (
-    <div className='dark:bg-black'>
-      <ResultsCategory />
+    <div className="pixel-perfect-home relative min-h-screen bg-background text-foreground">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 z-[60] border-l border-border/50"
+        style={{ left: "max(calc((100vw - 94rem) / 2 + 2.5rem), 2.5rem)" }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 z-[60] border-r border-border/50"
+        style={{ right: "max(calc((100vw - 94rem) / 2 + 2.5rem), 2.5rem)" }}
+      />
+
+      <PixelPerfectNavbar />
+
+      <section className="border-y border-border/70">
+        <div className="max-w-[94rem] mx-auto padding-global border-x border-border/70 py-6 lg:py-7">
+          <div className="grid grid-cols-1 px-12 gap-6 items-end">
+            <Searchbar initialValue={currentQuery} />
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div className="max-w-[94rem] mx-auto padding-global border-x border-border/70">
+          <ResultsCategory />
+        </div>
+      </section>
+
+      <PixelPerfectFooter />
     </div>
   );
 };

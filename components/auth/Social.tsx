@@ -21,7 +21,7 @@ export const Social = () => {
       <button
         type="button"
         onClick={() => onClick("google")}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-white/15 dark:bg-black/30 dark:text-gray-100 dark:hover:bg-white/5"
+        className="inline-flex w-full items-center justify-center gap-2 h-11 border border-border/70 bg-section-grey px-4 text-sm font-medium text-foreground transition hover:bg-background"
       >
         <BsGoogle className="h-5 w-5" aria-hidden={true} />
         Continuar con Google
@@ -29,7 +29,7 @@ export const Social = () => {
       <button
         type="button"
         onClick={() => onClick("github")}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-white/15 dark:bg-black/30 dark:text-gray-100 dark:hover:bg-white/5"
+        className="inline-flex w-full items-center justify-center gap-2 h-11 border border-border/70 bg-section-grey px-4 text-sm font-medium text-foreground transition hover:bg-background"
       >
         <BsGithub className="h-5 w-5" aria-hidden={true} />
         Continuar con GitHub

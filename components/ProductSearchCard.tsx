@@ -32,46 +32,46 @@ const ProductSearchCard = ({ product }: Props) => {
   const showTrustBadge = source === 'google-shopping' && !isMercadoLibreUrl && trustScore > 0;
 
   const cardContent = (
-    <article className='h-full rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950'>
+    <article className='h-full border border-border/70 bg-section-grey p-4 transition duration-200 hover:border-foreground/30'>
       <div className='mb-3 flex items-center justify-between gap-3'>
         <div className='flex flex-col'>
-          <span className='text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 dark:text-slate-400'>
+          <span className='text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground'>
             {sourceLabel}
           </span>
           {storeName ? (
-            <span className='text-[11px] text-slate-400 dark:text-slate-500'>{storeName}</span>
+            <span className='text-[11px] text-muted-foreground/80'>{storeName}</span>
           ) : domain ? (
-            <span className='text-[11px] text-slate-400 dark:text-slate-500'>{domain}</span>
+            <span className='text-[11px] text-muted-foreground/80'>{domain}</span>
           ) : null}
         </div>
         {hasDiscount ? (
-          <span className='rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'>
+          <span className='px-2 py-1 text-xs font-semibold bg-primary text-primary-foreground'>
             {getDiscountPercentage(currentPrice, originalPrice)}% OFF
           </span>
         ) : null}
       </div>
 
-      <div className='overflow-hidden rounded-xl bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800'>
+      <div className='overflow-hidden border border-border/70 bg-background'>
         <div className='aspect-[4/3] w-full'>
           <img
             src={imageSrc}
             alt={product.title}
-            className='h-full w-full object-contain p-4 transition duration-300 group-hover:scale-105'
+            className='h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.02]'
           />
         </div>
       </div>
 
       <div className='mt-4 min-h-[3.5rem]'>
-        <h2 className='text-sm font-semibold leading-5 text-slate-900 dark:text-slate-100'>{product.title}</h2>
+        <h2 className='text-sm font-semibold leading-5 text-foreground'>{product.title}</h2>
       </div>
 
       <div className='mt-3 flex flex-col'>
         {hasDiscount ? (
-          <span className='text-xs text-slate-400 line-through dark:text-slate-500'>
+          <span className='text-xs text-muted-foreground line-through'>
             {currency} {formatNumber(originalPrice)}
           </span>
         ) : null}
-        <span className='text-2xl font-bold leading-tight text-slate-900 dark:text-slate-100'>
+        <span className='text-2xl font-bold leading-tight text-foreground'>
           {currency} {formatNumber(currentPrice)}
         </span>
       </div>

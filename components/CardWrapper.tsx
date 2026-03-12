@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 
 interface CardWrapperProps {
   children: React.ReactNode;
@@ -12,16 +11,14 @@ interface CardWrapperProps {
 
 const CardWrapper = ({ children, HeaderLabel, backButtonHref, backButtonLabel }: CardWrapperProps) => {
   return (
-    <section className='w-full max-w-md rounded-2xl border border-black/10 bg-white/90 p-7 shadow-2xl backdrop-blur-sm dark:border-white/10 dark:bg-black/60 sm:p-8'>
-      <div className='mb-6 text-center'>
-        <div className='mx-auto mb-4 inline-flex rounded-full border border-black/10 bg-white px-4 py-2 shadow-sm dark:border-white/10 dark:bg-black/50'>
-          <Image src='/assets/icons/savemelin3.svg' width={110} height={36} alt='SaveMelin' />
-        </div>
-        <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>{HeaderLabel}</h2>
+    <section className='w-full max-w-[28rem] border border-border/70 bg-background p-5 sm:p-6'>
+      <div className='mb-5'>
+        <p className='text-xs uppercase tracking-[0.14em] text-muted-foreground'>SaveMelin</p>
+        <h2 className='mt-2 text-xl sm:text-2xl font-semibold tracking-tight text-foreground'>{HeaderLabel}</h2>
       </div>
       {children}
-      <div className='mt-6 text-center'>
-        <Link href={backButtonHref} className='text-sm font-medium text-primary transition hover:underline'>
+      <div className='mt-5 pt-3 border-t border-border/70 text-center'>
+        <Link href={backButtonHref} className='text-sm font-medium text-muted-foreground transition hover:text-foreground'>
           {backButtonLabel}
         </Link>
       </div>
