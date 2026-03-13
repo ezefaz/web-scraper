@@ -108,6 +108,7 @@ export async function GET(request: Request) {
     let failedProducts = 0;
     let pushedPriceHistory = 0;
     let pushedDolarHistory = 0;
+    const failureSamples: Array<{ url: string; reason: string }> = [];
 
     const operations = await mapWithConcurrency(products as any[], MAX_CONCURRENCY, async (currentProduct) => {
       try {
@@ -217,8 +218,14 @@ export async function GET(request: Request) {
         }
 
         return updateOperation;
-      } catch {
+      } catch (error: any) {
         failedProducts += 1;
+        if (failureSamples.length < 10) {
+          failureSamples.push({
+            url: String(currentProduct?.url || ""),
+            reason: String(error?.message || "Unknown error"),
+          });
+        }
         return null;
       }
     });
@@ -237,6 +244,7 @@ export async function GET(request: Request) {
       failedProducts,
       pushedPriceHistory,
       pushedDolarHistory,
+      failureSamples,
       week: currentWeekKey,
       executedAt: now.toISOString(),
     });
@@ -249,4 +257,3 @@ export async function GET(request: Request) {
     );
   }
 }
-

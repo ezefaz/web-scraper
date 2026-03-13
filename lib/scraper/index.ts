@@ -2,9 +2,8 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { extractCategory, extractCurrency, extractDescription, extractPrice, extractStars } from '../utils';
+import { extractCategory, extractCurrency, extractDescription, extractStars } from '../utils';
 import { scrapeDolarValue } from './dolar';
-import { getCurrentUser } from '../actions';
 
 export async function scrapeMLProduct(url: string) {
   if (!url) return;
@@ -24,8 +23,6 @@ export async function scrapeMLProduct(url: string) {
     port,
     rejectUnathorized: false,
   };
-
-  const user = await getCurrentUser();
 
   try {
     const response = await axios.get(url, options);
@@ -111,12 +108,12 @@ export async function scrapeMLProduct(url: string) {
 
     const statusElement = $('.ui-pdp-subtitle');
     const statusText = statusElement.text().trim();
-    const status = statusText.split(' ')[0];
+    const status = statusText.split(' ')[0] || '';
 
     // CATEGORIES
 
     const categories = extractCategory($);
-    const category = categories[0];
+    const category = categories[0] || '';
 
     const today = new Date();
 
@@ -149,7 +146,7 @@ export async function scrapeMLProduct(url: string) {
       productReviews.push(reviews);
     });
 
-    const storeName = store[0];
+    const storeName = store[0] || '';
 
     let isFollowing = false;
 
@@ -176,11 +173,13 @@ export async function scrapeMLProduct(url: string) {
         };
       })
       .get();
+    const officialStoreName = productDetails?.[0]?.oficialStore?.trim();
+    const fallbackStoreName = storeName?.trim();
 
     const data = {
       url,
       currency: currency || '$',
-      image: imageUrls[0],
+      image: imageUrls[0] || '',
       title,
       currentPrice: Number(currentPrice) || Number(originalPrice),
       originalPrice: Number(originalPrice) || Number(currentPrice),
@@ -188,7 +187,7 @@ export async function scrapeMLProduct(url: string) {
       priceHistory: [],
       dolarHistory: [],
       discountRate: Number(discountRate),
-      category: category || '',
+      category,
       reviewsCount: reviewsCount || 0,
       stars: stars || 0,
       stockAvailable: stockAvailable && !isOutOfStock ? stockAvailable : '1',
@@ -198,8 +197,8 @@ export async function scrapeMLProduct(url: string) {
       highestPrice: Number(originalPrice) || Number(currentPrice),
       averagePrice: Number(currentPrice) || Number(originalPrice),
       isFreeReturning,
-      storeName: productDetails[0].oficialStore,
-      status,
+      storeName: officialStoreName || fallbackStoreName || 'Marketplace',
+      status: status || 'Nuevo',
       isFreeShipping,
       productReviews,
       isFollowing,
