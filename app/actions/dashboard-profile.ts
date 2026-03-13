@@ -8,7 +8,12 @@ import { getCurrentUser } from "@/lib/actions";
 import { reset } from "@/app/actions/reset";
 import { connectToDb } from "@/lib/mongoose";
 import userModel from "@/lib/models/user.model";
-import { getPlanLimits, isFreePlan } from "@/lib/pricing/plans";
+import {
+  getPlanLimits,
+  isFreePlan,
+  resolveSubscriptionTier,
+  SUBSCRIPTION_TIERS,
+} from "@/lib/pricing/plans";
 
 const validCountries = ["argentina", "brasil", "colombia", "uruguay"] as const;
 
@@ -145,5 +150,43 @@ export const updateProductAlertPreference = async (values: {
     success: parsed.data.enabled
       ? "Alerta activada para este producto."
       : "Alerta desactivada para este producto.",
+  };
+};
+
+export const cancelDashboardSubscription = async () => {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser) {
+    return { error: "No autorizado." };
+  }
+
+  const currentTier = resolveSubscriptionTier(currentUser.subscription);
+  if (currentTier === SUBSCRIPTION_TIERS.BASIC) {
+    return { error: "Tu cuenta ya está en el plan gratuito." };
+  }
+
+  await connectToDb();
+
+  const updatedUser = await userModel.findByIdAndUpdate(
+    currentUser._id,
+    {
+      $set: {
+        subscription: SUBSCRIPTION_TIERS.BASIC,
+      },
+    },
+    { new: true }
+  );
+
+  if (!updatedUser) {
+    return { error: "No se pudo cancelar la suscripción en este momento." };
+  }
+
+  revalidatePath("/dashboard");
+  revalidatePath("/profile");
+
+  return {
+    success:
+      "Suscripción cancelada. Tu cuenta ahora está en plan gratuito.",
+    subscription: updatedUser.subscription,
   };
 };

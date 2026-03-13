@@ -3,12 +3,21 @@
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import toast from "react-hot-toast";
-import { Bell, KeyRound, Search, Sparkles, TrendingDown, User } from "lucide-react";
+import {
+  Bell,
+  CreditCard,
+  KeyRound,
+  Search,
+  Sparkles,
+  TrendingDown,
+  User,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/pixel-perfect-page-main/button";
 import { formatNumber } from "@/lib/utils";
 import {
+  cancelDashboardSubscription,
   requestDashboardPasswordReset,
   updateDashboardProfile,
   updateProductAlertPreference,
@@ -39,10 +48,18 @@ type DashboardMetrics = {
   accumulatedSavings: number;
 };
 
+type DashboardSubscription = {
+  tier: "basic" | "premium";
+  maxSavedProducts: number | null;
+  maxFollowedProducts: number | null;
+  scanCadence: string;
+};
+
 type Props = {
   user: DashboardUser;
   products: DashboardProduct[];
   metrics: DashboardMetrics;
+  subscription: DashboardSubscription;
 };
 
 const COUNTRY_OPTIONS: Array<{
@@ -67,13 +84,19 @@ function getProductDetailsHref(product: DashboardProduct) {
   return `/products/${product.id}?url=${encodedUrl}`;
 }
 
-export default function ProfileDashboardClient({ user, products, metrics }: Props) {
+export default function ProfileDashboardClient({
+  user,
+  products,
+  metrics,
+  subscription,
+}: Props) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<DashboardProduct[]>(products);
   const [name, setName] = useState(user.name || "");
   const [country, setCountry] = useState<DashboardUser["country"]>(user.country);
+  const [subscriptionTier, setSubscriptionTier] = useState(subscription.tier);
   const [isPending, startTransition] = useTransition();
   const [activeToggleId, setActiveToggleId] = useState<string | null>(null);
 
@@ -165,8 +188,39 @@ export default function ProfileDashboardClient({ user, products, metrics }: Prop
     },
   ];
 
+  const subscriptionStatus = {
+    tier: subscriptionTier,
+    isPremium: subscriptionTier === "premium",
+    maxSavedProducts: subscription.maxSavedProducts,
+    maxFollowedProducts: subscription.maxFollowedProducts,
+    scanCadence: subscription.scanCadence,
+  };
+
+  const shortcutLinks = [
+    { href: "#savings-ideas", label: "Ideas de ahorro" },
+    { href: "#saved-products", label: "Productos guardados" },
+    { href: "#profile-settings", label: "Configuración" },
+    { href: "#subscription-settings", label: "Suscripción" },
+  ];
+
+  const handleCancelSubscription = () => {
+    startTransition(async () => {
+      const response = await cancelDashboardSubscription();
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
+
+      setSubscriptionTier("basic");
+      toast.success(
+        response.success ||
+          "Suscripción cancelada. Tu cuenta volvió al plan gratuito."
+      );
+    });
+  };
+
   return (
-    <div className="py-10 lg:py-12 px-12 space-y-8">
+    <div className="px-5 py-10 lg:px-8 lg:py-12 space-y-8">
       <div className="border border-border/70 bg-background p-5 md:p-6">
         <p className="text-sm text-muted-foreground">Panel de usuario</p>
         <h1 className="mt-1 text-2xl md:text-3xl font-semibold text-foreground">
@@ -177,6 +231,21 @@ export default function ProfileDashboardClient({ user, products, metrics }: Prop
           ahorro en un solo lugar.
         </p>
       </div>
+
+      <section className="border border-border/70 bg-section-grey p-4 md:p-5">
+        <p className="text-xs uppercase tracking-wide text-muted-foreground">Atajos</p>
+        <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2">
+          {shortcutLinks.map((shortcut) => (
+            <a
+              key={shortcut.href}
+              href={shortcut.href}
+              className="h-10 border border-border/80 bg-background px-3 text-sm text-foreground inline-flex items-center justify-center hover:bg-section-grey transition-colors"
+            >
+              {shortcut.label}
+            </a>
+          ))}
+        </div>
+      </section>
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
         {summaryCards.map((card) => (
@@ -192,149 +261,194 @@ export default function ProfileDashboardClient({ user, products, metrics }: Prop
       </div>
 
       <div className="grid grid-cols-1 2xl:grid-cols-[1.45fr_1fr] gap-6">
-        <section className="border border-border/70 bg-background p-5 md:p-6 space-y-5">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground">
-                Productos guardados y alertas
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Elegí en qué productos querés recibir avisos cuando haya cambios.
-              </p>
+        <div className="space-y-6">
+          <section
+            id="savings-ideas"
+            className="scroll-mt-28 border border-border/70 bg-background p-5 md:p-6 space-y-4"
+          >
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Ideas para mejorar tu ahorro</h3>
             </div>
-            <Link href="/user-products">
-              <Button variant="secondary">Ver todos</Button>
-            </Link>
-          </div>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex gap-2">
+                <TrendingDown className="h-4 w-4 mt-0.5 text-primary" />
+                Activá alertas en todos los productos que hoy están sin descuento.
+              </li>
+              <li className="flex gap-2">
+                <Bell className="h-4 w-4 mt-0.5 text-primary" />
+                Definí un hábito semanal para revisar oportunidades.
+              </li>
+              <li className="flex gap-2">
+                <Search className="h-4 w-4 mt-0.5 text-primary" />
+                Agregá productos sustitutos para comparar antes de comprar.
+              </li>
+            </ul>
+            {bestOpportunity && calculateSaving(bestOpportunity) > 0 && (
+              <div className="border border-primary/40 bg-primary/10 p-3">
+                <p className="text-xs uppercase tracking-wide text-primary">
+                  Mejor oportunidad detectada
+                </p>
+                <p className="mt-1 text-sm font-medium text-foreground line-clamp-1">
+                  {bestOpportunity.title}
+                </p>
+                <p className="mt-1 text-sm text-primary font-semibold">
+                  Podés ahorrar $ {formatNumber(calculateSaving(bestOpportunity))}
+                </p>
+              </div>
+            )}
+          </section>
 
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => {
-                setPage(1);
-                setQuery(e.target.value);
-              }}
-              placeholder="Buscar por producto o categoría"
-              className="h-11 w-full border border-border bg-section-grey pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground/80 outline-none focus:border-foreground/30"
-            />
-          </div>
+          <section
+            id="saved-products"
+            className="scroll-mt-28 border border-border/70 bg-background p-5 md:p-6 space-y-5"
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground">
+                  Productos guardados y alertas
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Elegí en qué productos querés recibir avisos cuando haya cambios.
+                </p>
+              </div>
+              <Link href="/user-products">
+                <Button variant="secondary">Ver todos</Button>
+              </Link>
+            </div>
 
-          <div className="overflow-x-auto border border-border/70">
-            <table className="w-full min-w-[640px]">
-              <thead className="bg-section-grey border-b border-border/70">
-                <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  <th className="px-3 py-2">Producto</th>
-                  <th className="px-3 py-2">Precio actual</th>
-                  <th className="px-3 py-2">Ahorro detectado</th>
-                  <th className="px-3 py-2">Alertas</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibleProducts.map((item) => {
-                  const saving = calculateSaving(item);
-                  return (
-                    <tr
-                      key={item.id}
-                      className="border-b border-border/50 last:border-b-0 cursor-pointer hover:bg-section-grey/60 transition-colors"
-                      onClick={() => router.push(getProductDetailsHref(item))}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          router.push(getProductDetailsHref(item));
-                        }
-                      }}
-                      tabIndex={0}
-                    >
-                      <td className="px-3 py-3">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="h-12 w-12 border border-border/70 bg-white object-contain p-1"
-                          />
-                          <div className="min-w-0">
-                            <Link
-                              href={getProductDetailsHref(item)}
-                              className="block text-sm font-medium text-foreground line-clamp-1 hover:underline"
-                            >
-                              {item.title}
-                            </Link>
-                            <p className="text-xs text-muted-foreground">{item.category}</p>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                value={query}
+                onChange={(e) => {
+                  setPage(1);
+                  setQuery(e.target.value);
+                }}
+                placeholder="Buscar por producto o categoría"
+                className="h-11 w-full border border-border bg-section-grey pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground/80 outline-none focus:border-foreground/30"
+              />
+            </div>
+
+            <div className="overflow-x-auto border border-border/70">
+              <table className="w-full min-w-[640px]">
+                <thead className="bg-section-grey border-b border-border/70">
+                  <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="px-3 py-2">Producto</th>
+                    <th className="px-3 py-2">Precio actual</th>
+                    <th className="px-3 py-2">Ahorro detectado</th>
+                    <th className="px-3 py-2">Alertas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {visibleProducts.map((item) => {
+                    const saving = calculateSaving(item);
+                    return (
+                      <tr
+                        key={item.id}
+                        className="border-b border-border/50 last:border-b-0 cursor-pointer hover:bg-section-grey/60 transition-colors"
+                        onClick={() => router.push(getProductDetailsHref(item))}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            router.push(getProductDetailsHref(item));
+                          }
+                        }}
+                        tabIndex={0}
+                      >
+                        <td className="px-3 py-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <img
+                              src={item.image}
+                              alt={item.title}
+                              className="h-12 w-12 border border-border/70 bg-white object-contain p-1"
+                            />
+                            <div className="min-w-0">
+                              <Link
+                                href={getProductDetailsHref(item)}
+                                className="block text-sm font-medium text-foreground line-clamp-1 hover:underline"
+                              >
+                                {item.title}
+                              </Link>
+                              <p className="text-xs text-muted-foreground">{item.category}</p>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-3 py-3 text-sm font-medium text-foreground">
-                        {item.currency} {formatNumber(item.currentPrice)}
-                      </td>
-                      <td className="px-3 py-3">
-                        {saving > 0 ? (
-                          <span className="inline-flex items-center border border-primary/50 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-                            $ {formatNumber(saving)}
-                          </span>
-                        ) : (
-                          <span className="text-xs text-muted-foreground">Sin descuento</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-3">
-                        <label
-                          className="inline-flex items-center gap-2 text-sm text-foreground"
-                          onClick={(event) => event.stopPropagation()}
-                        >
-                          <input
-                            type="checkbox"
-                            className="h-4 w-4 accent-[var(--primary)]"
-                            checked={item.isFollowing}
-                            disabled={isPending && activeToggleId === item.id}
+                        </td>
+                        <td className="px-3 py-3 text-sm font-medium text-foreground">
+                          {item.currency} {formatNumber(item.currentPrice)}
+                        </td>
+                        <td className="px-3 py-3">
+                          {saving > 0 ? (
+                            <span className="inline-flex items-center border border-primary/50 bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+                              $ {formatNumber(saving)}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Sin descuento</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-3">
+                          <label
+                            className="inline-flex items-center gap-2 text-sm text-foreground"
                             onClick={(event) => event.stopPropagation()}
-                            onChange={(e) =>
-                              handleToggleAlert(item.id, e.target.checked)
-                            }
-                          />
-                          Recibir alertas
-                        </label>
+                          >
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 accent-[var(--primary)]"
+                              checked={item.isFollowing}
+                              disabled={isPending && activeToggleId === item.id}
+                              onClick={(event) => event.stopPropagation()}
+                              onChange={(e) =>
+                                handleToggleAlert(item.id, e.target.checked)
+                              }
+                            />
+                            Recibir alertas
+                          </label>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {visibleProducts.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-3 py-10 text-center text-sm text-muted-foreground">
+                        No encontramos productos con ese criterio.
                       </td>
                     </tr>
-                  );
-                })}
-                {visibleProducts.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="px-3 py-10 text-center text-sm text-muted-foreground">
-                      No encontramos productos con ese criterio.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-muted-foreground">
-              Página {currentPage} de {totalPages}
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="h-9 px-3 border border-border text-sm text-foreground disabled:opacity-50"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage <= 1}
-              >
-                Anterior
-              </button>
-              <button
-                type="button"
-                className="h-9 px-3 border border-border text-sm text-foreground disabled:opacity-50"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage >= totalPages}
-              >
-                Siguiente
-              </button>
+                  )}
+                </tbody>
+              </table>
             </div>
-          </div>
-        </section>
+
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                Página {currentPage} de {totalPages}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="h-9 px-3 border border-border text-sm text-foreground disabled:opacity-50"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage <= 1}
+                >
+                  Anterior
+                </button>
+                <button
+                  type="button"
+                  className="h-9 px-3 border border-border text-sm text-foreground disabled:opacity-50"
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage >= totalPages}
+                >
+                  Siguiente
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
 
         <aside className="space-y-6">
-          <section className="border border-border/70 bg-background p-5 md:p-6">
+          <section
+            id="profile-settings"
+            className="scroll-mt-28 border border-border/70 bg-background p-5 md:p-6"
+          >
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-primary" />
               <h3 className="text-lg font-semibold text-foreground">Configuración de perfil</h3>
@@ -374,57 +488,92 @@ export default function ProfileDashboardClient({ user, products, metrics }: Prop
                 Guardar perfil
               </Button>
             </form>
-          </section>
 
-          <section className="border border-border/70 bg-background p-5 md:p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <KeyRound className="h-4 w-4 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Seguridad</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Solicitá un enlace de restablecimiento para cambiar tu contraseña.
-            </p>
-            <Button
-              variant="secondary"
-              className="w-full"
-              onClick={handlePasswordReset}
-              disabled={isPending}
-            >
-              Solicitar cambio de contraseña
-            </Button>
-          </section>
-
-          <section className="border border-border/70 bg-background p-5 md:p-6 space-y-4">
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Ideas para mejorar tu ahorro</h3>
-            </div>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2">
-                <TrendingDown className="h-4 w-4 mt-0.5 text-primary" />
-                Activá alertas en todos los productos que hoy están sin descuento.
-              </li>
-              <li className="flex gap-2">
-                <Bell className="h-4 w-4 mt-0.5 text-primary" />
-                Definí un hábito semanal para revisar oportunidades.
-              </li>
-              <li className="flex gap-2">
-                <Search className="h-4 w-4 mt-0.5 text-primary" />
-                Agregá productos sustitutos para comparar antes de comprar.
-              </li>
-            </ul>
-            {bestOpportunity && calculateSaving(bestOpportunity) > 0 && (
-              <div className="border border-primary/40 bg-primary/10 p-3">
-                <p className="text-xs uppercase tracking-wide text-primary">
-                  Mejor oportunidad detectada
-                </p>
-                <p className="mt-1 text-sm font-medium text-foreground line-clamp-1">
-                  {bestOpportunity.title}
-                </p>
-                <p className="mt-1 text-sm text-primary font-semibold">
-                  Podés ahorrar $ {formatNumber(calculateSaving(bestOpportunity))}
-                </p>
+            <div className="mt-5 border-t border-border/70 pt-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <KeyRound className="h-4 w-4 text-primary" />
+                <h4 className="text-base font-semibold text-foreground">Seguridad de la cuenta</h4>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Solicitá un enlace de restablecimiento para actualizar tu contraseña.
+              </p>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={handlePasswordReset}
+                disabled={isPending}
+              >
+                Solicitar cambio de contraseña
+              </Button>
+            </div>
+          </section>
+
+          <section
+            id="subscription-settings"
+            className="scroll-mt-28 border border-border/70 bg-background p-5 md:p-6 space-y-4"
+          >
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Suscripción</h3>
+            </div>
+            <div className="border border-border/70 bg-section-grey p-4 space-y-2">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">Plan actual</p>
+              <p className="text-base font-semibold text-foreground">
+                {subscriptionStatus.isPremium ? "Savemelin Premium" : "Plan Gratuito"}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Escaneo de precios: {subscriptionStatus.scanCadence}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Guardados:{" "}
+                {subscriptionStatus.maxSavedProducts === null
+                  ? "Ilimitado"
+                  : `hasta ${subscriptionStatus.maxSavedProducts} productos`}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Alertas activas:{" "}
+                {subscriptionStatus.maxFollowedProducts === null
+                  ? "Ilimitadas"
+                  : `hasta ${subscriptionStatus.maxFollowedProducts} productos`}
+              </p>
+            </div>
+
+            {subscriptionStatus.isPremium ? (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  Si cancelás, tu cuenta vuelve al plan gratuito y se aplican sus límites.
+                </p>
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={handleCancelSubscription}
+                  disabled={isPending}
+                >
+                  Cancelar suscripción
+                </Button>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  Mejora tu cuenta para desbloquear análisis completo y seguimiento sin límites.
+                </p>
+                <div className="border border-border/70 bg-section-grey p-4 space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    Beneficios Premium
+                  </p>
+                  <ul className="space-y-1.5 text-sm text-foreground">
+                    <li>• Productos guardados y alertas activas ilimitadas.</li>
+                    <li>• Comparación de precios entre múltiples tiendas.</li>
+                    <li>• Prioridad en detección de cambios de precio.</li>
+                    <li>• Historial y seguimiento extendido para decisiones de compra.</li>
+                  </ul>
+                </div>
+                <Link href="/#pricing" className="block">
+                  <Button variant="primary" className="w-full">
+                    Mejorar a Premium
+                  </Button>
+                </Link>
+              </>
             )}
           </section>
         </aside>

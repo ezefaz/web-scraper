@@ -4,6 +4,10 @@ import { getCurrentUser } from "@/lib/actions";
 import PixelPerfectNavbar from "@/components/pixel-perfect-page-main/Navbar";
 import PixelPerfectFooter from "@/components/pixel-perfect-page-main/Footer";
 import ProfileDashboardClient from "@/components/profile/ProfileDashboardClient";
+import {
+  getPlanLimits,
+  resolveSubscriptionTier,
+} from "@/lib/pricing/plans";
 
 const verticalLineOffset = "max(calc((100vw - 94rem) / 2 + 2.5rem), 2.5rem)";
 
@@ -59,6 +63,9 @@ export default async function DashboardPage() {
     accumulatedSavings,
   };
 
+  const subscriptionTier = resolveSubscriptionTier(user.subscription);
+  const planLimits = getPlanLimits(user.subscription);
+
   return (
     <div className="pixel-perfect-home relative min-h-screen bg-background text-foreground">
       <div
@@ -84,6 +91,16 @@ export default async function DashboardPage() {
             }}
             products={products}
             metrics={metrics}
+            subscription={{
+              tier: subscriptionTier,
+              maxSavedProducts: Number.isFinite(planLimits.maxSavedProducts)
+                ? planLimits.maxSavedProducts
+                : null,
+              maxFollowedProducts: Number.isFinite(planLimits.maxFollowedProducts)
+                ? planLimits.maxFollowedProducts
+                : null,
+              scanCadence: planLimits.scanCadence,
+            }}
           />
         </div>
       </section>
