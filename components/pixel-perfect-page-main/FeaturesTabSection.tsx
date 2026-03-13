@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Clock3, Tag } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
+import Link from "next/link";
 
 type ProductCard = {
   id: string;
@@ -133,9 +134,10 @@ export default function PixelPerfectFeaturesTabSection() {
                     const discountLabel = getDiscountLabel(product);
 
                     return (
-                      <article
+                      <Link
                         key={product.id}
-                        className="bg-section-grey border border-border/70 p-4 min-h-[17rem] flex flex-col gap-3"
+                        href={`/products/${product.id}`}
+                        className="bg-section-grey border border-border/70 p-4 min-h-[17rem] flex flex-col gap-3 transition-colors hover:bg-background"
                       >
                         <div className="h-28 border border-border/70 bg-background overflow-hidden">
                           <img
@@ -181,17 +183,12 @@ export default function PixelPerfectFeaturesTabSection() {
                             </span>
                           </div>
 
-                          <a
-                            href={product.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                          >
+                          <span className="mt-3 inline-flex items-center gap-1 text-xs text-muted-foreground">
                             <Tag className="w-3 h-3" />
-                            Ver publicación
-                          </a>
+                            Ver detalle
+                          </span>
                         </div>
-                      </article>
+                      </Link>
                     );
                   })}
                 </div>
