@@ -59,6 +59,7 @@ export const updateDashboardProfile = async (values: {
     },
   });
 
+  revalidatePath("/dashboard");
   revalidatePath("/profile");
   return {
     success: "Perfil actualizado correctamente.",
@@ -117,6 +118,7 @@ export const updateProductAlertPreference = async (values: {
     return { error: "No se encontró el producto dentro de tus guardados." };
   }
 
+  revalidatePath("/dashboard");
   revalidatePath("/profile");
   return {
     success: parsed.data.enabled
@@ -124,4 +126,3 @@ export const updateProductAlertPreference = async (values: {
       : "Alerta desactivada para este producto.",
   };
 };
-

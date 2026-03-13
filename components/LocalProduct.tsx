@@ -14,7 +14,7 @@ import {
   Store,
   Truck,
 } from 'lucide-react';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber, formatUSD } from '@/lib/utils';
 import { scrapeMLProductDetail } from '@/lib/scraper/mercadolibre-product-detail';
 import ScraperButton from './ScraperButton';
 import { createProduct } from '@/app/actions/create-product';
@@ -116,7 +116,7 @@ const LocalProduct = () => {
         }
 
         if (result?.success || result?.alreadySaved) {
-          router.push('/user-products');
+          router.push('/dashboard');
           return;
         }
 
@@ -143,6 +143,23 @@ const LocalProduct = () => {
   const statCards = useMemo(() => {
     if (!productData) return [];
     const currency = productData.currency || '$';
+    const rawDolarValue = Number(productData.currentDolar?.value || 0);
+    const dolarValue =
+      rawDolarValue > 0 && rawDolarValue < 20
+        ? rawDolarValue * 1000
+        : rawDolarValue;
+    const usdPrice =
+      Number(productData.currentPrice || 0) > 0 && dolarValue > 0
+        ? Number(productData.currentPrice) / dolarValue
+        : null;
+    const dolarDate = productData.currentDolar?.date
+      ? new Date(productData.currentDolar.date)
+      : null;
+    const dolarDateLabel =
+      dolarDate && !Number.isNaN(dolarDate.getTime())
+        ? dolarDate.toLocaleDateString('es-AR')
+        : null;
+
     return [
       {
         label: 'Precio actual',
@@ -159,6 +176,14 @@ const LocalProduct = () => {
       {
         label: 'Precio más bajo',
         value: `${currency} ${formatNumber(productData.lowestPrice)}`,
+      },
+      {
+        label: 'Valor en USD',
+        value: usdPrice ? formatUSD(usdPrice) : 'N/A',
+        helperText:
+          dolarValue > 0
+            ? `Cotización tomada: $${formatNumber(dolarValue)}${dolarDateLabel ? ` (${dolarDateLabel})` : ''}`
+            : 'Cotización no disponible',
       },
     ];
   }, [productData]);
@@ -307,13 +332,49 @@ const LocalProduct = () => {
                 Resumen de precios
               </h2>
             </div>
-            <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4'>
               {statCards.map((card) => (
-                <div key={card.label} className='border border-border/70 bg-section-grey p-4'>
-                  <p className='text-xs uppercase tracking-wide text-muted-foreground'>
+                <div
+                  key={card.label}
+                  className={`border p-4 ${
+                    card.label === 'Precio promedio'
+                      ? 'border-orange-200 bg-orange-50'
+                      : card.label === 'Precio más alto'
+                        ? 'border-red-200 bg-red-50'
+                        : card.label === 'Precio más bajo'
+                          ? 'border-emerald-200 bg-emerald-50'
+                          : 'border-border/70 bg-section-grey'
+                  }`}
+                >
+                  <p
+                    className={`text-xs uppercase tracking-wide ${
+                      card.label === 'Precio promedio'
+                        ? 'text-[#c46a1b]'
+                        : card.label === 'Precio más alto'
+                          ? 'text-[#dc2626]'
+                          : card.label === 'Precio más bajo'
+                            ? 'text-[#16a34a]'
+                            : 'text-muted-foreground'
+                    }`}
+                  >
                     {card.label}
                   </p>
-                  <p className='mt-2 text-lg font-semibold text-foreground'>{card.value}</p>
+                  <p
+                    className={`mt-2 text-lg font-semibold ${
+                      card.label === 'Precio promedio'
+                        ? 'text-[#c46a1b]'
+                        : card.label === 'Precio más alto'
+                          ? 'text-[#dc2626]'
+                          : card.label === 'Precio más bajo'
+                            ? 'text-[#16a34a]'
+                            : 'text-foreground'
+                    }`}
+                  >
+                    {card.value}
+                  </p>
+                  {'helperText' in card && card.helperText ? (
+                    <p className='mt-1 text-xs text-muted-foreground'>{card.helperText}</p>
+                  ) : null}
                 </div>
               ))}
             </div>

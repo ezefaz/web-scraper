@@ -12,6 +12,7 @@ export type DolarHistoryItem = {
 
 export interface MonthlyData {
 	Month: string;
+	Period?: string;
 	Mayor: number | string;
 	Menor: number | string;
 }

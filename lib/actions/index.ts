@@ -250,19 +250,14 @@ export async function deleteProduct(productId: string) {
 export async function getUserProducts() {
   try {
     await connectToDb();
-    const user: any = await getCurrentUser();
+    const currentUser: any = await getCurrentUser();
+    if (!currentUser?._id) return [];
 
-    if (!user) return;
-
-    const userWithProducts = await User.findOne({ email: user.email }).populate(
+    const userWithProducts = await User.findById(currentUser._id).select(
       "products"
     );
 
-    if (!userWithProducts) {
-      throw new Error("User not found");
-    }
-
-    return userWithProducts.products;
+    return userWithProducts?.products ?? [];
   } catch (error: any) {
     throw new Error(`Failed to fetch user products: ${error.message}`);
   }

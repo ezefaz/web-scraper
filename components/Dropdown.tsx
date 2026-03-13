@@ -156,7 +156,7 @@ const Dropdown = () => {
                 </svg>
               }
               text='Perfil'
-              link='/profile'
+              link='/dashboard'
             />
 
             {loggedUser && loggedUser.role === 'ADMIN' && (

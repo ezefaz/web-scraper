@@ -72,35 +72,123 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
     lowestPrice,
   } = product;
 
-  const dolarValue = Number(currentDolar?.value || 0);
-  const scrapedDolarDate = currentDolar?.date;
-  const priceBasedOnDolar = dolarValue > 0 ? currentPrice / dolarValue : 0;
-
-  const lastPrices = priceHistory
-    .map((item: any) => item?.price)
-    .filter((price: any) => typeof price === "number");
-  const lastDates = priceHistory.map((item: any) => item?.date).filter(Boolean);
-  const uniquePrices = Array.from(new Set(lastPrices));
-  const uniqueDolarValues = Array.from(
-    new Set(
-      dolarHistory
-        .map((item: any) => Number(item?.value || 0))
-        .filter((value: number) => value > 0),
-    ),
+  const rawDolarValue = Number(currentDolar?.value || 0);
+  const dolarValue =
+    rawDolarValue > 0 && rawDolarValue < 20
+      ? rawDolarValue * 1000
+      : rawDolarValue;
+  const normalizedCurrentPrice = Number(currentPrice || 0);
+  const normalizedHighestPrice = Number(highestPrice || 0);
+  const normalizedLowestPrice = Number(lowestPrice || 0);
+  const historicalPrices = (priceHistory || [])
+    .map((item: any) => Number(item?.price))
+    .filter((value: number) => Number.isFinite(value) && value > 0);
+  const effectiveHighestPrice = Math.max(
+    normalizedHighestPrice,
+    normalizedCurrentPrice,
+    ...historicalPrices,
   );
-  const uniqueDolarDatesArray = Array.from(
-    new Set(dolarHistory.map((item: any) => item?.date).filter(Boolean)),
-  );
+  const effectiveLowestPrice =
+    historicalPrices.length > 0
+      ? Math.min(
+          normalizedLowestPrice > 0 ? normalizedLowestPrice : Infinity,
+          normalizedCurrentPrice > 0 ? normalizedCurrentPrice : Infinity,
+          ...historicalPrices,
+        )
+      : normalizedCurrentPrice;
 
-  const monthlyData = getMonthlyData(priceHistory, currency);
-  const weeklyData = getWeeklyData(priceHistory);
-  const productAnualData = getAnnualMonthlyData(priceHistory, currency);
-  const dolarWeeklyData = getCurrentWeekDolarData(dolarHistory, currentPrice);
-  const dolarMonthlyData = getCurrentMonthlyDolarData(
+  const priceBasedOnDolar =
+    dolarValue > 0 && normalizedCurrentPrice > 0
+      ? normalizedCurrentPrice / dolarValue
+      : 0;
+
+  const dayLabel = new Intl.DateTimeFormat("es-AR", {
+    day: "2-digit",
+    month: "short",
+  }).format(new Date());
+  const monthLabel = new Intl.DateTimeFormat("es-AR", {
+    month: "short",
+    year: "numeric",
+  }).format(new Date());
+  const currentDolarDate = currentDolar?.date ? new Date(currentDolar.date) : null;
+  const currentDolarDateLabel =
+    currentDolarDate && !Number.isNaN(currentDolarDate.getTime())
+      ? currentDolarDate.toLocaleDateString("es-AR")
+      : null;
+
+  const monthlyDataRaw = getMonthlyData(priceHistory, currency);
+  const weeklyDataRaw = getWeeklyData(priceHistory);
+  const productAnualDataRaw = getAnnualMonthlyData(priceHistory, currency);
+  const dolarWeeklyDataRaw = getCurrentWeekDolarData(dolarHistory, currentPrice);
+  const dolarMonthlyDataRaw = getCurrentMonthlyDolarData(
     dolarHistory,
     currentPrice,
   );
-  const dolarAnualData = getAnnualDolarData(currentPrice, dolarHistory);
+  const dolarAnualDataRaw = getAnnualDolarData(currentPrice, dolarHistory);
+
+  const fallbackPricePoint =
+    normalizedCurrentPrice > 0
+      ? { Period: dayLabel, Month: dayLabel, Mayor: normalizedCurrentPrice, Menor: normalizedCurrentPrice }
+      : null;
+  const fallbackAnnualPricePoint =
+    normalizedCurrentPrice > 0
+      ? { Period: monthLabel, Month: monthLabel, Mayor: normalizedCurrentPrice, Menor: normalizedCurrentPrice }
+      : null;
+
+  const weeklyData =
+    weeklyDataRaw.length > 0
+      ? weeklyDataRaw
+      : fallbackPricePoint
+        ? [fallbackPricePoint]
+        : [];
+  const monthlyData =
+    monthlyDataRaw.length > 0
+      ? monthlyDataRaw
+      : fallbackPricePoint
+        ? [fallbackPricePoint]
+        : [];
+  const productAnualData =
+    productAnualDataRaw.length > 0
+      ? productAnualDataRaw
+      : fallbackAnnualPricePoint
+        ? [fallbackAnnualPricePoint]
+        : [];
+
+  const fallbackDolarPoint =
+    normalizedCurrentPrice > 0 && dolarValue > 0
+      ? {
+          Period: dayLabel,
+          "Valor Producto USD": normalizedCurrentPrice / dolarValue,
+          "Dólar ARS": dolarValue,
+        }
+      : null;
+  const fallbackAnnualDolarPoint =
+    normalizedCurrentPrice > 0 && dolarValue > 0
+      ? {
+          Period: monthLabel,
+          "Valor Producto USD": normalizedCurrentPrice / dolarValue,
+          "Dólar ARS": dolarValue,
+        }
+      : null;
+
+  const dolarWeeklyData =
+    dolarWeeklyDataRaw.length > 0
+      ? dolarWeeklyDataRaw
+      : fallbackDolarPoint
+        ? [fallbackDolarPoint]
+        : [];
+  const dolarMonthlyData =
+    dolarMonthlyDataRaw.length > 0
+      ? dolarMonthlyDataRaw
+      : fallbackDolarPoint
+        ? [fallbackDolarPoint]
+        : [];
+  const dolarAnualData =
+    dolarAnualDataRaw.length > 0
+      ? dolarAnualDataRaw
+      : fallbackAnnualDolarPoint
+        ? [fallbackAnnualDolarPoint]
+        : [];
 
   const similarProducts = await getSimilarProducts(id);
   const hasDiscount = Number(originalPrice || 0) > Number(currentPrice || 0);
@@ -200,12 +288,12 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
 
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link href={product.url} target="_blank">
-                      {/* <Button variant='primary'>
-                        <span className='inline-flex items-center gap-2'>
+                      <Button variant="primary">
+                        <span className="inline-flex items-center gap-2">
                           Comprar ahora
-                          <ExternalLink className='h-4 w-4' />
+                          <ExternalLink className="h-4 w-4" />
                         </span>
-                      </Button> */}
+                      </Button>
                     </Link>
                     <FollowProductButton productUrl={product.url} />
                   </div>
@@ -238,28 +326,28 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
                     {currency} {formatNumber(currentPrice)}
                   </p>
                 </div>
-                <div className="border border-border/70 bg-section-grey p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                <div className="border border-orange-200 bg-orange-50 p-4">
+                  <p className="text-xs uppercase tracking-wide text-[#c46a1b]">
                     Precio promedio
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-foreground">
+                  <p className="mt-2 text-lg font-semibold text-[#c46a1b]">
                     {currency} {formatNumber(averagePrice)}
                   </p>
                 </div>
-                <div className="border border-border/70 bg-section-grey p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                <div className="border border-red-200 bg-red-50 p-4">
+                  <p className="text-xs uppercase tracking-wide text-[#dc2626]">
                     Precio más alto
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-foreground">
-                    {currency} {formatNumber(highestPrice)}
+                  <p className="mt-2 text-lg font-semibold text-[#dc2626]">
+                    {currency} {formatNumber(effectiveHighestPrice)}
                   </p>
                 </div>
-                <div className="border border-border/70 bg-section-grey p-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                <div className="border border-emerald-200 bg-emerald-50 p-4">
+                  <p className="text-xs uppercase tracking-wide text-[#16a34a]">
                     Precio más bajo
                   </p>
-                  <p className="mt-2 text-lg font-semibold text-foreground">
-                    {currency} {formatNumber(lowestPrice)}
+                  <p className="mt-2 text-lg font-semibold text-[#16a34a]">
+                    {currency} {formatNumber(effectiveLowestPrice)}
                   </p>
                 </div>
                 <div className="border border-border/70 bg-section-grey p-4">
@@ -270,6 +358,13 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
                     {priceBasedOnDolar > 0
                       ? formatUSD(priceBasedOnDolar)
                       : "N/A"}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {dolarValue > 0
+                      ? `Cotización tomada: $${formatNumber(dolarValue)}${
+                          currentDolarDateLabel ? ` (${currentDolarDateLabel})` : ""
+                        }`
+                      : "Cotización no disponible"}
                   </p>
                 </div>
               </div>
@@ -288,10 +383,8 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <BarChart
                   productTitle={title}
-                  priceHistory={uniquePrices}
-                  dateHistory={lastDates}
-                  lowestPrice={lowestPrice}
-                  highestPrice={highestPrice}
+                  lowestPrice={effectiveLowestPrice}
+                  highestPrice={effectiveHighestPrice}
                   monthlyData={monthlyData}
                   weeklyData={weeklyData}
                   anualData={productAnualData}
@@ -299,11 +392,6 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
                 />
                 {currentUser?.country === "argentina" ? (
                   <DolarBasedChart
-                    currentPrice={currentPrice}
-                    dolarValue={dolarValue}
-                    dolarDate={scrapedDolarDate}
-                    dolarDates={uniqueDolarDatesArray as Array<Date>}
-                    dolarValues={uniqueDolarValues}
                     weeklyData={dolarWeeklyData}
                     monthlyData={dolarMonthlyData}
                     anualData={dolarAnualData}

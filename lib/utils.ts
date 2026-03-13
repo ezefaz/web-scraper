@@ -305,63 +305,130 @@ export function getWeekFromDate(dateString: string) {
 
 // DOLAR FUNCTIONS
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const toDate = (value: Date | string) => {
+	const date = value instanceof Date ? value : new Date(value);
+	return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const toDayKey = (date: Date) =>
+	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+		2,
+		"0"
+	)}-${String(date.getDate()).padStart(2, "0")}`;
+
+const toMonthKey = (date: Date) =>
+	`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+const formatDayLabel = (date: Date) =>
+	new Intl.DateTimeFormat("es-AR", {
+		day: "2-digit",
+		month: "short",
+	}).format(date);
+
+const formatMonthLabel = (date: Date) =>
+	new Intl.DateTimeFormat("es-AR", {
+		month: "short",
+		year: "numeric",
+	}).format(date);
+
+const normalizePriceHistory = (priceHistory: PriceHistoryItem[] = []) =>
+	priceHistory
+		.map((item) => ({
+			date: toDate(item.date),
+			price: Number(item.price),
+		}))
+		.filter(
+			(item): item is { date: Date; price: number } =>
+				Boolean(item.date) && Number.isFinite(item.price) && item.price > 0
+		)
+		.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+const normalizeDolarValue = (value: number) => {
+	if (!Number.isFinite(value) || value <= 0) return null;
+	return value < 20 ? value * 1000 : value;
+};
+
+const normalizeDolarHistory = (dolarHistory: Array<any> = []) =>
+	dolarHistory
+		.map((item) => {
+			const date = toDate(item?.date);
+			const normalizedValue = normalizeDolarValue(Number(item?.value));
+			return { date, value: normalizedValue };
+		})
+		.filter((item) => Boolean(item.date) && item.value !== null)
+		.map((item) => ({ date: item.date as Date, value: item.value as number }))
+		.sort((a, b) => a.date.getTime() - b.date.getTime());
+
 export const getCurrentWeekDolarData = (
 	dolarHistory: Array<any>,
 	currentPrice: Number
 ) => {
-	const currentDate: any = new Date();
-	const currentWeekDolarData = [];
+	const numericPrice = Number(currentPrice);
+	if (!Number.isFinite(numericPrice) || numericPrice <= 0) return [];
 
-	for (let i = 0; i < dolarHistory.length; i++) {
-		const dolarDate = new Date(dolarHistory[i].date);
-		const diffTime = Math.abs(currentDate - Number(dolarDate));
-		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-		let formattedDolarPrice = dolarHistory[i].value;
-		if (formattedDolarPrice < 9) {
-			formattedDolarPrice *= 1000;
-		}
+	const normalized = normalizeDolarHistory(dolarHistory);
+	if (!normalized.length) return [];
 
-		const updatedDolarPrice = Number(currentPrice) / formattedDolarPrice;
-		if (diffDays <= 7) {
-			currentWeekDolarData.push({
-				Date: formatDay(new Date(dolarDate)),
-				"Valor Producto": updatedDolarPrice,
-				"Valor Dólar": formattedDolarPrice,
-			});
-		}
+	const latestDate = normalized[normalized.length - 1].date;
+	const minDate = new Date(latestDate.getTime() - 6 * DAY_MS);
+	const byDay = new Map<string, { date: Date; values: number[] }>();
+
+	for (const item of normalized) {
+		if (item.date < minDate) continue;
+		const key = toDayKey(item.date);
+		if (!byDay.has(key)) byDay.set(key, { date: item.date, values: [] });
+		byDay.get(key)!.values.push(item.value);
 	}
 
-	return currentWeekDolarData;
+	return Array.from(byDay.values())
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((item) => {
+			const dolarAvg =
+				item.values.reduce((acc, current) => acc + current, 0) /
+				item.values.length;
+			return {
+				Period: formatDayLabel(item.date),
+				"Valor Producto USD": numericPrice / dolarAvg,
+				"Dólar ARS": dolarAvg,
+			};
+		});
 };
 
 export const getCurrentMonthlyDolarData = (
 	dolarHistory: Array<any>,
 	currentPrice: number
 ) => {
-	const currentDate: any = new Date();
-	const currentMonthDolarData: any[] = [];
+	const numericPrice = Number(currentPrice);
+	if (!Number.isFinite(numericPrice) || numericPrice <= 0) return [];
 
-	for (let i = 0; i < dolarHistory.length; i++) {
-		const dolarDate = new Date(dolarHistory[i].date);
-		const diffTime = Math.abs(currentDate - Number(dolarDate));
-		const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-		const formattedDolarPrice =
-			dolarHistory[i].value < 9
-				? dolarHistory[i].value * 1000
-				: dolarHistory[i].value;
+	const normalized = normalizeDolarHistory(dolarHistory);
+	if (!normalized.length) return [];
 
-		const updatedProductValue = Number(currentPrice) / formattedDolarPrice;
+	const latestDate = normalized[normalized.length - 1].date;
+	const minDate = new Date(latestDate.getTime() - 29 * DAY_MS);
+	const byDay = new Map<string, { date: Date; values: number[] }>();
 
-		if (diffDays <= 30) {
-			currentMonthDolarData.push({
-				Date: formatDay(new Date(dolarDate)),
-				"Valor Producto": updatedProductValue,
-				"Valor Dólar": formattedDolarPrice,
-			});
-		}
+	for (const item of normalized) {
+		if (item.date < minDate) continue;
+		const key = toDayKey(item.date);
+		if (!byDay.has(key)) byDay.set(key, { date: item.date, values: [] });
+		byDay.get(key)!.values.push(item.value);
 	}
 
-	return currentMonthDolarData;
+	return Array.from(byDay.values())
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((item) => {
+			const dolarAvg =
+				item.values.reduce((acc, current) => acc + current, 0) /
+				item.values.length;
+			return {
+				Period: formatDayLabel(item.date),
+				"Valor Producto USD": numericPrice / dolarAvg,
+				"Dólar ARS": dolarAvg,
+			};
+		});
 };
 
 export const getDailyDolarData = (
@@ -418,44 +485,36 @@ export const getAnnualDolarData = (
 	currentPrice: number,
 	dolarPriceHistory: DolarPriceHistoryItem[]
 ) => {
-	const monthlyDataMap = new Map<number, { highestPrice: number }>();
-	let productValue = 0;
-	let annualData: any = [];
+	const numericPrice = Number(currentPrice);
+	if (!Number.isFinite(numericPrice) || numericPrice <= 0) return [];
 
-	for (const priceItem of dolarPriceHistory) {
-		const currentDate = priceItem.date;
-		const currentDolarValue = priceItem.value;
-		const formattedDolarValue =
-			currentDolarValue < 9 ? currentDolarValue * 1000 : currentDolarValue;
+	const normalized = normalizeDolarHistory(dolarPriceHistory);
+	if (!normalized.length) return [];
 
-		if (!monthlyDataMap.has(currentDate.getMonth())) {
-			monthlyDataMap.set(currentDate.getMonth(), { highestPrice: -Infinity });
-		}
+	const latestDate = normalized[normalized.length - 1].date;
+	const minDate = new Date(latestDate);
+	minDate.setMonth(minDate.getMonth() - 11);
+	const byMonth = new Map<string, { date: Date; values: number[] }>();
 
-		const monthData = monthlyDataMap.get(currentDate.getMonth());
-
-		if (monthData) {
-			monthData.highestPrice = Math.max(
-				monthData.highestPrice,
-				formattedDolarValue
-			);
-		}
-
-		productValue = currentPrice / Number(formattedDolarValue);
-
-		const formattedDate = currentDate.toLocaleDateString("es-AR", {
-			year: "numeric",
-			month: "long",
-		});
-
-		annualData.push({
-			Date: formattedDate,
-			"Valor Producto": productValue,
-			"Valor Dólar": formattedDolarValue,
-		});
+	for (const item of normalized) {
+		if (item.date < minDate) continue;
+		const key = toMonthKey(item.date);
+		if (!byMonth.has(key)) byMonth.set(key, { date: item.date, values: [] });
+		byMonth.get(key)!.values.push(item.value);
 	}
 
-	return annualData;
+	return Array.from(byMonth.values())
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((item) => {
+			const dolarAvg =
+				item.values.reduce((acc, current) => acc + current, 0) /
+				item.values.length;
+			return {
+				Period: formatMonthLabel(item.date),
+				"Valor Producto USD": numericPrice / dolarAvg,
+				"Dólar ARS": dolarAvg,
+			};
+		});
 };
 
 export const getCurrentWeekData = (
@@ -561,144 +620,111 @@ export const getDailyData = (currentPrice: Number, originalPrice: Number) => {
 };
 
 export function getWeeklyData(priceHistory: any) {
-	const weeklyDataMap = new Map();
+	const normalized = normalizePriceHistory(priceHistory);
+	if (!normalized.length) return [];
 
-	// Iterate through the price history array
-	for (const { date, price } of priceHistory) {
-		const currentWeekStart = getStartOfWeekSunday(new Date());
-		const currentWeekEnd = new Date(currentWeekStart);
-		currentWeekEnd.setDate(currentWeekEnd.getDate() + 6);
+	const latestDate = normalized[normalized.length - 1].date;
+	const minDate = new Date(latestDate.getTime() - 6 * DAY_MS);
+	const byDay = new Map<string, { date: Date; lowest: number; highest: number }>();
 
-		const currentDate = new Date(date);
-
-		// Check if the date is within the current week (Sunday to Saturday)
-		if (currentDate >= currentWeekStart && currentDate <= currentWeekEnd) {
-			const formattedDate = formatDate(currentDate);
-
-			// If the date is not already in the map, add it
-			if (!weeklyDataMap.has(formattedDate)) {
-				weeklyDataMap.set(formattedDate, {
-					highestPrice: -Infinity,
-					lowestPrice: Infinity,
-				});
-			}
-
-			// Update highest and lowest prices for the date
-			const { highestPrice, lowestPrice } = weeklyDataMap.get(formattedDate);
-			weeklyDataMap.set(formattedDate, {
-				highestPrice: Math.max(highestPrice, price),
-				lowestPrice: Math.min(lowestPrice, price),
+	for (const item of normalized) {
+		if (item.date < minDate) continue;
+		const key = toDayKey(item.date);
+		if (!byDay.has(key)) {
+			byDay.set(key, {
+				date: item.date,
+				lowest: item.price,
+				highest: item.price,
 			});
+			continue;
 		}
+		const current = byDay.get(key)!;
+		current.lowest = Math.min(current.lowest, item.price);
+		current.highest = Math.max(current.highest, item.price);
 	}
 
-	// Convert the map to the desired array format
-	const weeklyData = Array.from(
-		weeklyDataMap,
-		([Month, { highestPrice, lowestPrice }]) => ({
-			Month,
-			Mayor: highestPrice,
-			Menor: lowestPrice,
-		})
-	);
-
-	return weeklyData;
-}
-
-function getStartOfWeekSunday(date: Date) {
-	const dayOfWeek = date.getDay();
-	const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? 0 : 0);
-	return new Date(date.setDate(diff));
-}
-
-function formatDate(date: Date) {
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-	return `${year}-${month}-${day}`;
+	return Array.from(byDay.values())
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((item) => ({
+			Period: formatDayLabel(item.date),
+			Mayor: item.highest,
+			Menor: item.lowest,
+		}));
 }
 
 export const getMonthlyData = (
 	priceHistory: PriceHistoryItem[],
 	currency: string
 ): MonthlyData[] => {
-	const monthlyDataMap = new Map<
-		string,
-		{ lowestPrice: number; highestPrice: number }
-	>();
+	const normalized = normalizePriceHistory(priceHistory);
+	if (!normalized.length) return [];
 
-	for (const priceItem of priceHistory) {
-		const yearMonthDay = priceItem.date.toISOString();
+	const latestDate = normalized[normalized.length - 1].date;
+	const minDate = new Date(latestDate.getTime() - 29 * DAY_MS);
+	const byDay = new Map<string, { date: Date; lowest: number; highest: number }>();
 
-		if (!monthlyDataMap.has(yearMonthDay)) {
-			monthlyDataMap.set(yearMonthDay, {
-				lowestPrice: Infinity,
-				highestPrice: -Infinity,
+	for (const item of normalized) {
+		if (item.date < minDate) continue;
+		const key = toDayKey(item.date);
+		if (!byDay.has(key)) {
+			byDay.set(key, {
+				date: item.date,
+				lowest: item.price,
+				highest: item.price,
 			});
+			continue;
 		}
-
-		const dayData = monthlyDataMap.get(yearMonthDay);
-
-		if (dayData) {
-			dayData.lowestPrice = Math.min(dayData.lowestPrice, priceItem.price);
-			dayData.highestPrice = Math.max(dayData.highestPrice, priceItem.price);
-		}
+		const current = byDay.get(key)!;
+		current.lowest = Math.min(current.lowest, item.price);
+		current.highest = Math.max(current.highest, item.price);
 	}
 
-	const monthlyData: MonthlyData[] = [];
-
-	monthlyDataMap.forEach((data, day) => {
-		monthlyData.push({
-			Month: formatDay(new Date(day)),
-			Mayor: data.highestPrice,
-			Menor: data.lowestPrice,
-		});
-	});
-
-	return monthlyData;
+	return Array.from(byDay.values())
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((item) => ({
+			Month: formatDayLabel(item.date),
+			Period: formatDayLabel(item.date),
+			Mayor: item.highest,
+			Menor: item.lowest,
+		}));
 };
 
 export const getAnnualMonthlyData = (
 	priceHistory: PriceHistoryItem[],
 	currency: string
 ): MonthlyData[] => {
-	const monthlyDataMap = new Map<
-		number,
-		{ lowestPrice: number; highestPrice: number }
-	>();
+	const normalized = normalizePriceHistory(priceHistory);
+	if (!normalized.length) return [];
 
-	for (const priceItem of priceHistory) {
-		const yearMonth = priceItem.date.getMonth() + 1;
+	const latestDate = normalized[normalized.length - 1].date;
+	const minDate = new Date(latestDate);
+	minDate.setMonth(minDate.getMonth() - 11);
+	const byMonth = new Map<string, { date: Date; lowest: number; highest: number }>();
 
-		if (!monthlyDataMap.has(yearMonth)) {
-			monthlyDataMap.set(yearMonth, {
-				lowestPrice: Infinity,
-				highestPrice: -Infinity,
+	for (const item of normalized) {
+		if (item.date < minDate) continue;
+		const key = toMonthKey(item.date);
+		if (!byMonth.has(key)) {
+			byMonth.set(key, {
+				date: item.date,
+				lowest: item.price,
+				highest: item.price,
 			});
+			continue;
 		}
-
-		const monthData = monthlyDataMap.get(yearMonth);
-
-		if (monthData) {
-			monthData.lowestPrice = Math.min(monthData.lowestPrice, priceItem.price);
-			monthData.highestPrice = Math.max(
-				monthData.highestPrice,
-				priceItem.price
-			);
-		}
+		const current = byMonth.get(key)!;
+		current.lowest = Math.min(current.lowest, item.price);
+		current.highest = Math.max(current.highest, item.price);
 	}
 
-	const monthlyData: MonthlyData[] = [];
-
-	monthlyDataMap.forEach((data, month) => {
-		monthlyData.push({
-			Month: formatMonth(new Date(`2024-${month}-01`)),
-			Mayor: data.highestPrice,
-			Menor: data.lowestPrice,
-		});
-	});
-
-	return monthlyData;
+	return Array.from(byMonth.values())
+		.sort((a, b) => a.date.getTime() - b.date.getTime())
+		.map((item) => ({
+			Month: formatMonthLabel(item.date),
+			Period: formatMonthLabel(item.date),
+			Mayor: item.highest,
+			Menor: item.lowest,
+		}));
 };
 
 const formatDay = (date: Date) => {

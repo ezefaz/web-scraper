@@ -71,7 +71,7 @@ const BusinessProfilePage = (props: Props) => {
           <h1>Cuenta creada con éxito.</h1>
           <p>
             Porfavor termine de configurar su cuenta{" "}
-            <a href="/profile">aquí.</a>
+            <a href="/dashboard">aquí.</a>
           </p>
 
           <FormError message={error} />

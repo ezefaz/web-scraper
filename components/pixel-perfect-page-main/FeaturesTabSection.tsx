@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Eye, Globe, Tag, Target, Zap } from "lucide-react";
+import { Gamepad2, MonitorSmartphone, ShieldCheck, Tag, Zap } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
 
-type CategoryId = "electronics" | "fashion" | "food" | "appliances";
+type CategoryId = "tech" | "gaming" | "sneakers" | "appliances";
 
 type TabItem = {
   id: CategoryId;
@@ -33,40 +33,40 @@ type CategoryContent = {
 const AUTO_SWITCH_MS = 6000;
 
 const tabs: TabItem[] = [
-  { id: "electronics", label: "Electrónica", icon: Zap },
-  { id: "fashion", label: "Vestimenta y Accesorios", icon: Eye },
-  { id: "food", label: "Alimentos", icon: Globe },
-  { id: "appliances", label: "Electrodomésticos", icon: Target },
+  { id: "tech", label: "Tecnología", icon: MonitorSmartphone },
+  { id: "gaming", label: "Gaming", icon: Gamepad2 },
+  { id: "sneakers", label: "Zapatillas", icon: Zap },
+  { id: "appliances", label: "Electrodomésticos", icon: ShieldCheck },
 ];
 
 const categoryContent: Record<CategoryId, CategoryContent> = {
-  electronics: {
-    title: "Destacados en Electrónica",
+  tech: {
+    title: "Destacados en Tecnología",
     description:
-      "Productos guardados en SaveMelin para tecnología y consumo digital.",
+      "Productos de alta demanda con buena reputación de vendedor y envío full.",
   },
-  fashion: {
-    title: "Destacados en Vestimenta y Accesorios",
+  gaming: {
+    title: "Destacados en Gaming",
     description:
-      "Selección de productos de moda guardados con oportunidades de precio.",
+      "Consolas, periféricos y accesorios gamer con variación de precio relevante.",
   },
-  food: {
-    title: "Destacados en Alimentos",
+  sneakers: {
+    title: "Destacados en Zapatillas",
     description:
-      "Productos de consumo frecuente guardados y agrupados por categoría.",
+      "Modelos deportivos y urbanos con descuentos y oportunidades de compra.",
   },
   appliances: {
     title: "Destacados en Electrodomésticos",
     description:
-      "Línea blanca y pequeños electrodomésticos guardados en la base de datos.",
+      "Pequeños y grandes electrodomésticos con señales fuertes de ahorro real.",
   },
 };
 
 function createEmptyProductsByCategory(): Record<CategoryId, ProductCard[]> {
   return {
-    electronics: [],
-    fashion: [],
-    food: [],
+    tech: [],
+    gaming: [],
+    sneakers: [],
     appliances: [],
   };
 }
@@ -242,7 +242,7 @@ export default function PixelPerfectFeaturesTabSection() {
               <div className="inline-flex items-center gap-2 border border-border rounded-sm px-3 py-1.5 mb-4">
                 <Tag className="w-3.5 h-3.5 text-primary" />
                 <span className="text-xs text-muted-foreground">
-                  Actualización automática
+                  Actualización semanal
                 </span>
               </div>
 

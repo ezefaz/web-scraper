@@ -57,7 +57,7 @@ export default function PixelPerfectNavbar() {
               <Button
                 variant="secondary"
                 size="default"
-                onClick={() => router.push("/profile")}
+                onClick={() => router.push("/dashboard")}
               >
                 Mi cuenta
               </Button>
@@ -128,7 +128,7 @@ export default function PixelPerfectNavbar() {
                   className="w-full"
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    router.push("/profile");
+                    router.push("/dashboard");
                   }}
                 >
                   Mi cuenta

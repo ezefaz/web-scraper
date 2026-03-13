@@ -48,7 +48,7 @@ export default function FollowProductButton({ productUrl }: FollowProductButtonP
       }
 
       if (result?.success || result?.alreadySaved) {
-        router.push("/user-products");
+        router.push("/dashboard");
         return;
       }
 
@@ -85,4 +85,3 @@ export default function FollowProductButton({ productUrl }: FollowProductButtonP
     </div>
   );
 }
-

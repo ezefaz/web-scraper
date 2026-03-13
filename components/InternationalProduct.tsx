@@ -10,6 +10,8 @@ import { Badge, Card } from "@tremor/react";
 import { TiendamiaProduct } from "@/types";
 import { PiKeyReturn } from "react-icons/pi";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { Button } from "@/components/pixel-perfect-page-main/button";
+import { ExternalLink } from "lucide-react";
 
 const InternationalProduct = () => {
 	const searchParams = useSearchParams();
@@ -106,20 +108,13 @@ const InternationalProduct = () => {
                         </>
                       )}
                     </div> */}
-								<button className='btn w-fit m-auto flex items-center justify-center gap-2 min-w-[200px]'>
-									<Image
-										src='/assets/icons/bag.svg'
-										alt='check'
-										width={22}
-										height={22}
-									/>
-									<Link
-										href={productHref}
-										target='_blank'
-										className='text-base text-white'>
-										Comprar Ahora
-									</Link>
-								</button>
+								<Button
+									variant='primary'
+									onClick={() => window.open(productHref, "_blank")}
+								>
+									Comprar ahora
+									<ExternalLink className='h-4 w-4' />
+								</Button>
 							</div>
 						</div>
 

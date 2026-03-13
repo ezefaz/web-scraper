@@ -95,7 +95,7 @@ export default function UserDropdown(props: any) {
             </DropdownItem>
           )}
           <DropdownItem key='profile'>
-            <Link href='/profile'>Perfil</Link>
+            <Link href='/dashboard'>Perfil</Link>
           </DropdownItem>
           <DropdownItem key='my_products' endContent={<PiPlusCircleDuotone className='text-large' />}>
             <Link href='/user-products'>Mis Productos</Link>
