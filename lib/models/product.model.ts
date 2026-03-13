@@ -42,6 +42,12 @@ const productSchema = new mongoose.Schema(
     },
     status: { type: String },
     storeName: { type: String },
+    sellerName: { type: String },
+    sellerProfileUrl: { type: String },
+    sellerReputation: { type: String },
+    sellerSales: { type: String },
+    sellerWarranty: { type: String },
+    sellerIsOfficialStore: { type: Boolean, default: false },
     productReviews: { type: Array },
     users: [
       {

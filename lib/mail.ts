@@ -1,59 +1,62 @@
 import { Resend } from 'resend';
-import { APP_BASE_URL } from '@/lib/config/urls';
+import { APP_BASE_URL } from './config/urls';
+import { buildSavemelinEmail } from './email/template';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const senderEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
 
 export const sendVerificationEmail = async (email: string, token: string) => {
   const confirmLink = `${APP_BASE_URL}/new-verification?token=${token}`;
+  const html = buildSavemelinEmail({
+    preheader: 'Confirma tu cuenta para activar tu acceso',
+    title: 'Confirma tu cuenta',
+    subtitle:
+      'Solo falta un paso para empezar a seguir precios y recibir alertas.',
+    contentHtml: `
+      <p style="margin:0 0 12px;">Haz clic en el botón para verificar tu cuenta.</p>
+      <p style="margin:0;">Si no creaste esta cuenta, puedes ignorar este correo.</p>
+    `,
+    cta: {
+      label: 'Verificar cuenta',
+      href: confirmLink,
+    },
+    helpText: `Si el botón no funciona, copia este enlace en tu navegador:<br /><span style="word-break:break-all;">${confirmLink}</span>`,
+    finePrint:
+      'Este enlace puede expirar. Si sucede, solicita uno nuevo desde la pantalla de verificación.',
+  });
 
   await resend.emails.send({
-    from: 'hello@webgeenix.com',
+    from: senderEmail,
     to: email,
     subject: 'Confirma tu cuenta',
-    html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="text-align: center; color: #333;">¡Confirma tu cuenta!</h2>
-      <p style="text-align: center; color: #555;">
-        Haz click <a href="${confirmLink}" style="color: #007bff; text-decoration: none;">aquí</a>
-        para verificar tu cuenta
-      </p>
-      <p style="text-align: center; color: #555;">
-        Si el botón no funciona, copia y pega este enlace en tu navegador:
-        <br />
-        <span style="color: #007bff;">${confirmLink}</span>
-      </p>
-      <p style="text-align: center; color: #888; font-size: 12px;">
-        Este correo electrónico fue generado automáticamente. Por favor, no responder a este mensaje.
-      </p>
-    </div>
-  `,
+    html,
   });
 };
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  // const resetLink = `http://localhost:3000/new-password?token=${token}`;
-  const resetLink = `${APP_BASE_URL}/new-verification?token=${token}`;
+  const resetLink = `${APP_BASE_URL}/reset?token=${token}`;
+  const html = buildSavemelinEmail({
+    preheader: 'Restablece tu contraseña de Savemelin',
+    title: 'Restablece tu contraseña',
+    subtitle:
+      'Recibimos una solicitud para cambiar la contraseña de tu cuenta.',
+    contentHtml: `
+      <p style="margin:0 0 12px;">Usa el siguiente botón para crear una contraseña nueva.</p>
+      <p style="margin:0;">Si no hiciste esta solicitud, ignora este correo y tu contraseña seguirá igual.</p>
+    `,
+    cta: {
+      label: 'Cambiar contraseña',
+      href: resetLink,
+    },
+    helpText: `Si el botón no funciona, copia este enlace en tu navegador:<br /><span style="word-break:break-all;">${resetLink}</span>`,
+    finePrint:
+      'Por seguridad, este enlace expira en poco tiempo. Solicita uno nuevo si ya no es válido.',
+  });
 
   await resend.emails.send({
-    from: 'hello@webgeenix.com',
+    from: senderEmail,
     to: email,
     subject: 'Reiniciar Contraseña',
-    html: `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="text-align: center; color: #333;">Reinicia tu contraseña!</h2>
-      <p style="text-align: center; color: #555;">
-        Haz click <a href="${resetLink}" style="color: #007bff; text-decoration: none;">aquí</a>
-        para reinciar tu contraseña.
-      </p>
-      <p style="text-align: center; color: #555;">
-        Si el botón no funciona, copia y pega este enlace en tu navegador:
-        <br />
-        <span style="color: #007bff;">${resetLink}</span>
-      </p>
-      <p style="text-align: center; color: #888; font-size: 12px;">
-        Este correo electrónico fue generado automáticamente. Por favor, no responder a este mensaje.
-      </p>
-    </div>
-  `,
+    html,
   });
 };

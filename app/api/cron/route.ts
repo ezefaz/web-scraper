@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 import { connectToDb } from "@/lib/mongoose";
 import Product from "@/lib/models/product.model";
+import User from "@/lib/models/user.model";
+import { generateEmailBody, sendEmail } from "@/lib/nodemailer";
 import { scrapeMLProduct } from "@/lib/scraper";
-import { getAveragePrice, getHighestPrice, getLowestPrice } from "@/lib/utils";
+import {
+  getAveragePrice,
+  getEmailNotifType,
+  getHighestPrice,
+  getLowestPrice,
+} from "@/lib/utils";
+import { ProductType } from "@/types";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -108,6 +116,13 @@ export async function GET(request: Request) {
     let failedProducts = 0;
     let pushedPriceHistory = 0;
     let pushedDolarHistory = 0;
+    let alertEmailsSent = 0;
+    let alertEmailsFailed = 0;
+    const alertEmailsByType: Record<string, number> = {
+      CHANGE_OF_STOCK: 0,
+      LOWEST_PRICE: 0,
+      THRESHOLD_MET: 0,
+    };
     const failureSamples: Array<{ url: string; reason: string }> = [];
     const skippedSamples: Array<{ url: string; reason: string; currentPrice?: number }> = [];
     const skippedByReason: Record<string, number> = {
@@ -197,6 +212,83 @@ export async function GET(request: Request) {
           if (shouldPushDolar) pushedDolarHistory += 1;
         }
 
+        const usersFollowingThisProduct = await User.find(
+          { "products.url": currentProduct.url, "products.isFollowing": true },
+          { email: 1, products: 1 },
+        ).lean();
+
+        for (const userDoc of usersFollowingThisProduct as any[]) {
+          const trackedProduct = (userDoc?.products || []).find(
+            (tracked: any) =>
+              tracked?.url === currentProduct.url && Boolean(tracked?.isFollowing),
+          );
+          if (!trackedProduct || !userDoc?.email) continue;
+
+          const notifType = getEmailNotifType(
+            scrapedProduct as ProductType,
+            trackedProduct as ProductType,
+          );
+
+          if (!notifType) continue;
+
+          try {
+            const emailContent = await generateEmailBody(scrapedProduct, notifType);
+            await sendEmail(emailContent, [String(userDoc.email)]);
+            alertEmailsSent += 1;
+            alertEmailsByType[notifType] =
+              (alertEmailsByType[notifType] || 0) + 1;
+          } catch (emailError: any) {
+            alertEmailsFailed += 1;
+            if (failureSamples.length < 10) {
+              failureSamples.push({
+                url: String(currentProduct?.url || ""),
+                reason: `Email ${notifType} failed: ${String(
+                  emailError?.message || "Unknown error",
+                )}`,
+              });
+            }
+          }
+        }
+
+        const userProductSet: Record<string, any> = {
+          "products.$[product].currency": scrapedProduct.currency || "$",
+          "products.$[product].image": scrapedProduct.image || "",
+          "products.$[product].title": scrapedProduct.title || "",
+          "products.$[product].currentPrice": scrapedCurrentPrice,
+          "products.$[product].originalPrice": scrapedOriginalPrice,
+          "products.$[product].discountRate": Number(
+            scrapedProduct.discountRate || 0,
+          ),
+          "products.$[product].description": scrapedProduct.description || "",
+          "products.$[product].category": scrapedProduct.category || "",
+          "products.$[product].reviewsCount": Number(
+            scrapedProduct.reviewsCount || 0,
+          ),
+          "products.$[product].stockAvailable": scrapedProduct.stockAvailable || "",
+          "products.$[product].stars": scrapedProduct.stars || "",
+          "products.$[product].isOutOfStock": Boolean(
+            scrapedProduct.isOutOfStock,
+          ),
+          "products.$[product].isFreeReturning": Boolean(
+            scrapedProduct.isFreeReturning,
+          ),
+          "products.$[product].isFreeShipping": Boolean(
+            scrapedProduct.isFreeShipping,
+          ),
+          "products.$[product].status": scrapedProduct.status || "",
+          "products.$[product].currentDolar": nextCurrentDolar,
+          "products.$[product].priceHistory": nextPriceHistory,
+          "products.$[product].lowestPrice": getLowestPrice(nextPriceHistory),
+          "products.$[product].highestPrice": getHighestPrice(nextPriceHistory),
+          "products.$[product].averagePrice": getAveragePrice(nextPriceHistory),
+        };
+
+        await User.updateMany(
+          { "products.url": currentProduct.url },
+          { $set: userProductSet },
+          { arrayFilters: [{ "product.url": currentProduct.url }] },
+        );
+
         const updateOperation: UpdateOperation = {
           updateOne: {
             filter: { _id: currentProduct._id },
@@ -218,6 +310,12 @@ export async function GET(request: Request) {
                 isFreeShipping: Boolean(scrapedProduct.isFreeShipping),
                 status: scrapedProduct.status || "",
                 storeName: scrapedProduct.storeName || "",
+                sellerName: scrapedProduct.sellerName || "",
+                sellerProfileUrl: scrapedProduct.sellerProfileUrl || "",
+                sellerReputation: scrapedProduct.sellerReputation || "",
+                sellerSales: scrapedProduct.sellerSales || "",
+                sellerWarranty: scrapedProduct.sellerWarranty || "",
+                sellerIsOfficialStore: Boolean(scrapedProduct.sellerIsOfficialStore),
                 productReviews: Array.isArray(scrapedProduct.productReviews)
                   ? scrapedProduct.productReviews
                   : [],
@@ -264,6 +362,9 @@ export async function GET(request: Request) {
       failedProducts,
       pushedPriceHistory,
       pushedDolarHistory,
+      alertEmailsSent,
+      alertEmailsFailed,
+      alertEmailsByType,
       skippedByReason,
       skippedSamples,
       failureSamples,

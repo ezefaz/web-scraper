@@ -32,6 +32,21 @@ type Props = {
   searchParams?: { url?: string };
 };
 
+const formatSellerDisplayName = (value: string) => {
+  const normalized = (value || "")
+    .replace(/\s+/g, " ")
+    .replace(/^vendido\s*por\s*/i, "")
+    .replace(/\|.*$/, "")
+    .trim();
+
+  if (!normalized) return "Marketplace";
+
+  return normalized
+    .replace(/([a-záéíóúñ])([A-ZÁÉÍÓÚÑ])/g, "$1 $2")
+    .replace(/([A-ZÁÉÍÓÚÑ]{2,})([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)/g, "$1 $2")
+    .trim();
+};
+
 const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
   const currentUser = await getCurrentUser();
   const foundedProduct = await getProductById(id);
@@ -67,6 +82,12 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
     title,
     image,
     storeName,
+    sellerName,
+    sellerProfileUrl,
+    sellerReputation,
+    sellerSales,
+    sellerWarranty,
+    sellerIsOfficialStore,
     status,
     isFreeShipping,
     isFreeReturning,
@@ -105,6 +126,9 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
     dolarValue > 0 && normalizedCurrentPrice > 0
       ? normalizedCurrentPrice / dolarValue
       : 0;
+  const sellerDisplayName = formatSellerDisplayName(
+    sellerName || storeName || "Marketplace",
+  );
 
   const dayLabel = new Intl.DateTimeFormat("es-AR", {
     day: "2-digit",
@@ -240,9 +264,6 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
 
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-3">
-                    <span className="inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background">
-                      {storeName || "Marketplace"}
-                    </span>
                     {category && (
                       <span className="inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background">
                         {category}
@@ -251,6 +272,11 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
                     {status && (
                       <span className="inline-flex items-center border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background">
                         {status}
+                      </span>
+                    )}
+                    {sellerIsOfficialStore && (
+                      <span className="inline-flex items-center border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-700">
+                        Tienda oficial
                       </span>
                     )}
                     <span
@@ -273,6 +299,51 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
                         ? "Devolución gratis"
                         : "Devolución con cargo"}
                     </span>
+                  </div>
+
+                  <div className="mb-4 border border-border/70 bg-background p-3 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-2">
+                      <p>
+                        Vendedor:{" "}
+                        {sellerProfileUrl ? (
+                          <Link
+                            href={sellerProfileUrl}
+                            target="_blank"
+                            className="font-medium text-foreground hover:text-primary transition-colors"
+                          >
+                            {sellerDisplayName}
+                          </Link>
+                        ) : (
+                          <span className="font-medium text-foreground">
+                            {sellerDisplayName}
+                          </span>
+                        )}
+                      </p>
+                      {sellerReputation && (
+                        <p>
+                          Reputación:{" "}
+                          <span className="font-medium text-foreground">
+                            {sellerReputation}
+                          </span>
+                        </p>
+                      )}
+                      {sellerSales && (
+                        <p>
+                          Ventas:{" "}
+                          <span className="font-medium text-foreground">
+                            {sellerSales}
+                          </span>
+                        </p>
+                      )}
+                      {sellerWarranty && (
+                        <p>
+                          Garantía:{" "}
+                          <span className="font-medium text-foreground">
+                            {sellerWarranty}
+                          </span>
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <h1 className="text-2xl md:text-3xl font-semibold leading-tight text-foreground max-w-4xl">

@@ -5,6 +5,7 @@ import Product from "@/lib/models/product.model";
 import { connectToDb } from "@/lib/mongoose";
 import { getPlanLimits, isFreePlan } from "@/lib/pricing/plans";
 import { scrapeMLProduct } from "@/lib/scraper";
+import { generateEmailBody, sendEmail } from "@/lib/nodemailer";
 import { ProductType } from "@/types";
 
 export const createProduct = async (productUrl: string) => {
@@ -62,6 +63,15 @@ export const createProduct = async (productUrl: string) => {
     };
     currentUser.products.push(productSnapshot);
     await currentUser.save();
+
+    if (currentUser.email) {
+      try {
+        const emailContent = await generateEmailBody(productSnapshot, "WELCOME");
+        await sendEmail(emailContent, [currentUser.email]);
+      } catch (emailError) {
+        console.error("[WELCOME_EMAIL_ERROR]", emailError);
+      }
+    }
 
     return {
       success: true,

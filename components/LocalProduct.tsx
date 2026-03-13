@@ -11,7 +11,6 @@ import {
   Package,
   RotateCcw,
   ShoppingBag,
-  Store,
   Truck,
 } from 'lucide-react';
 import { formatNumber, formatUSD } from '@/lib/utils';
@@ -38,6 +37,21 @@ const isValidMLProductUrl = (url: string) => {
   } catch {
     return false;
   }
+};
+
+const formatSellerDisplayName = (value?: string) => {
+  const normalized = (value || '')
+    .replace(/\s+/g, ' ')
+    .replace(/^vendido\s*por\s*/i, '')
+    .replace(/\|.*$/, '')
+    .trim();
+
+  if (!normalized) return 'Marketplace';
+
+  return normalized
+    .replace(/([a-záéíóúñ])([A-ZÁÉÍÓÚÑ])/g, '$1 $2')
+    .replace(/([A-ZÁÉÍÓÚÑ]{2,})([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+)/g, '$1 $2')
+    .trim();
 };
 
 const LocalProduct = () => {
@@ -194,6 +208,9 @@ const LocalProduct = () => {
       Number(productData.originalPrice || 0) > 0 &&
       Number(productData.currentPrice) < Number(productData.originalPrice),
   );
+  const sellerDisplayName = formatSellerDisplayName(
+    productData?.sellerName || productData?.storeName,
+  );
 
   return (
     <div className='py-12 lg:py-14'>
@@ -224,10 +241,6 @@ const LocalProduct = () => {
 
               <div className='min-w-0'>
                 <div className='flex flex-wrap items-center gap-2 mb-3'>
-                  <span className='inline-flex items-center gap-1 border border-border/70 px-2.5 py-1 text-xs text-muted-foreground bg-background'>
-                    <Store className='h-3.5 w-3.5 text-primary' />
-                    {extractSellerName(productData.storeName || 'Tienda oficial')}
-                  </span>
                   <span
                     className={`inline-flex items-center gap-1 border px-2.5 py-1 text-xs ${
                       productData.isFreeShipping
@@ -264,6 +277,57 @@ const LocalProduct = () => {
                       {productData.status}
                     </span>
                   )}
+                  {productData.sellerIsOfficialStore && (
+                    <span className='inline-flex items-center gap-1 border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-700'>
+                      <CheckCircle2 className='h-3.5 w-3.5 text-emerald-600' />
+                      Tienda oficial
+                    </span>
+                  )}
+                </div>
+
+                <div className='mb-4 border border-border/70 bg-background p-3 text-xs text-muted-foreground'>
+                  <div className='flex flex-wrap items-center gap-x-4 gap-y-2 mb-2'>
+                    <p>
+                      Vendedor:{' '}
+                      {productData.sellerProfileUrl ? (
+                        <Link
+                          href={productData.sellerProfileUrl}
+                          target='_blank'
+                          className='font-medium text-foreground hover:text-primary transition-colors'
+                        >
+                          {sellerDisplayName}
+                        </Link>
+                      ) : (
+                        <span className='font-medium text-foreground'>
+                          {sellerDisplayName}
+                        </span>
+                      )}
+                    </p>
+                    {productData.sellerReputation ? (
+                      <p>
+                        Reputación:{' '}
+                        <span className='font-medium text-foreground'>
+                          {productData.sellerReputation}
+                        </span>
+                      </p>
+                    ) : null}
+                    {productData.sellerSales ? (
+                      <p>
+                        Ventas:{' '}
+                        <span className='font-medium text-foreground'>
+                          {productData.sellerSales}
+                        </span>
+                      </p>
+                    ) : null}
+                    {productData.sellerWarranty ? (
+                      <p>
+                        Garantía:{' '}
+                        <span className='font-medium text-foreground'>
+                          {productData.sellerWarranty}
+                        </span>
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
 
                 <h1 className='text-2xl md:text-3xl font-semibold leading-tight text-foreground max-w-4xl'>
@@ -402,14 +466,3 @@ const LocalProduct = () => {
 };
 
 export default LocalProduct;
-
-function extractSellerName(fullSellerInfo: string) {
-  const startIdx = fullSellerInfo.indexOf('(');
-  const endIdx = fullSellerInfo.indexOf(')');
-
-  if (startIdx !== -1 && endIdx !== -1) {
-    return fullSellerInfo.substring(startIdx + 1, endIdx);
-  } else {
-    return fullSellerInfo;
-  }
-}

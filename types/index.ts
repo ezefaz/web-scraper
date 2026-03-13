@@ -68,7 +68,13 @@ export type ProductType = {
 	stockAvailable?: string;
 	isOutOfStock: Boolean;
 	users?: UserType[] | undefined;
-	storeName?: String;
+	storeName?: string;
+	sellerName?: string;
+	sellerProfileUrl?: string;
+	sellerReputation?: string;
+	sellerSales?: string;
+	sellerWarranty?: string;
+	sellerIsOfficialStore?: boolean;
 	isFreeReturning?: boolean;
 	isFreeShipping?: boolean;
 	status?: string;

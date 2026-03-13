@@ -4,6 +4,7 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { extractCategory, extractCurrency, extractDescription, extractStars } from '../utils';
 import { scrapeDolarValue } from './dolar';
+import { extractMercadoLibreSeller } from './mercadolibre-seller';
 
 export async function scrapeMLProductDetail(productUrl: string) {
   // bright data proxy configuration
@@ -117,25 +118,6 @@ export async function scrapeMLProductDetail(productUrl: string) {
 
     const today = new Date();
 
-    // STORE INFO
-
-    const storeInformation = $('.ui-pdp-seller__header__info-container');
-
-    const store = storeInformation
-      .map((index, element) => {
-        const originalText = $(element).text().trim();
-
-        // Find the position of "Vendido por" and "|"
-        const vendidoPorIndex = originalText.indexOf('Vendido por');
-        const pipeIndex = originalText.indexOf('|');
-
-        // Extract the substring between "Vendido por" and "|"
-        const extractedText = originalText.substring(vendidoPorIndex + 'Vendido por'.length, pipeIndex).trim();
-
-        return extractedText;
-      })
-      .get();
-
     const reviewParagraphs = $('.ui-review-capability-comments__comment__content');
 
     const productReviews: Array<string> = [];
@@ -146,22 +128,9 @@ export async function scrapeMLProductDetail(productUrl: string) {
       productReviews.push(reviews);
     });
 
-    const storeName = store[0];
-
     let isFollowing = false;
-
-    const productDetails = $('.ui-pdp-seller__header')
-      .map((index, element) => {
-        const oficialStore = $(element).find('.ui-pdp-color--BLUE.ui-pdp-family--REGULAR').text();
-        // $(element).find('.ui-pdp-seller__header .ui-pdp-seller__header__title').text();
-
-        const warranty = $(element).find('.ui-pdp-family--REGULAR.ui-pdp-media__title').text();
-
-        return {
-          oficialStore,
-        };
-      })
-      .get();
+    const sellerData = extractMercadoLibreSeller($);
+    const storeName = sellerData.sellerName || 'Marketplace';
 
     const data = {
       url: productUrl,
@@ -184,7 +153,13 @@ export async function scrapeMLProductDetail(productUrl: string) {
       highestPrice: Number(originalPrice) || Number(currentPrice),
       averagePrice: Number(currentPrice) || Number(originalPrice),
       isFreeReturning,
-      storeName: productDetails[0].oficialStore,
+      storeName,
+      sellerName: sellerData.sellerName || storeName,
+      sellerProfileUrl: sellerData.sellerProfileUrl,
+      sellerReputation: sellerData.sellerReputation,
+      sellerSales: sellerData.sellerSales,
+      sellerWarranty: sellerData.sellerWarranty,
+      sellerIsOfficialStore: sellerData.sellerIsOfficialStore,
       status: status || 'Refurbished',
       isFreeShipping,
       productReviews,

@@ -1,17 +1,17 @@
 import AuthPageShell from "@/components/auth/AuthPageShell";
-import ResetForm from "@/components/auth/ResetForm";
+import NewPasswordForm from "@/components/auth/NewPasswordForm";
 
 export default function ResetPage() {
   return (
     <AuthPageShell
-      badge="Recuperación de acceso"
-      title="Recupera tu cuenta de SaveMelin"
-      description="Te enviamos un enlace seguro para restablecer tu contraseña y volver a seguir precios en minutos."
+      badge="Cambio de contraseña"
+      title="Restablece tu contraseña"
+      description="Ingresa una nueva contraseña para recuperar el acceso a tu cuenta."
       ctaHref="/sign-in"
       ctaLabel="Volver a iniciar sesión"
       withDataBackground
     >
-      <ResetForm />
+      <NewPasswordForm />
     </AuthPageShell>
   );
 }

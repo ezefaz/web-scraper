@@ -126,7 +126,7 @@ const LoginForm = () => {
             </button>
           </div>
           {errors.password && <span className="text-xs text-red-600">{errors.password.message}</span>}
-          <Link href="/reset" className="inline-block text-xs font-medium text-muted-foreground transition hover:text-foreground">
+          <Link href="/new-password" className="inline-block text-xs font-medium text-muted-foreground transition hover:text-foreground">
             ¿Olvidaste tu contraseña?
           </Link>
         </div>
