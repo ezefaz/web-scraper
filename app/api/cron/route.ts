@@ -109,12 +109,24 @@ export async function GET(request: Request) {
     let pushedPriceHistory = 0;
     let pushedDolarHistory = 0;
     const failureSamples: Array<{ url: string; reason: string }> = [];
+    const skippedSamples: Array<{ url: string; reason: string; currentPrice?: number }> = [];
+    const skippedByReason: Record<string, number> = {
+      empty_scrape: 0,
+      invalid_price: 0,
+    };
 
     const operations = await mapWithConcurrency(products as any[], MAX_CONCURRENCY, async (currentProduct) => {
       try {
         const scrapedProduct: any = await scrapeMLProduct(currentProduct.url);
         if (!scrapedProduct) {
           skippedProducts += 1;
+          skippedByReason.empty_scrape += 1;
+          if (skippedSamples.length < 10) {
+            skippedSamples.push({
+              url: String(currentProduct?.url || ""),
+              reason: "empty_scrape",
+            });
+          }
           return null;
         }
 
@@ -125,6 +137,14 @@ export async function GET(request: Request) {
 
         if (!Number.isFinite(scrapedCurrentPrice) || scrapedCurrentPrice <= 0) {
           skippedProducts += 1;
+          skippedByReason.invalid_price += 1;
+          if (skippedSamples.length < 10) {
+            skippedSamples.push({
+              url: String(currentProduct?.url || ""),
+              reason: "invalid_price",
+              currentPrice: scrapedCurrentPrice,
+            });
+          }
           return null;
         }
 
@@ -244,6 +264,8 @@ export async function GET(request: Request) {
       failedProducts,
       pushedPriceHistory,
       pushedDolarHistory,
+      skippedByReason,
+      skippedSamples,
       failureSamples,
       week: currentWeekKey,
       executedAt: now.toISOString(),
