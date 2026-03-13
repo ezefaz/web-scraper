@@ -1,16 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Gamepad2, MonitorSmartphone, ShieldCheck, Tag, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Clock3, Tag } from "lucide-react";
 import { formatNumber } from "@/lib/utils";
-
-type CategoryId = "tech" | "gaming" | "sneakers" | "appliances";
-
-type TabItem = {
-  id: CategoryId;
-  label: string;
-  icon: typeof Zap;
-};
 
 type ProductCard = {
   id: string;
@@ -23,96 +15,28 @@ type ProductCard = {
   discountRate: number;
   shipping: string;
   currency: string;
+  updatedAt: string;
 };
-
-type CategoryContent = {
-  title: string;
-  description: string;
-};
-
-const AUTO_SWITCH_MS = 6000;
-
-const tabs: TabItem[] = [
-  { id: "tech", label: "Tecnología", icon: MonitorSmartphone },
-  { id: "gaming", label: "Gaming", icon: Gamepad2 },
-  { id: "sneakers", label: "Zapatillas", icon: Zap },
-  { id: "appliances", label: "Electrodomésticos", icon: ShieldCheck },
-];
-
-const categoryContent: Record<CategoryId, CategoryContent> = {
-  tech: {
-    title: "Destacados en Tecnología",
-    description:
-      "Productos de alta demanda con buena reputación de vendedor y envío full.",
-  },
-  gaming: {
-    title: "Destacados en Gaming",
-    description:
-      "Consolas, periféricos y accesorios gamer con variación de precio relevante.",
-  },
-  sneakers: {
-    title: "Destacados en Zapatillas",
-    description:
-      "Modelos deportivos y urbanos con descuentos y oportunidades de compra.",
-  },
-  appliances: {
-    title: "Destacados en Electrodomésticos",
-    description:
-      "Pequeños y grandes electrodomésticos con señales fuertes de ahorro real.",
-  },
-};
-
-function createEmptyProductsByCategory(): Record<CategoryId, ProductCard[]> {
-  return {
-    tech: [],
-    gaming: [],
-    sneakers: [],
-    appliances: [],
-  };
-}
-
-function nextTabId(currentTabId: CategoryId): CategoryId {
-  const currentIndex = tabs.findIndex((tab) => tab.id === currentTabId);
-  const nextIndex = (currentIndex + 1) % tabs.length;
-  return tabs[nextIndex].id;
-}
 
 function getDiscountLabel(product: ProductCard): string {
   if (product.discountRate > 0) return `-${product.discountRate}%`;
   if (product.oldPrice > product.price && product.oldPrice > 0) {
-    const computed = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
+    const computed = Math.round(
+      ((product.oldPrice - product.price) / product.oldPrice) * 100,
+    );
     return computed > 0 ? `-${computed}%` : "Sin descuento";
   }
   return "Sin descuento";
 }
 
 export default function PixelPerfectFeaturesTabSection() {
-  const [activeTab, setActiveTab] = useState<CategoryId>(tabs[0].id);
-  const [progress, setProgress] = useState(0);
-  const [restartKey, setRestartKey] = useState(0);
   const [isLoadingProducts, setIsLoadingProducts] = useState(true);
-  const [productsByCategory, setProductsByCategory] = useState<
-    Record<CategoryId, ProductCard[]>
-  >(createEmptyProductsByCategory);
-
-  const activeCategoryMeta = useMemo(
-    () => categoryContent[activeTab],
-    [activeTab],
-  );
-  const activeProducts = useMemo(
-    () => productsByCategory[activeTab] || [],
-    [productsByCategory, activeTab],
-  );
-  const activeTabMeta = useMemo(
-    () => tabs.find((tab) => tab.id === activeTab) ?? tabs[0],
-    [activeTab],
-  );
-  const ActiveIcon = activeTabMeta.icon;
+  const [products, setProducts] = useState<ProductCard[]>([]);
 
   useEffect(() => {
     let mounted = true;
 
-    const fetchFeaturedProducts = async () => {
+    const fetchLatestProducts = async () => {
       setIsLoadingProducts(true);
       try {
         const response = await fetch("/api/featured-products", {
@@ -121,25 +45,19 @@ export default function PixelPerfectFeaturesTabSection() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch featured products");
+          throw new Error("Failed to fetch latest products");
         }
 
         const payload = await response.json();
-        const data = payload?.data ?? {};
-        const nextState = createEmptyProductsByCategory();
-
-        for (const tab of tabs) {
-          const rawItems = Array.isArray(data?.[tab.id]) ? data[tab.id] : [];
-          nextState[tab.id] = rawItems;
-        }
+        const data = Array.isArray(payload?.data) ? payload.data : [];
 
         if (mounted) {
-          setProductsByCategory(nextState);
+          setProducts(data);
         }
       } catch (error) {
-        console.error("[FEATURES_TAB_FETCH]", error);
+        console.error("[LATEST_PRODUCTS_FETCH]", error);
         if (mounted) {
-          setProductsByCategory(createEmptyProductsByCategory());
+          setProducts([]);
         }
       } finally {
         if (mounted) {
@@ -148,45 +66,12 @@ export default function PixelPerfectFeaturesTabSection() {
       }
     };
 
-    fetchFeaturedProducts();
+    fetchLatestProducts();
 
     return () => {
       mounted = false;
     };
   }, []);
-
-  useEffect(() => {
-    let frameId = 0;
-    let startTime = 0;
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const nextProgress = Math.min((elapsed / AUTO_SWITCH_MS) * 100, 100);
-      setProgress(nextProgress);
-
-      if (nextProgress >= 100) {
-        setActiveTab((current) => nextTabId(current));
-        return;
-      }
-
-      frameId = window.requestAnimationFrame(animate);
-    };
-
-    frameId = window.requestAnimationFrame(animate);
-    return () => window.cancelAnimationFrame(frameId);
-  }, [activeTab, restartKey]);
-
-  const handleTabClick = (tabId: CategoryId) => {
-    setActiveTab(tabId);
-    setProgress(0);
-    setRestartKey((prev) => prev + 1);
-  };
-
-  const secondsToNextCategory = Math.max(
-    1,
-    Math.ceil((AUTO_SWITCH_MS * (100 - progress)) / 100 / 1000),
-  );
 
   return (
     <section className="py-12">
@@ -195,86 +80,34 @@ export default function PixelPerfectFeaturesTabSection() {
           <div className="px-6 lg:px-8 py-6 border-b border-border/70">
             <p className="text-sm text-muted-foreground mb-2">Destacados</p>
             <h2 className="text-2xl lg:text-3xl tracking-tight text-foreground font-semibold">
-              Productos guardados por categoría
+              Últimos productos buscados por usuarios
             </h2>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 border-b border-border/70">
-            {tabs.map((tab, index) => {
-              const Icon = tab.icon;
-              const isActive = tab.id === activeTab;
-              const isLast = index === tabs.length - 1;
-
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => handleTabClick(tab.id)}
-                  className={`relative px-4 py-4 lg:px-5 lg:py-5 text-left transition-colors cursor-pointer ${
-                    isLast ? "" : "border-r border-border/70"
-                  } ${
-                    isActive
-                      ? "text-foreground bg-section-grey"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 text-primary" />
-                    <span className="text-[0.95rem] lg:text-base font-medium leading-tight">
-                      {tab.label}
-                    </span>
-                  </div>
-
-                  <span className="absolute left-0 bottom-0 h-[1px] w-full bg-border/70" />
-                  {isActive && (
-                    <span
-                      className="absolute left-0 bottom-0 h-[2px] bg-primary transition-[width] duration-100 ease-linear"
-                      style={{ width: `${progress}%` }}
-                    />
-                  )}
-                </button>
-              );
-            })}
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-[18rem_minmax(0,1fr)]">
             <aside className="border-b xl:border-b-0 xl:border-r border-border/70 p-6 lg:p-8 bg-section-grey">
               <div className="inline-flex items-center gap-2 border border-border rounded-sm px-3 py-1.5 mb-4">
-                <Tag className="w-3.5 h-3.5 text-primary" />
+                <Clock3 className="w-3.5 h-3.5 text-primary" />
                 <span className="text-xs text-muted-foreground">
-                  Actualización semanal
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 mb-2">
-                <ActiveIcon className="w-4 h-4 text-primary" />
-                <span className="text-sm text-muted-foreground">
-                  {activeTabMeta.label}
+                  Ordenado por fecha
                 </span>
               </div>
 
               <h3 className="text-xl font-semibold tracking-tight text-foreground leading-tight mb-3">
-                {activeCategoryMeta.title}
+                Actividad reciente de búsqueda
               </h3>
 
               <p className="text-sm leading-relaxed text-muted-foreground mb-5">
-                {activeCategoryMeta.description}
+                Mostramos los últimos productos incorporados a la base por
+                búsquedas de usuarios, sin curación semanal.
               </p>
 
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>
-                  <span className="text-foreground font-medium">
-                    {activeProducts.length}
-                  </span>{" "}
-                  productos guardados
-                </p>
-                <p>
-                  Próxima categoría en{" "}
-                  <span className="text-foreground font-medium">
-                    {secondsToNextCategory}s
-                  </span>
-                </p>
-              </div>
+              <p className="text-sm text-muted-foreground">
+                <span className="text-foreground font-medium">
+                  {products.length}
+                </span>{" "}
+                productos recientes
+              </p>
             </aside>
 
             <div className="p-6 lg:p-8">
@@ -282,18 +115,18 @@ export default function PixelPerfectFeaturesTabSection() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {Array.from({ length: 6 }).map((_, index) => (
                     <div
-                      key={`featured-skeleton-${index}`}
+                      key={`latest-skeleton-${index}`}
                       className="border border-border/70 bg-section-grey p-4 h-[17rem] animate-pulse"
                     />
                   ))}
                 </div>
-              ) : activeProducts.length === 0 ? (
+              ) : products.length === 0 ? (
                 <div className="border border-border/70 bg-section-grey p-6 text-sm text-muted-foreground">
-                  No hay productos guardados en esta categoría todavía.
+                  Todavía no hay productos recientes disponibles.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {activeProducts.map((product) => {
+                  {products.map((product) => {
                     const hasOldPrice =
                       Number(product.oldPrice) > 0 &&
                       Number(product.oldPrice) > Number(product.price);
@@ -301,7 +134,7 @@ export default function PixelPerfectFeaturesTabSection() {
 
                     return (
                       <article
-                        key={`${activeTab}-${product.id}`}
+                        key={product.id}
                         className="bg-section-grey border border-border/70 p-4 min-h-[17rem] flex flex-col gap-3"
                       >
                         <div className="h-28 border border-border/70 bg-background overflow-hidden">
@@ -323,7 +156,7 @@ export default function PixelPerfectFeaturesTabSection() {
                             </p>
                           </div>
                           <span className="text-[11px] px-2 py-0.5 border border-primary/30 text-primary bg-primary/10">
-                            Guardado
+                            Reciente
                           </span>
                         </header>
 
@@ -352,8 +185,9 @@ export default function PixelPerfectFeaturesTabSection() {
                             href={product.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-3 inline-flex text-xs text-muted-foreground hover:text-foreground transition-colors"
+                            className="mt-3 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
                           >
+                            <Tag className="w-3 h-3" />
                             Ver publicación
                           </a>
                         </div>
