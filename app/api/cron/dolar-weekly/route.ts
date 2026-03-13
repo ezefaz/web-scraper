@@ -77,7 +77,7 @@ export async function GET(request: Request) {
       },
     );
 
-    const pushOperations = products.flatMap((product: any) => {
+    const pushOperations: any[] = products.flatMap((product: any) => {
       const history = Array.isArray(product.dolarHistory) ? product.dolarHistory : [];
       const lastHistoryEntry = history.length ? history[history.length - 1] : null;
 

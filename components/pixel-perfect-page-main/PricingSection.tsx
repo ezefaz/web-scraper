@@ -95,7 +95,18 @@ function PlanCard({
   const accentBg = highlighted ? "bg-primary" : "bg-foreground";
 
   return (
-    <article className="p-7 lg:p-8">
+    <article
+      className={`p-7 lg:p-8 ${
+        highlighted
+          ? "relative shadow-[inset_0_0_0_1px_hsl(var(--primary))]"
+          : ""
+      }`}
+    >
+      {highlighted && (
+        <span className="absolute right-7 top-7 inline-flex items-center border border-primary/40 bg-primary/10 px-3 py-1 text-[0.95rem] font-medium tracking-tight text-primary">
+          Popular
+        </span>
+      )}
       <p className={`inline-flex items-center gap-2 text-[1.05rem] ${accentText}`}>
         <span className={`w-2 h-2 ${accentBg}`} />
         {eyebrow}

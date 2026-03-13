@@ -35,7 +35,7 @@ type Props = {
 const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
   const currentUser = await getCurrentUser();
   const foundedProduct = await getProductById(id);
-  const userProduct = currentUser?.products?.find(
+  const userProductById = currentUser?.products?.find(
     (product: any) => product._id.toString() === id,
   );
   const fallbackUrl = (() => {
@@ -47,11 +47,15 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
     }
   })();
 
-  const productUrl = foundedProduct?.url || userProduct?.url || fallbackUrl;
+  const productUrl = foundedProduct?.url || userProductById?.url || fallbackUrl;
   if (!productUrl) redirect("/");
 
   const product: ProductType = await getProductByURL(productUrl);
   if (!product) redirect("/");
+  const userProduct = currentUser?.products?.find(
+    (item: any) => item?.url === product.url,
+  );
+  const isUserFollowingProduct = Boolean(userProduct?.isFollowing);
 
   const {
     currentDolar,
@@ -295,7 +299,9 @@ const ProductDetailsPage = async ({ params: { id }, searchParams }: Props) => {
                         </span>
                       </Button>
                     </Link>
-                    <FollowProductButton productUrl={product.url} />
+                    {!isUserFollowingProduct && (
+                      <FollowProductButton productUrl={product.url} />
+                    )}
                   </div>
 
                   <Link

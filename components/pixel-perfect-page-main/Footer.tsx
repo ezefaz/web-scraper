@@ -34,7 +34,10 @@ const footerResources = [
   "Productos destacados",
   "Preguntas frecuentes",
 ];
-const footerLegal = ["Terminos de uso", "Politica de privacidad"];
+const footerLegal = [
+  { label: "Terminos de uso", href: "#" },
+  { label: "Politica de privacidad", href: "/privacy-policy" },
+];
 const SECTION_DIVIDER_SRC =
   "https://cdn.prod.website-files.com/69385e16d68663814109c132/6941785a4b1f2df4106341e2_Line-Divider.svg";
 
@@ -175,13 +178,13 @@ export default function PixelPerfectFooter() {
                 <h4 className="font-semibold text-foreground mb-4">Legal</h4>
                 <ul className="space-y-2.5">
                   {footerLegal.map((item) => (
-                    <li key={item}>
-                      <a
-                        href="#"
+                    <li key={item.label}>
+                      <Link
+                        href={item.href}
                         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        {item}
-                      </a>
+                        {item.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>

@@ -12,12 +12,7 @@ import { register as registration } from "@/app/actions/register";
 import { TbEyeFilled } from "react-icons/tb";
 import { IoMdEyeOff } from "react-icons/io";
 import { Social } from "./Social";
-import { BsCart } from "react-icons/bs";
 import { useSearchParams } from "next/navigation";
-import { APP_BASE_URL } from "@/lib/config/urls";
-
-const mercadolibreAuthUrl: string =
-  `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=${encodeURIComponent(`${APP_BASE_URL}/`)}`;
 
 const RegisterForm = () => {
   const searchParams = useSearchParams();
@@ -179,14 +174,6 @@ const RegisterForm = () => {
         o continúa con
       </div>
       <Social />
-
-      <a
-        href={mercadolibreAuthUrl}
-        className="mt-2 inline-flex w-full items-center justify-center gap-2 h-11 border border-border/70 bg-foreground px-4 text-sm font-medium text-background transition hover:bg-foreground/90"
-      >
-        <BsCart className="h-5 w-5" aria-hidden={true} />
-        Iniciar como vendedor
-      </a>
 
       <p className="mt-4 text-xs text-muted-foreground">
         Al registrarte aceptas nuestra política de{" "}
