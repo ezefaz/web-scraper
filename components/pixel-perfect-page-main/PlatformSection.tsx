@@ -43,7 +43,7 @@ export default function PixelPerfectPlatformSection() {
       <div className="max-w-[94rem] mx-auto padding-global">
         <div className="border border-border/70">
           <div className="border-b border-border/70 px-6 py-7 lg:py-8 text-center">
-            <p className="text-[1.4rem] lg:text-[1.6rem] tracking-tight text-muted-foreground">
+            <p className="text-[1.55rem] lg:text-[1.7rem] tracking-tight text-muted-foreground leading-[1.35]">
               Unifica la comparación de precios de productos localmente &amp;
               global
             </p>

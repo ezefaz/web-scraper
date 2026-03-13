@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/actions";
 import { reset } from "@/app/actions/reset";
 import { connectToDb } from "@/lib/mongoose";
 import userModel from "@/lib/models/user.model";
+import { getPlanLimits, isFreePlan } from "@/lib/pricing/plans";
 
 const validCountries = ["argentina", "brasil", "colombia", "uruguay"] as const;
 
@@ -98,6 +99,26 @@ export const updateProductAlertPreference = async (values: {
   const parsed = productAlertSchema.safeParse(values);
   if (!parsed.success) {
     return { error: "Parámetros inválidos." };
+  }
+
+  if (parsed.data.enabled) {
+    const limits = getPlanLimits(currentUser.subscription);
+    if (Number.isFinite(limits.maxFollowedProducts)) {
+      const products = Array.isArray(currentUser.products) ? currentUser.products : [];
+      const currentFollowedCount = products.filter((item: any) => Boolean(item.isFollowing)).length;
+      const targetProduct = products.find(
+        (item: any) => String(item._id) === parsed.data.productId
+      );
+      const isAlreadyFollowing = Boolean(targetProduct?.isFollowing);
+
+      if (!isAlreadyFollowing && currentFollowedCount >= limits.maxFollowedProducts) {
+        return {
+          error: isFreePlan(currentUser.subscription)
+            ? `Plan gratuito: puedes seguir hasta ${limits.maxFollowedProducts} productos.`
+            : "Has alcanzado el límite de seguimiento de tu plan.",
+        };
+      }
+    }
   }
 
   await connectToDb();

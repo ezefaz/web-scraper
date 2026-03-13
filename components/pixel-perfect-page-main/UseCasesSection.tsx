@@ -399,17 +399,17 @@ export default function PixelPerfectUseCasesSection() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-primary">⊢</span>
-              <span className="text-sm font-medium text-primary">
+              <span className="text-[1.1rem] font-medium text-primary">
                 Mejora tu experiencia de compra
               </span>
               <span className="text-primary">⊣</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold leading-tight tracking-tight text-foreground max-w-md">
+            <h2 className="text-[3rem] sm:text-[3.4rem] lg:text-[4.3rem] font-medium leading-[0.95] tracking-tight text-foreground max-w-[46rem]">
               Los motivos por los que debes usar Savemelin para comprar al mejor
               precio
             </h2>
           </div>
-          <p className="text-base text-muted-foreground leading-relaxed max-w-md lg:pt-8">
+          <p className="text-[1.55rem] text-muted-foreground leading-[1.38] max-w-[38rem] lg:pt-8">
             Desde evolución de precios, detección de ofertas falsas y resultados
             de múltiples sitios — soportamos todas las instancias desde que
             buscas el producto hasta que realizas la compra para que tengas la
@@ -429,10 +429,10 @@ export default function PixelPerfectUseCasesSection() {
               >
                 <Mockup />
                 <div className="p-5 flex-1">
-                  <h3 className="text-base font-bold text-foreground mb-2">
+                  <h3 className="text-[1.4rem] font-semibold text-foreground mb-2 leading-[1.2]">
                     {useCase.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
+                  <p className="text-[1.15rem] text-muted-foreground leading-[1.4]">
                     {useCase.description}
                   </p>
                 </div>

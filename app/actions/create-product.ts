@@ -3,6 +3,7 @@
 import { getCurrentUser } from "@/lib/actions";
 import Product from "@/lib/models/product.model";
 import { connectToDb } from "@/lib/mongoose";
+import { getPlanLimits, isFreePlan } from "@/lib/pricing/plans";
 import { scrapeMLProduct } from "@/lib/scraper";
 import { ProductType } from "@/types";
 
@@ -36,6 +37,21 @@ export const createProduct = async (productUrl: string) => {
       return {
         alreadySaved: true,
         message: "Este producto ya estaba en tus guardados.",
+      };
+    }
+
+    const limits = getPlanLimits(currentUser.subscription);
+    const savedProductsCount = Array.isArray(currentUser.products)
+      ? currentUser.products.length
+      : 0;
+
+    if (
+      Number.isFinite(limits.maxSavedProducts) &&
+      savedProductsCount >= limits.maxSavedProducts
+    ) {
+      return {
+        requiresUpgrade: isFreePlan(currentUser.subscription),
+        error: `Plan gratuito: puedes guardar y seguir hasta ${limits.maxSavedProducts} productos. Elimina uno o pasa a Premium para continuar.`,
       };
     }
 

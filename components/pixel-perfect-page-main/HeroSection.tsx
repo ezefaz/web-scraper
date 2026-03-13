@@ -10,12 +10,12 @@ export default function PixelPerfectHeroSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
           <div className="p-6">
             <div className="inline-flex items-center gap-2 border border-border rounded-sm px-4 py-2 mb-8">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-[1.1rem] text-muted-foreground">
                 Ahorro inteligente para tus compras
               </span>
             </div>
 
-            <h1 className="text-5xl sm:text-5xl lg:text-[4rem] font-bold leading-[1.08] tracking-tight text-foreground mb-8">
+            <h1 className="text-[3.2rem] sm:text-[3.6rem] lg:text-[4.9rem] font-medium leading-[0.95] tracking-tight text-foreground mb-8">
               Agrega productos, compará valores y comprá al{" "}
               <span className="text-primary italic">menor precio</span>
             </h1>
@@ -32,14 +32,14 @@ export default function PixelPerfectHeroSection() {
             <div className="mt-6 grid grid-cols-2 gap-3 sm:flex sm:items-center sm:gap-4 sm:flex-wrap">
               <Button
                 variant="hero"
-                className="w-full h-11 px-3 text-sm sm:w-auto sm:h-12 sm:px-8 sm:text-base"
+                className="w-full h-11 px-3 text-sm sm:w-auto sm:h-12 sm:px-8 sm:text-[1.05rem]"
               >
                 Quiero ahorrar
                 <ArrowRight className="w-4 h-4 ml-1" />
               </Button>
               <Button
                 variant="secondary"
-                className="w-full h-11 px-3 text-sm sm:w-auto sm:h-auto sm:px-0 sm:text-base"
+                className="w-full h-11 px-3 text-sm sm:w-auto sm:h-auto sm:px-0 sm:text-[1.05rem]"
               >
                 Ver funcionalidades
               </Button>

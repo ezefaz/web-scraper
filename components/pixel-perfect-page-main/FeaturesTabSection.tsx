@@ -79,8 +79,8 @@ export default function PixelPerfectFeaturesTabSection() {
       <div className="max-w-[94rem] mx-auto padding-global">
         <div className="border border-border/70 bg-background">
           <div className="px-6 lg:px-8 py-6 border-b border-border/70">
-            <p className="text-sm text-muted-foreground mb-2">Destacados</p>
-            <h2 className="text-2xl lg:text-3xl tracking-tight text-foreground font-semibold">
+            <p className="text-[1.1rem] text-muted-foreground mb-2">Destacados</p>
+            <h2 className="text-[3rem] lg:text-[4rem] leading-[0.95] tracking-tight text-foreground font-medium">
               Últimos productos buscados por usuarios
             </h2>
           </div>
@@ -89,21 +89,21 @@ export default function PixelPerfectFeaturesTabSection() {
             <aside className="border-b xl:border-b-0 xl:border-r border-border/70 p-6 lg:p-8 bg-section-grey">
               <div className="inline-flex items-center gap-2 border border-border rounded-sm px-3 py-1.5 mb-4">
                 <Clock3 className="w-3.5 h-3.5 text-primary" />
-                <span className="text-xs text-muted-foreground">
+                <span className="text-[0.95rem] text-muted-foreground">
                   Ordenado por fecha
                 </span>
               </div>
 
-              <h3 className="text-xl font-semibold tracking-tight text-foreground leading-tight mb-3">
+              <h3 className="text-[2.2rem] font-medium tracking-tight text-foreground leading-[1.05] mb-3">
                 Actividad reciente de búsqueda
               </h3>
 
-              <p className="text-sm leading-relaxed text-muted-foreground mb-5">
+              <p className="text-[1.3rem] leading-[1.4] text-muted-foreground mb-5">
                 Mostramos los últimos productos incorporados a la base por
                 búsquedas de usuarios, sin curación semanal.
               </p>
 
-              <p className="text-sm text-muted-foreground">
+              <p className="text-[1.2rem] text-muted-foreground">
                 <span className="text-foreground font-medium">
                   {products.length}
                 </span>{" "}
@@ -150,10 +150,10 @@ export default function PixelPerfectFeaturesTabSection() {
 
                         <header className="flex items-start justify-between gap-3">
                           <div>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-[0.95rem] text-muted-foreground">
                               {product.store}
                             </p>
-                            <p className="text-sm text-foreground font-medium leading-snug line-clamp-2 mt-1">
+                            <p className="text-[1.15rem] text-foreground font-medium leading-snug line-clamp-2 mt-1">
                               {product.name}
                             </p>
                           </div>
@@ -164,7 +164,7 @@ export default function PixelPerfectFeaturesTabSection() {
 
                         <div className="mt-auto">
                           <div className="flex items-end gap-2 flex-wrap">
-                            <span className="text-xl font-semibold text-foreground tracking-tight">
+                            <span className="text-[1.65rem] font-semibold text-foreground tracking-tight">
                               {product.currency} {formatNumber(product.price)}
                             </span>
                             {hasOldPrice && (

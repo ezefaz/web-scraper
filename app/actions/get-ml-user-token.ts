@@ -1,11 +1,12 @@
 import axios from 'axios';
+import { APP_BASE_URL } from '@/lib/config/urls';
 
 export async function getMLUserToken(code: string) {
   const apiUrl = 'https://api.mercadolibre.com/oauth/token';
   const appId: any = process.env.MERCADOLIBRE_CLIENT_ID;
   const secretKey: any = process.env.MERCADOLIBRE_CLIENT_SECRET;
   const authorizationCode: any = process.env.MERCADOLIBRE_CODE;
-  const redirectUri = 'https://savemelin.com/';
+  const redirectUri = `${APP_BASE_URL}/`;
   const codeVerifier = 'YOUR_CODE_VERIFIER';
 
   const formData = new URLSearchParams();
@@ -41,7 +42,7 @@ export async function getMLUserToken(code: string) {
     };
 
     let bodyContent =
-      'grant_type=authorization_code&client_id=7423381817150989&client_secret=ueOGFqfmUl1CGxl4dHHx5BIkU1AdbeC2&code=TG-65c4bf8c5f581e00011ad571-159892588&redirect_uri=https://savemelin.com/profile/business&code_verifier=$CODE_VERIFIER';
+      `grant_type=authorization_code&client_id=7423381817150989&client_secret=ueOGFqfmUl1CGxl4dHHx5BIkU1AdbeC2&code=TG-65c4bf8c5f581e00011ad571-159892588&redirect_uri=${encodeURIComponent(`${APP_BASE_URL}/profile/business`)}&code_verifier=$CODE_VERIFIER`;
 
     let reqOptions = {
       url: 'https://api.mercadolibre.com/oauth/token',

@@ -10,6 +10,7 @@ import { generateEmailBody, sendEmail } from "../nodemailer";
 import User from "../models/user.model";
 import { auth } from "@/auth";
 import { getUserByEmail } from "@/data/user";
+import { getPlanLimits, isFreePlan } from "@/lib/pricing/plans";
 import sellerModel from "../models/seller.model";
 
 export async function scrapeAndStoreProducts(productUrl: string) {
@@ -405,6 +406,22 @@ export async function followProduct(productId: string) {
     if (isAlreadyFollowing) {
       console.log("User is already following this product.");
       return;
+    }
+
+    const limits = getPlanLimits(user.subscription);
+    if (Number.isFinite(limits.maxFollowedProducts)) {
+      const currentFollowedCount = Array.isArray(user.products)
+        ? user.products.filter((product: any) => Boolean(product.isFollowing)).length
+        : 0;
+
+      if (currentFollowedCount >= limits.maxFollowedProducts) {
+        console.log(
+          isFreePlan(user.subscription)
+            ? `[FOLLOW_PRODUCT_LIMIT] Plan gratuito alcanzó el límite de ${limits.maxFollowedProducts} productos seguidos.`
+            : "[FOLLOW_PRODUCT_LIMIT] Límite de seguimiento alcanzado."
+        );
+        return;
+      }
     }
 
     // const productUser = product.users.find((userProduct: any) => userProduct.email === user.email);

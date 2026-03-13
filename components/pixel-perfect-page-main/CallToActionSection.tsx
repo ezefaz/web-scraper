@@ -40,13 +40,13 @@ export default function PixelPerfectCallToActionSection() {
           </svg>
 
           <div className="relative z-10 max-w-[42rem] text-center">
-            <h3 className="text-[2.5rem] lg:text-[4.2rem] leading-[0.95] tracking-tight font-medium text-foreground">
+            <h3 className="text-[3.1rem] lg:text-[4.8rem] leading-[0.95] tracking-tight font-medium text-foreground">
               Para qué gastar demás?
             </h3>
 
             <Link
               href="/sign-up"
-              className="mt-10 inline-flex items-center justify-between gap-5 bg-primary px-8 py-4 min-w-[22rem] lg:min-w-[30rem] text-primary-foreground hover:bg-primary/90 transition-colors text-[1.05rem] lg:text-[1.35rem] leading-none tracking-tight"
+              className="mt-10 inline-flex items-center justify-between gap-5 bg-primary px-8 py-4 min-w-[22rem] lg:min-w-[30rem] text-primary-foreground hover:bg-primary/90 transition-colors text-[1.15rem] lg:text-[1.45rem] leading-none tracking-tight"
             >
               <span>Proba Savemelin Gratis.</span>
               <ArrowRight className="w-7 h-7 lg:w-8 lg:h-8 shrink-0" />

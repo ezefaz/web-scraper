@@ -1,16 +1,10 @@
 import { Resend } from 'resend';
+import { APP_BASE_URL } from '@/lib/config/urls';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerificationEmail = async (email: string, token: string) => {
-  const isDevelopment = process.env.NODE_ENV === 'development';
-
-  const developmentBaseURL = 'http://localhost:3000';
-  const productionBaseURL = 'https://savemelin.com';
-
-  const confirmLink = isDevelopment
-    ? `${developmentBaseURL}/new-verification?token=${token}`
-    : `${productionBaseURL}/new-verification?token=${token}`;
+  const confirmLink = `${APP_BASE_URL}/new-verification?token=${token}`;
 
   await resend.emails.send({
     from: 'hello@webgeenix.com',
@@ -38,15 +32,7 @@ export const sendVerificationEmail = async (email: string, token: string) => {
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
   // const resetLink = `http://localhost:3000/new-password?token=${token}`;
-
-  const isDevelopment = process.env.NODE_ENV === 'development';
-
-  const developmentBaseURL = 'http://localhost:3000';
-  const productionBaseURL = 'https://savemelin.com';
-
-  const resetLink = isDevelopment
-    ? `${developmentBaseURL}/new-verification?token=${token}`
-    : `${productionBaseURL}/new-verification?token=${token}`;
+  const resetLink = `${APP_BASE_URL}/new-verification?token=${token}`;
 
   await resend.emails.send({
     from: 'hello@webgeenix.com',

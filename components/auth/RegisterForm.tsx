@@ -14,9 +14,10 @@ import { IoMdEyeOff } from "react-icons/io";
 import { Social } from "./Social";
 import { BsCart } from "react-icons/bs";
 import { useSearchParams } from "next/navigation";
+import { APP_BASE_URL } from "@/lib/config/urls";
 
 const mercadolibreAuthUrl: string =
-  "https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=https://savemelin.com/";
+  `https://auth.mercadolibre.com.ar/authorization?response_type=code&client_id=7423381817150989&redirect_uri=${encodeURIComponent(`${APP_BASE_URL}/`)}`;
 
 const RegisterForm = () => {
   const searchParams = useSearchParams();

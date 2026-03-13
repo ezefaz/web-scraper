@@ -54,15 +54,15 @@ export default function PixelPerfectSolutionSection() {
         <div className="mb-12">
           <div className="flex items-center gap-2 mb-4">
             <span className="text-primary">⊢</span>
-            <span className="text-sm font-medium text-primary">
+            <span className="text-[1.1rem] font-medium text-primary">
               La solución
             </span>
             <span className="text-primary">⊣</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-tight tracking-tight text-foreground mb-4 max-w-lg">
+          <h2 className="text-[3rem] sm:text-[3.4rem] lg:text-[4.5rem] font-medium leading-[0.95] tracking-tight text-foreground mb-4 max-w-[44rem]">
             Te avisamos el mejor momento de comprar el producto que deseas
           </h2>
-          <p className="text-base text-muted-foreground leading-relaxed max-w-lg">
+          <p className="text-[1.6rem] text-muted-foreground leading-[1.38] max-w-[46rem]">
             Savemelin te provee con la mejor información y estadisticas para
             comprar al mejor precio, siguiendo una evolución del precio del
             producto y de los diferentes paginas de compra.
@@ -176,7 +176,7 @@ export default function PixelPerfectSolutionSection() {
         </div>
 
         <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8 mt-16 mb-16">
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-xl">
+          <p className="text-[1.3rem] text-muted-foreground leading-[1.4] max-w-[44rem]">
             La prioridad es cuidar tu bolsillo. Sabemos la importancia y el
             impacto que puede generar el ahorro a largo plazo, por eso juntamos
             una serie de servicios para maximizarlo.
@@ -200,10 +200,10 @@ export default function PixelPerfectSolutionSection() {
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
                 <div className="h-0.5 w-full bg-primary/20 rounded mb-3" />
-                <h4 className="text-sm font-bold text-foreground mb-1">
+                <h4 className="text-[1.15rem] font-semibold text-foreground mb-1">
                   {stat.label}
                 </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="text-[1rem] text-muted-foreground leading-[1.4]">
                   {stat.description}
                 </p>
               </div>
