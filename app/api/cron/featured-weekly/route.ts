@@ -12,7 +12,7 @@ import {
 import { scrapeMLProduct } from "@/lib/scraper";
 import { scrapeProductSearchPageML } from "@/lib/scraper/product-search-page-ml";
 
-export const maxDuration = 120;
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
