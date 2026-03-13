@@ -1,0 +1,4 @@
+interface:
+  display_name: "Backend Cost Efficiency"
+  short_description: "Backend pattern for cost, cache, and rate limit"
+  default_prompt: "Use $backend-cost-efficiency to implement or refactor this backend flow with deterministic cache keys, requester-based rate limiting, and bounded external API cost."

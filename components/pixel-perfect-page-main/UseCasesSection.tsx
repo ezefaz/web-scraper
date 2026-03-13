@@ -23,7 +23,7 @@ const useCases = [
   },
   {
     mockup: "deals",
-    title: "Ahorro masivo",
+    title: "Alertas de Oportunidades",
     description:
       "Activá alertas de baja de precio y oportunidades de descuento para comprar en el momento exacto y maximizar tu ahorro mensual.",
   },

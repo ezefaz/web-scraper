@@ -4,6 +4,8 @@ import PixelPerfectPlatformSection from "@/components/pixel-perfect-page-main/Pl
 import PixelPerfectSolutionSection from "@/components/pixel-perfect-page-main/SolutionSection";
 import PixelPerfectUseCasesSection from "@/components/pixel-perfect-page-main/UseCasesSection";
 import PixelPerfectFeaturesTabSection from "@/components/pixel-perfect-page-main/FeaturesTabSection";
+import PixelPerfectPricingSection from "@/components/pixel-perfect-page-main/PricingSection";
+import PixelPerfectCallToActionSection from "@/components/pixel-perfect-page-main/CallToActionSection";
 import PixelPerfectFooter from "@/components/pixel-perfect-page-main/Footer";
 
 const SECTION_DIVIDER_SRC =
@@ -47,7 +49,7 @@ export default function PixelPerfectPage() {
           className="relative z-[70] block w-full h-auto select-none pointer-events-none"
           loading="lazy"
         />
-        <div id="precios" className="border-t border-border/70 scroll-mt-24">
+        <div className="border-t border-border/70 scroll-mt-24">
           <PixelPerfectUseCasesSection />
         </div>
         <img
@@ -60,6 +62,10 @@ export default function PixelPerfectPage() {
         <div id="destacado" className="border-t border-border/70 scroll-mt-24">
           <PixelPerfectFeaturesTabSection />
         </div>
+        <div id="precios" className="scroll-mt-24">
+          <PixelPerfectPricingSection />
+        </div>
+        <PixelPerfectCallToActionSection />
         <img
           src={SECTION_DIVIDER_SRC}
           alt=""
