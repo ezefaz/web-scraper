@@ -52,7 +52,9 @@ export const createProduct = async (productUrl: string) => {
     ) {
       return {
         requiresUpgrade: isFreePlan(currentUser.subscription),
-        error: `Plan gratuito: puedes guardar y seguir hasta ${limits.maxSavedProducts} productos. Elimina uno o pasa a Premium para continuar.`,
+        error: isFreePlan(currentUser.subscription)
+          ? `Plan gratuito: puedes guardar y seguir hasta ${limits.maxSavedProducts} productos. Elimina uno o mejora tu plan para continuar.`
+          : `Tu plan actual permite hasta ${limits.maxSavedProducts} productos guardados. Elimina uno o mejora de plan para continuar.`,
       };
     }
 

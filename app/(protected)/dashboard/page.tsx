@@ -93,6 +93,7 @@ export default async function DashboardPage() {
             metrics={metrics}
             subscription={{
               tier: subscriptionTier,
+              tierLabel: planLimits.label,
               maxSavedProducts: Number.isFinite(planLimits.maxSavedProducts)
                 ? planLimits.maxSavedProducts
                 : null,
@@ -100,6 +101,8 @@ export default async function DashboardPage() {
                 ? planLimits.maxFollowedProducts
                 : null,
               scanCadence: planLimits.scanCadence,
+              serperMonthlyCredits: planLimits.serperMonthlyCredits,
+              multiStoreComparison: planLimits.multiStoreComparison,
             }}
           />
         </div>

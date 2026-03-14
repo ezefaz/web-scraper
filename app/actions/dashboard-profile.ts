@@ -120,7 +120,7 @@ export const updateProductAlertPreference = async (values: {
         return {
           error: isFreePlan(currentUser.subscription)
             ? `Plan gratuito: puedes seguir hasta ${limits.maxFollowedProducts} productos.`
-            : "Has alcanzado el límite de seguimiento de tu plan.",
+            : `Has alcanzado el límite de seguimiento de tu plan (${limits.maxFollowedProducts}).`,
         };
       }
     }

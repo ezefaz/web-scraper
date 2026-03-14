@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/pixel-perfect-page-main/button";
 import { formatNumber } from "@/lib/utils";
+import { PLAN_LIMITS, SUBSCRIPTION_TIERS, type SubscriptionTier } from "@/lib/pricing/plans";
 import {
   cancelDashboardSubscription,
   requestDashboardPasswordReset,
@@ -49,10 +50,13 @@ type DashboardMetrics = {
 };
 
 type DashboardSubscription = {
-  tier: "basic" | "premium";
+  tier: SubscriptionTier;
+  tierLabel: string;
   maxSavedProducts: number | null;
   maxFollowedProducts: number | null;
   scanCadence: string;
+  serperMonthlyCredits: number;
+  multiStoreComparison: boolean;
 };
 
 type Props = {
@@ -96,7 +100,8 @@ export default function ProfileDashboardClient({
   const [items, setItems] = useState<DashboardProduct[]>(products);
   const [name, setName] = useState(user.name || "");
   const [country, setCountry] = useState<DashboardUser["country"]>(user.country);
-  const [subscriptionTier, setSubscriptionTier] = useState(subscription.tier);
+  const [subscriptionInfo, setSubscriptionInfo] =
+    useState<DashboardSubscription>(subscription);
   const [isPending, startTransition] = useTransition();
   const [activeToggleId, setActiveToggleId] = useState<string | null>(null);
 
@@ -189,11 +194,14 @@ export default function ProfileDashboardClient({
   ];
 
   const subscriptionStatus = {
-    tier: subscriptionTier,
-    isPremium: subscriptionTier === "premium",
-    maxSavedProducts: subscription.maxSavedProducts,
-    maxFollowedProducts: subscription.maxFollowedProducts,
-    scanCadence: subscription.scanCadence,
+    tier: subscriptionInfo.tier,
+    tierLabel: subscriptionInfo.tierLabel,
+    isFree: subscriptionInfo.tier === SUBSCRIPTION_TIERS.BASIC,
+    maxSavedProducts: subscriptionInfo.maxSavedProducts,
+    maxFollowedProducts: subscriptionInfo.maxFollowedProducts,
+    scanCadence: subscriptionInfo.scanCadence,
+    serperMonthlyCredits: subscriptionInfo.serperMonthlyCredits,
+    multiStoreComparison: subscriptionInfo.multiStoreComparison,
   };
 
   const shortcutLinks = [
@@ -211,7 +219,16 @@ export default function ProfileDashboardClient({
         return;
       }
 
-      setSubscriptionTier("basic");
+      const basicPlan = PLAN_LIMITS[SUBSCRIPTION_TIERS.BASIC];
+      setSubscriptionInfo({
+        tier: SUBSCRIPTION_TIERS.BASIC,
+        tierLabel: basicPlan.label,
+        maxSavedProducts: basicPlan.maxSavedProducts,
+        maxFollowedProducts: basicPlan.maxFollowedProducts,
+        scanCadence: basicPlan.scanCadence,
+        serperMonthlyCredits: basicPlan.serperMonthlyCredits,
+        multiStoreComparison: basicPlan.multiStoreComparison,
+      });
       toast.success(
         response.success ||
           "Suscripción cancelada. Tu cuenta volvió al plan gratuito."
@@ -516,7 +533,7 @@ export default function ProfileDashboardClient({
             <div className="border border-border/70 bg-section-grey p-4 space-y-2">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Plan actual</p>
               <p className="text-base font-semibold text-foreground">
-                {subscriptionStatus.isPremium ? "Savemelin Premium" : "Plan Gratuito"}
+                Savemelin {subscriptionStatus.tierLabel}
               </p>
               <p className="text-sm text-muted-foreground">
                 Escaneo de precios: {subscriptionStatus.scanCadence}
@@ -533,9 +550,23 @@ export default function ProfileDashboardClient({
                   ? "Ilimitadas"
                   : `hasta ${subscriptionStatus.maxFollowedProducts} productos`}
               </p>
+              <p className="text-sm text-muted-foreground">
+                Búsquedas en otras tiendas por mes:{" "}
+                <span className="text-foreground font-medium">
+                  {subscriptionStatus.serperMonthlyCredits > 0
+                    ? `${subscriptionStatus.serperMonthlyCredits} búsquedas`
+                    : "No incluido"}
+                </span>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Comparación en otras tiendas:{" "}
+                <span className="text-foreground font-medium">
+                  {subscriptionStatus.multiStoreComparison ? "Incluido" : "Solo Mercado Libre"}
+                </span>
+              </p>
             </div>
 
-            {subscriptionStatus.isPremium ? (
+            {!subscriptionStatus.isFree ? (
               <>
                 <p className="text-sm text-muted-foreground">
                   Si cancelás, tu cuenta vuelve al plan gratuito y se aplican sus límites.
@@ -552,22 +583,22 @@ export default function ProfileDashboardClient({
             ) : (
               <>
                 <p className="text-sm text-muted-foreground">
-                  Mejora tu cuenta para desbloquear análisis completo y seguimiento sin límites.
+                  Mejora tu cuenta para desbloquear más seguimiento, consultas multitienda y alertas más frecuentes.
                 </p>
                 <div className="border border-border/70 bg-section-grey p-4 space-y-2">
                   <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    Beneficios Premium
+                    Beneficios al mejorar
                   </p>
                   <ul className="space-y-1.5 text-sm text-foreground">
-                    <li>• Productos guardados y alertas activas ilimitadas.</li>
+                    <li>• Más productos guardados y seguidos según plan.</li>
                     <li>• Comparación de precios entre múltiples tiendas.</li>
-                    <li>• Prioridad en detección de cambios de precio.</li>
-                    <li>• Historial y seguimiento extendido para decisiones de compra.</li>
+                    <li>• Mayor frecuencia de actualización de precios.</li>
+                    <li>• Más histórico y más consultas Serper por mes.</li>
                   </ul>
                 </div>
                 <Link href="/#pricing" className="block">
                   <Button variant="primary" className="w-full">
-                    Mejorar a Premium
+                    Mejorar plan
                   </Button>
                 </Link>
               </>

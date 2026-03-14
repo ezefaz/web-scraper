@@ -418,7 +418,7 @@ export async function followProduct(productId: string) {
         console.log(
           isFreePlan(user.subscription)
             ? `[FOLLOW_PRODUCT_LIMIT] Plan gratuito alcanzó el límite de ${limits.maxFollowedProducts} productos seguidos.`
-            : "[FOLLOW_PRODUCT_LIMIT] Límite de seguimiento alcanzado."
+            : `[FOLLOW_PRODUCT_LIMIT] Límite de seguimiento alcanzado para el plan actual (${limits.maxFollowedProducts}).`
         );
         return;
       }
