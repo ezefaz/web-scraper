@@ -454,7 +454,12 @@ const parseGoogleShoppingFromMarkdown = (
     if (seen.has(url)) continue;
     seen.add(url);
 
-    const trustScore = getDomainTrustIndex(domain, 'google-shopping');
+    const trustScore = getDomainTrustIndex(domain, {
+      source: 'google-shopping',
+      storeName: domain,
+      price,
+      referencePrice: maxPrice,
+    });
     items.push({
       url,
       title,
@@ -700,7 +705,12 @@ const parseGoogleShoppingDom = (
     }
     seen.add(url);
 
-    const trustScore = getDomainTrustIndex(domain, 'google-shopping');
+    const trustScore = getDomainTrustIndex(domain, {
+      source: 'google-shopping',
+      storeName,
+      price,
+      referencePrice: maxPrice,
+    });
 
     items.push({
       url,
@@ -843,7 +853,20 @@ const parseSerperShoppingItems = (
     }
     seen.add(dedupeKey);
 
-    const trustScore = getDomainTrustIndex(domain, 'google-shopping');
+    const rating = Number((rawItem as any)?.rating);
+    const ratingCount = Number((rawItem as any)?.ratingCount);
+    const deliveryText = String((rawItem as any)?.delivery || '').toLowerCase();
+    const returnPolicyText = String((rawItem as any)?.returnPolicy || '').toLowerCase();
+    const trustScore = getDomainTrustIndex(domain, {
+      source: 'google-shopping',
+      storeName: storeName || domain,
+      rating: Number.isFinite(rating) ? rating : undefined,
+      ratingCount: Number.isFinite(ratingCount) ? ratingCount : undefined,
+      price,
+      referencePrice: maxPrice,
+      freeShipping: /gratis|free\s+shipping|env[ií]o\s+gratis/.test(deliveryText),
+      freeReturns: /devolucion|devolución|free\s+return/.test(returnPolicyText),
+    });
 
     items.push({
       url,
@@ -1006,6 +1029,8 @@ async function scrapeGoogleShoppingProductsUncached(
           storeName: item.storeName,
           domain: item.domain,
           image: Boolean(item.image),
+          trustScore: item.trustScore,
+          trustLabel: item.trustLabel,
           url: item.url,
         })),
       });
@@ -1151,8 +1176,8 @@ export async function scrapeGoogleShoppingProducts(
       dolarValue: normalizedDolarValue,
       parserVersion: GOOGLE_SHOPPING_PARSER_VERSION,
     },
-    ttlMs: 10 * 60 * 1000,
-    emptyTtlMs: 2 * 60 * 1000,
+    ttlMs: 30 * 60 * 1000,
+    emptyTtlMs: 5 * 60 * 1000,
     rateLimit: {
       identifier: requester,
       scope: 'google-shopping-products',
@@ -1187,8 +1212,8 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
       country,
       parserVersion: GOOGLE_SHOPPING_PARSER_VERSION,
     },
-    ttlMs: 10 * 60 * 1000,
-    emptyTtlMs: 2 * 60 * 1000,
+    ttlMs: 20 * 60 * 1000,
+    emptyTtlMs: 5 * 60 * 1000,
     rateLimit: {
       identifier: requester,
       scope: 'google-shopping-search-page',
@@ -1244,7 +1269,11 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
 
       return selected.map((item) => {
         const domain = item.domain || getDomainFromUrl(item.url);
-        const trustScore = getDomainTrustIndex(domain, 'google-shopping');
+        const trustScore = getDomainTrustIndex(domain, {
+          source: 'google-shopping',
+          storeName: item.storeName || domain,
+          price: item.price,
+        });
         return {
           url: item.url,
           title: item.title,

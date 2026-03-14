@@ -103,7 +103,10 @@ const getDomainFromUrl = (value: string) => {
 
 const buildTrustMeta = (url: string) => {
 	const domain = getDomainFromUrl(url);
-	const trustScore = getDomainTrustIndex(domain, "mercadolibre");
+	const trustScore = getDomainTrustIndex(domain, {
+		source: "mercadolibre",
+		storeName: domain,
+	});
 	const trustLabel = getTrustLabel(trustScore);
 	return { domain, trustScore, trustLabel };
 };

@@ -424,17 +424,26 @@ const buildProductList = (
       if (typeof maxPrice === 'number') return item.price <= maxPrice;
       return true;
     })
-    .map((item) => ({
-      url: normalizeListingUrl(item.url),
-      title: item.title,
-      price: item.price,
-      image: toHttpsImageUrl(item.image),
-      dolarPrice: item.price / validDolarValue,
-      source,
-      domain: getDomainFromUrl(item.url),
-      trustScore: getDomainTrustIndex(getDomainFromUrl(item.url), source),
-      trustLabel: getTrustLabel(getDomainTrustIndex(getDomainFromUrl(item.url), source)),
-    }))
+    .map((item) => {
+      const domain = getDomainFromUrl(item.url);
+      const trustScore = getDomainTrustIndex(domain, {
+        source,
+        storeName: domain,
+        price: item.price,
+        referencePrice: typeof maxPrice === 'number' ? maxPrice : undefined,
+      });
+      return {
+        url: normalizeListingUrl(item.url),
+        title: item.title,
+        price: item.price,
+        image: toHttpsImageUrl(item.image),
+        dolarPrice: item.price / validDolarValue,
+        source,
+        domain,
+        trustScore,
+        trustLabel: getTrustLabel(trustScore),
+      };
+    })
     .sort((a, b) => a.price - b.price)
     .slice(0, 30);
 };
@@ -680,8 +689,8 @@ export async function scrapePriceComparissonProducts(productTitle: string, produ
       country,
       productPrice: normalizedPrice,
     },
-    ttlMs: 5 * 60 * 1000,
-    emptyTtlMs: 60 * 1000,
+    ttlMs: 30 * 60 * 1000,
+    emptyTtlMs: 5 * 60 * 1000,
     rateLimit: {
       identifier: requester,
       scope: 'price-comparison',

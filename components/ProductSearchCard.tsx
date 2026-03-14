@@ -31,7 +31,7 @@ const ProductSearchCard = ({ product }: Props) => {
   const domain = product?.domain || '';
   const storeName = product?.storeName || '';
   const trustScore = Number(product?.trustScore) || 0;
-  const trustLabel = product?.trustLabel || (trustScore >= 80 ? 'Alta' : trustScore >= 60 ? 'Media' : 'Baja');
+  const trustLabel = product?.trustLabel || (trustScore >= 75 ? 'Alta' : trustScore >= 50 ? 'Media' : 'Baja');
   const showTrustBadge = source === 'google-shopping' && !isMercadoLibreUrl && trustScore > 0;
 
   const cardContent = (
@@ -93,7 +93,7 @@ const ProductSearchCard = ({ product }: Props) => {
 
       <div className='mt-3 flex flex-wrap gap-2'>
         {showTrustBadge ? (
-          <Badge size='xs' color={trustScore >= 80 ? 'emerald' : trustScore >= 60 ? 'amber' : 'rose'}>
+          <Badge size='xs' color={trustScore >= 75 ? 'emerald' : trustScore >= 50 ? 'amber' : 'rose'}>
             Confiabilidad: {trustLabel} ({trustScore})
           </Badge>
         ) : null}

@@ -102,8 +102,8 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
   const activeData = activeSource === 'mercadolibre' ? mercadolibreData : googleShoppingData;
 
   const trustDeltaType = (score: number) => {
-    if (score >= 80) return 'moderateIncrease';
-    if (score >= 60) return 'unchanged';
+    if (score >= 75) return 'moderateIncrease';
+    if (score >= 50) return 'unchanged';
     return 'moderateDecrease';
   };
 

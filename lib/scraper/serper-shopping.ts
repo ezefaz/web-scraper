@@ -27,6 +27,11 @@ export type SerperShoppingItem = {
   images?: Array<string | { url?: string; link?: string }>;
   image?: string | { url?: string; link?: string };
   productId?: string | number;
+  rating?: number;
+  ratingCount?: number;
+  delivery?: string;
+  returnPolicy?: string;
+  snippet?: string;
 };
 
 export type SerperShoppingResponse = {
