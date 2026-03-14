@@ -30,6 +30,9 @@ export default function ResultsCategory() {
   const [mercadolibreData, setMercadolibreData] = useState<any[]>([]);
   const [googleShoppingData, setGoogleShoppingData] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sourceFilter, setSourceFilter] = useState<
+    "all" | "mercadolibre" | "google-shopping"
+  >("all");
 
   useEffect(() => {
     const isMercadoLibreUrl = (url: string) =>
@@ -86,7 +89,12 @@ export default function ResultsCategory() {
   }, [product]);
 
   const allProducts = useMemo(() => {
-    const merged = [...mercadolibreData, ...googleShoppingData];
+    const merged =
+      sourceFilter === "mercadolibre"
+        ? [...mercadolibreData]
+        : sourceFilter === "google-shopping"
+          ? [...googleShoppingData]
+          : [...mercadolibreData, ...googleShoppingData];
 
     const uniqueByUrl = new Map<string, any>();
     for (const item of merged) {
@@ -98,12 +106,12 @@ export default function ResultsCategory() {
       }
     }
 
-    return [...uniqueByUrl.values()].sort((a: any, b: any) => {
+    return Array.from(uniqueByUrl.values()).sort((a: any, b: any) => {
       const aPrice = Number(a?.currentPrice) || 0;
       const bPrice = Number(b?.currentPrice) || 0;
       return aPrice - bPrice;
     });
-  }, [mercadolibreData, googleShoppingData]);
+  }, [mercadolibreData, googleShoppingData, sourceFilter]);
 
   const totalPages = Math.max(1, Math.ceil(allProducts.length / PAGE_SIZE));
 
@@ -149,9 +157,46 @@ export default function ResultsCategory() {
             {formattedProduct ? `para "${formattedProduct}"` : ""}
           </p>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Página {currentPage} de {totalPages}
-        </p>
+        <div className="flex items-center gap-3 flex-wrap justify-end">
+          <div className="inline-flex border border-border/70 bg-background">
+            <button
+              type="button"
+              onClick={() => setSourceFilter("all")}
+              className={`h-9 px-3 text-sm font-medium transition-colors ${
+                sourceFilter === "all"
+                  ? "bg-foreground text-background"
+                  : "text-foreground hover:bg-section-grey"
+              }`}
+            >
+              Todos
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceFilter("mercadolibre")}
+              className={`h-9 px-3 text-sm font-medium transition-colors border-l border-border/70 ${
+                sourceFilter === "mercadolibre"
+                  ? "bg-foreground text-background"
+                  : "text-foreground hover:bg-section-grey"
+              }`}
+            >
+              MercadoLibre ({mercadolibreData.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setSourceFilter("google-shopping")}
+              className={`h-9 px-3 text-sm font-medium transition-colors border-l border-border/70 ${
+                sourceFilter === "google-shopping"
+                  ? "bg-foreground text-background"
+                  : "text-foreground hover:bg-section-grey"
+              }`}
+            >
+              Otras tiendas ({googleShoppingData.length})
+            </button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Página {currentPage} de {totalPages}
+          </p>
+        </div>
       </div>
 
       <ProductResults data={paginatedProducts} />

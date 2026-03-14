@@ -5,6 +5,10 @@ import * as cheerio from 'cheerio';
 import { getCurrentUser } from '../actions';
 import { resolveSearchRequester, runCachedSearch } from '../search/query-cache';
 import { getDomainFromUrl, getDomainTrustIndex, getTrustLabel, TrustLabel } from './trust-score';
+import {
+  fetchSerperShoppingRaw,
+  SerperShoppingItem,
+} from './serper-shopping';
 
 type Country = 'argentina' | 'brasil' | 'colombia' | 'uruguay';
 
@@ -40,6 +44,7 @@ export interface GoogleShoppingSearchProduct {
 
 const LOG_TAG = '[GOOGLE_SHOPPING]';
 const GOOGLE_SHOPPING_DEBUG = process.env.PRICE_COMPARISON_DEBUG === 'true' || process.env.GOOGLE_SHOPPING_DEBUG === 'true';
+const GOOGLE_SHOPPING_PARSER_VERSION = 'serper-shopping-v6';
 
 const logInfo = (requestId: string, message: string, meta?: Record<string, unknown>) => {
   if (!GOOGLE_SHOPPING_DEBUG) return;
@@ -185,10 +190,7 @@ const normalizeUrl = (value?: string) => {
     const parsed = new URL(resolved.startsWith('http') ? resolved : `https://www.google.com${resolved}`);
     const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
     parsed.hash = '';
-    // Keep query params for non-Google URLs to preserve direct product links.
-    if (host.endsWith('google.com') || host.endsWith('google.com.ar')) {
-      parsed.search = '';
-    }
+    // Keep query params, including Google Shopping ibp/prds links.
     return parsed.toString();
   } catch {
     return resolved.split('#')[0].split('?')[0];
@@ -265,6 +267,41 @@ const parsePrice = (value: string) => {
   return Number(raw);
 };
 
+const parseSerperPrice = (item: SerperShoppingItem) => {
+  const extracted =
+    item.extracted_price
+    ?? item.extractedPrice
+    ?? item.priceValue
+    ?? null;
+
+  if (typeof extracted === 'number' && Number.isFinite(extracted)) {
+    return Math.round(extracted);
+  }
+
+  const priceText = String(item.price ?? '').trim();
+  const parsed = parsePrice(priceText);
+  return Number.isFinite(parsed) ? Math.round(parsed) : NaN;
+};
+
+const buildSerperQuery = (query: string) => {
+  return query.trim();
+};
+
+const extractSerperItems = (response: any) => {
+  const candidates: Array<[string, unknown]> = [
+    ['shopping', response?.shopping],
+    ['shoppingResults', response?.shoppingResults],
+    ['shopping_results', response?.shopping_results],
+    ['results', response?.results],
+  ];
+
+  for (const [key, value] of candidates) {
+    if (Array.isArray(value)) return { key, items: value as SerperShoppingItem[] };
+  }
+
+  return { key: '', items: [] as SerperShoppingItem[] };
+};
+
 const getImageFromSrcset = (srcset?: string) => {
   if (!srcset) return '';
   const first = srcset
@@ -287,6 +324,21 @@ const extractDomainHint = (value: string) => {
     .toLowerCase()
     .match(/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}\b/);
   return match?.[0] || '';
+};
+
+const isMercadoLibreStoreName = (value: string) =>
+  /mercado\s*libre|mercadolibre|mercado\s*livre/i.test(String(value || ''));
+
+const buildSyntheticStoreDomain = (storeName: string) => {
+  const normalized = String(storeName || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40);
+
+  return normalized ? `${normalized}.store` : '';
 };
 
 const cleanQuery = (title: string) =>
@@ -638,7 +690,7 @@ const parseGoogleShoppingDom = (
     }
 
     const similarity = getTitleSimilarity(originalQuery, title);
-    if (similarity < 0.35) {
+    if (similarity < 0.2) {
       stats.lowSimilarity += 1;
       return;
     }
@@ -672,13 +724,171 @@ const parseGoogleShoppingDom = (
   return items;
 };
 
+const parseSerperShoppingItems = (
+  rawItems: SerperShoppingItem[],
+  originalQuery: string,
+  dolarValue: number,
+  referencePrice: number,
+  requestId?: string,
+) => {
+  const validDolarValue = Number.isFinite(dolarValue) && dolarValue > 0 ? dolarValue : 1;
+  const items: GoogleShoppingComparisonProduct[] = [];
+  const seen = new Set<string>();
+  const excludedDomains: Record<string, number> = {};
+
+  const stats = {
+    total: rawItems.length,
+    missingTitle: 0,
+    missingUrl: 0,
+    invalidDomain: 0,
+    invalidPrice: 0,
+    overMaxPrice: 0,
+    lowSimilarity: 0,
+    duplicate: 0,
+    accepted: 0,
+  };
+
+  const maxPrice = Math.max(1, referencePrice);
+
+  const cleanText = (value: unknown) =>
+    String(value || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+  const extractSerperImage = (rawItem: SerperShoppingItem) => {
+    const fromObject = (value: unknown) => {
+      if (!value || typeof value !== 'object') return '';
+      const candidate = (value as any).url || (value as any).link || '';
+      return cleanText(candidate);
+    };
+
+    const candidateValues: unknown[] = [
+      rawItem.imageUrl,
+      (rawItem as any).image_url,
+      rawItem.thumbnailUrl,
+      (rawItem as any).thumbnail_url,
+      rawItem.thumbnail,
+      rawItem.image,
+      (rawItem as any).images?.[0],
+      (rawItem as any).thumbnails?.[0],
+    ];
+
+    for (const candidate of candidateValues) {
+      const textCandidate =
+        typeof candidate === 'string'
+          ? cleanText(candidate)
+          : fromObject(candidate);
+      const normalized = toHttps(textCandidate);
+      const isHttpImage = /^https?:\/\//i.test(normalized);
+      const isDataImage = /^data:image\//i.test(normalized);
+      if (normalized && (isHttpImage || isDataImage) && !normalized.startsWith('blob:')) {
+        return normalized;
+      }
+    }
+
+    return '';
+  };
+
+  rawItems.forEach((rawItem) => {
+    const title = cleanText(rawItem.title);
+    const url = normalizeUrl(cleanText(rawItem.link || rawItem.url));
+    const rawDomain = getDomainFromUrl(url);
+    const price = parseSerperPrice(rawItem);
+    const image = extractSerperImage(rawItem);
+    const storeName = cleanStoreName(cleanText(rawItem.source || rawItem.merchant || rawItem.store || rawDomain));
+    const storeLooksLikeMercadoLibre = isMercadoLibreStoreName(storeName);
+    const isGoogleRedirect = !!rawDomain && isGoogleOwnedDomain(rawDomain);
+    const domain = (!rawDomain || isGoogleRedirect) && storeName
+      ? buildSyntheticStoreDomain(storeName)
+      : rawDomain;
+    const domainAccepted = (() => {
+      if (storeLooksLikeMercadoLibre) return false;
+      if (rawDomain && !isGoogleOwnedDomain(rawDomain)) {
+        return isAllowedOtherStoreDomain(rawDomain);
+      }
+      return !!domain && domain.includes('.') && !isLocalDomain(domain);
+    })();
+    const dedupeKey = `${cleanText(rawItem.productId || '')}:${storeName || domain || url}`.toLowerCase() || url;
+
+    if (!title) {
+      stats.missingTitle += 1;
+      return;
+    }
+    if (!url) {
+      stats.missingUrl += 1;
+      return;
+    }
+    if (!domain || !domainAccepted) {
+      stats.invalidDomain += 1;
+      excludedDomains[rawDomain || domain || '(none)'] = (excludedDomains[rawDomain || domain || '(none)'] || 0) + 1;
+      return;
+    }
+    if (!Number.isFinite(price) || price <= 0) {
+      stats.invalidPrice += 1;
+      return;
+    }
+    if (price > maxPrice * 1.8) {
+      stats.overMaxPrice += 1;
+      return;
+    }
+
+    const similarity = getTitleSimilarity(originalQuery, title);
+    if (similarity < 0.35) {
+      stats.lowSimilarity += 1;
+      return;
+    }
+    if (seen.has(dedupeKey)) {
+      stats.duplicate += 1;
+      return;
+    }
+    seen.add(dedupeKey);
+
+    const trustScore = getDomainTrustIndex(domain, 'google-shopping');
+
+    items.push({
+      url,
+      title,
+      price,
+      image,
+      dolarPrice: price / validDolarValue,
+      source: 'google-shopping',
+      domain,
+      storeName: storeName || domain,
+      trustScore,
+      trustLabel: getTrustLabel(trustScore),
+    });
+    stats.accepted += 1;
+  });
+
+  if (requestId) {
+    logInfo(requestId, 'Serper parse summary', stats);
+    const topExcluded = Object.entries(excludedDomains)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10);
+    if (topExcluded.length > 0) {
+      logInfo(requestId, 'Serper excluded domains', { top: topExcluded });
+    }
+  }
+
+  return items;
+};
+
 async function scrapeGoogleShoppingProductsUncached(
   productTitle: string,
   productPrice: number,
   country: Country,
   dolarValue: number,
+  resultLimit = 5,
 ): Promise<GoogleShoppingComparisonProduct[]> {
   const requestId = Math.random().toString(36).slice(2, 10);
+  console.log(`${LOG_TAG}[${requestId}] Start shopping scrape`, {
+    productTitle,
+    productPrice,
+    country,
+    resultLimit,
+    provider: String(process.env.GOOGLE_SHOPPING_PROVIDER || '').trim().toLowerCase() || 'default',
+    parserVersion: GOOGLE_SHOPPING_PARSER_VERSION,
+  });
   const query = cleanQuery(productTitle);
   if (!query || !Number.isFinite(productPrice) || productPrice <= 0) {
     logInfo(requestId, 'Invalid input for Google Shopping scraper', { productTitle, productPrice });
@@ -711,6 +921,110 @@ async function scrapeGoogleShoppingProductsUncached(
     query,
     queryCandidates,
   });
+
+  const serperEnabled = Boolean(String(process.env.SERPER_API_KEY || '').trim());
+  const provider = String(process.env.GOOGLE_SHOPPING_PROVIDER || '').trim().toLowerCase();
+  const serperNum = Math.max(1, Math.min(40, Number(process.env.SERPER_MAX_NUM || 40) || 40));
+  const maxResults = Math.max(1, Math.min(40, Number(resultLimit) || 5));
+  const serperLogRaw = String(process.env.SERPER_LOG_RAW || '').trim().toLowerCase() === 'true';
+
+  if (serperEnabled && provider !== 'html') {
+    try {
+      const serperQuery = buildSerperQuery(query);
+      logInfo(requestId, 'Trying Serper shopping provider', {
+        gl,
+        hl: 'es-419',
+        num: serperNum,
+        query: serperQuery,
+      });
+      console.log(`${LOG_TAG}[${requestId}] Serper shopping request`, {
+        query: serperQuery,
+        gl,
+        hl: 'es-419',
+        num: serperNum,
+      });
+      const serperResponse = await fetchSerperShoppingRaw(
+        { q: serperQuery, gl, hl: 'es-419', num: serperNum },
+        { timeoutMs: 12000 },
+      );
+
+      if (serperLogRaw) {
+        try {
+          const preview = JSON.stringify(serperResponse).slice(0, 3000);
+          logInfo(requestId, 'Serper raw response preview', { preview });
+        } catch {
+          // ignore serialization errors
+        }
+      }
+
+      const { key: serperKey, items: rawItems } = extractSerperItems(serperResponse);
+
+      logInfo(requestId, 'Serper response meta', {
+        keys: Object.keys(serperResponse || {}).slice(0, 40),
+        usedKey: serperKey || '(none)',
+        itemCount: rawItems.length,
+      });
+
+      console.log(`${LOG_TAG}[${requestId}] Serper shopping raw results`, {
+        usedKey: serperKey || '(none)',
+        total: rawItems.length,
+        sample: rawItems.slice(0, 5).map((item) => ({
+          title: item?.title,
+          source: item?.source || item?.merchant || item?.store,
+          price: item?.price,
+          hasImageUrl: Boolean((item as any)?.imageUrl || (item as any)?.image_url),
+          productId: (item as any)?.productId,
+          link: item?.link || item?.url,
+        })),
+      });
+
+      if (requestId && rawItems.length > 0) {
+        logInfo(requestId, 'Serper raw sample', {
+          total: rawItems.length,
+          sampleKeys: Object.keys(rawItems[0] || {}).slice(0, 24),
+          sample: rawItems.slice(0, 2).map((item) => ({
+            title: item?.title,
+            link: item?.link || item?.url,
+            price: item?.price,
+            extracted_price:
+              (item as any)?.extracted_price
+              ?? (item as any)?.extractedPrice
+              ?? (item as any)?.priceValue,
+            source: item?.source || item?.merchant || item?.store,
+          })),
+        });
+      }
+      const finalSerperResults = parseSerperShoppingItems(rawItems, query, dolarValue, productPrice, requestId)
+        .sort((a, b) => a.price - b.price)
+        .slice(0, maxResults);
+
+      console.log(`${LOG_TAG}[${requestId}] Serper shopping parsed results`, {
+        count: finalSerperResults.length,
+        sample: finalSerperResults.slice(0, 8).map((item) => ({
+          title: item.title,
+          price: item.price,
+          storeName: item.storeName,
+          domain: item.domain,
+          image: Boolean(item.image),
+          url: item.url,
+        })),
+      });
+
+      if (finalSerperResults.length > 0) {
+        return finalSerperResults;
+      }
+    } catch (error: any) {
+      console.error(`${LOG_TAG}[${requestId}] Serper shopping provider failed`, {
+        status: error?.status || error?.response?.status,
+        message: error?.message,
+        data: error?.data || error?.response?.data,
+      });
+      logError(requestId, 'Serper shopping provider failed', {
+        status: error?.status || error?.response?.status,
+        message: error?.message,
+      });
+    }
+  }
 
   for (const candidate of queryCandidates) {
     const urls = [
@@ -745,7 +1059,7 @@ async function scrapeGoogleShoppingProductsUncached(
           });
 
           if (items.length > 0) {
-            return items.sort((a, b) => a.price - b.price).slice(0, 30);
+            return items.sort((a, b) => a.price - b.price).slice(0, maxResults);
           }
         } catch (error: any) {
           logError(requestId, 'Google Shopping request failed', {
@@ -786,7 +1100,9 @@ async function scrapeGoogleShoppingProductsUncached(
           totalResults: fallbackItems.length,
         });
 
-        if (fallbackItems.length > 0) return fallbackItems;
+        if (fallbackItems.length > 0) {
+          return fallbackItems.sort((a, b) => a.price - b.price).slice(0, maxResults);
+        }
       } catch (error: any) {
         logError(requestId, 'Rendered Google fallback failed', {
           candidate,
@@ -811,6 +1127,9 @@ export async function scrapeGoogleShoppingProducts(
   country: Country,
   dolarValue: number,
 ): Promise<GoogleShoppingComparisonProduct[]> {
+  const user = await getCurrentUser();
+  const requester = await resolveSearchRequester(user?.email || user?.id || null);
+
   const query = cleanQuery(productTitle);
   const normalizedPrice = Math.max(1, Math.round(Number(productPrice) || 0));
   const normalizedDolarValue = Number.isFinite(dolarValue) && dolarValue > 0
@@ -821,6 +1140,8 @@ export async function scrapeGoogleShoppingProducts(
     return [];
   }
 
+  const comparisonMaxResults = Math.max(1, Math.min(5, Number(process.env.SERPER_MAX_RESULTS || 5) || 5));
+
   return runCachedSearch({
     namespace: 'google-shopping-products',
     params: {
@@ -828,11 +1149,18 @@ export async function scrapeGoogleShoppingProducts(
       productPrice: normalizedPrice,
       country,
       dolarValue: normalizedDolarValue,
+      parserVersion: GOOGLE_SHOPPING_PARSER_VERSION,
     },
     ttlMs: 10 * 60 * 1000,
     emptyTtlMs: 2 * 60 * 1000,
+    rateLimit: {
+      identifier: requester,
+      scope: 'google-shopping-products',
+      limit: 10,
+      windowMs: 60 * 1000,
+    },
     execute: async () =>
-      scrapeGoogleShoppingProductsUncached(query, normalizedPrice, country, normalizedDolarValue),
+      scrapeGoogleShoppingProductsUncached(query, normalizedPrice, country, normalizedDolarValue, comparisonMaxResults),
   });
 }
 
@@ -844,6 +1172,12 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
 
   const requestId = Math.random().toString(36).slice(2, 10);
   logInfo(requestId, 'Starting Google Shopping search scrape', { query, country });
+  console.log(`${LOG_TAG}[${requestId}] Start search-page scrape`, {
+    query,
+    normalizedQuery: cleanQuery(query),
+    country,
+    parserVersion: GOOGLE_SHOPPING_PARSER_VERSION,
+  });
   const requester = await resolveSearchRequester(user?.email || user?.id || null);
 
   return runCachedSearch({
@@ -851,6 +1185,7 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
     params: {
       query: query.toLowerCase(),
       country,
+      parserVersion: GOOGLE_SHOPPING_PARSER_VERSION,
     },
     ttlMs: 10 * 60 * 1000,
     emptyTtlMs: 2 * 60 * 1000,
@@ -861,11 +1196,13 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
       windowMs: 60 * 1000,
     },
     execute: async () => {
-      const comparisonItems = await scrapeGoogleShoppingProducts(
+      const searchMaxResults = Math.max(10, Math.min(40, Number(process.env.SERPER_MAX_NUM || 40) || 40));
+      const comparisonItems = await scrapeGoogleShoppingProductsUncached(
         query,
         Number.MAX_SAFE_INTEGER / 1000,
         country,
         1,
+        searchMaxResults,
       );
 
       logInfo(requestId, 'Raw Google Shopping search items', {
@@ -879,13 +1216,16 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
       });
 
       const sanitized = comparisonItems.filter((item) => {
-        const domain = getDomainFromUrl(item.url) || item.domain;
+        const domain = item.domain || getDomainFromUrl(item.url);
         if (!domain) return false;
-        return isAllowedOtherStoreDomain(domain);
+        if (isMercadoLibreStoreName(item.storeName || '')) return false;
+        if (isMercadoLibreDomain(domain)) return false;
+        if (isLocalDomain(domain)) return false;
+        return true;
       });
 
       const strict = sanitized.filter((item) => {
-        const domain = getDomainFromUrl(item.url) || item.domain;
+        const domain = item.domain || getDomainFromUrl(item.url);
         return isLikelyPublicStoreDomain(domain);
       });
 
@@ -903,7 +1243,7 @@ export async function scrapeGoogleShoppingSearchProducts(productTitle: any): Pro
       });
 
       return selected.map((item) => {
-        const domain = getDomainFromUrl(item.url) || item.domain;
+        const domain = item.domain || getDomainFromUrl(item.url);
         const trustScore = getDomainTrustIndex(domain, 'google-shopping');
         return {
           url: item.url,

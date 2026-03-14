@@ -303,7 +303,7 @@ export default function ProfileDashboardClient({
             id="saved-products"
             className="scroll-mt-28 border border-border/70 bg-background p-5 md:p-6 space-y-5"
           >
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex flex-col md:flex-row md:items-center gap-3">
               <div>
                 <h2 className="text-xl font-semibold text-foreground">
                   Productos guardados y alertas
@@ -312,9 +312,6 @@ export default function ProfileDashboardClient({
                   Elegí en qué productos querés recibir avisos cuando haya cambios.
                 </p>
               </div>
-              <Link href="/user-products">
-                <Button variant="secondary">Ver todos</Button>
-              </Link>
             </div>
 
             <div className="relative">

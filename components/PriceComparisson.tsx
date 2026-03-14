@@ -37,6 +37,34 @@ interface Props {
   productPrice: number;
 }
 
+const ResultThumb = ({ src, title, storeName }: { src?: string; title: string; storeName?: string }) => {
+  const sanitizedSrc = typeof src === 'string' ? src.trim() : '';
+  const [failed, setFailed] = useState(!sanitizedSrc);
+
+  if (failed) {
+    return (
+      <div className='flex h-[60px] w-[60px] items-center justify-center rounded-md border border-border/70 bg-section-grey text-center'>
+        <div>
+          <p className='text-[9px] uppercase tracking-[0.12em] text-muted-foreground'>Sin</p>
+          <p className='text-[9px] uppercase tracking-[0.12em] text-muted-foreground'>imagen</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={sanitizedSrc}
+      alt={title}
+      width={60}
+      height={60}
+      className='rounded-md object-contain'
+      onError={() => setFailed(true)}
+      title={storeName || title}
+    />
+  );
+};
+
 const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -130,6 +158,9 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                 <TableBody>
                   {activeData.map((product, index) => {
                     const itemPrice = Number(product.price);
+                    const isGoogleHostedLink = /(^https?:\/\/)?(www\.)?google\./i.test(
+                      String(product.url || ''),
+                    );
 
                     const deltaType =
                       productPrice === itemPrice
@@ -142,13 +173,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                     return (
                       <TableRow key={`${product.url}-${index}`}>
                         <TableCell className='w-1/6 sm:w-auto'>
-                          <img
-                            src={product.image || '/assets/images/hero-1.svg'}
-                            alt={product.title}
-                            width={60}
-                            height={60}
-                            className='rounded-md object-contain'
-                          />
+                          <ResultThumb src={product.image} title={product.title} storeName={product.storeName} />
                         </TableCell>
                         <TableCell className='text-left'>
                           <Text>{product.title}</Text>
@@ -190,7 +215,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                               onClick={() => window.open(product.url, '_blank')}
                               aria-label={`Visitar ${product.title}`}
                             >
-                              Visitar
+                              {isGoogleHostedLink ? 'Ver en Google Shopping' : 'Visitar'}
                             </button>
                             <div
                               className='cursor-pointer text-gray-500 hover:text-blue-500'
@@ -304,6 +329,9 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                       <TableBody>
                         {activeData.map((product, index) => {
                           const itemPrice = Number(product.price);
+                          const isGoogleHostedLink = /(^https?:\/\/)?(www\.)?google\./i.test(
+                            String(product.url || ''),
+                          );
 
                           const deltaType =
                             productPrice === itemPrice
@@ -316,13 +344,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                           return (
                             <TableRow key={`${product.url}-modal-${index}`}>
                               <TableCell className='w-1/6 sm:w-auto'>
-                                <img
-                                  src={product.image || '/assets/images/hero-1.svg'}
-                                  alt={product.title}
-                                  width={60}
-                                  height={60}
-                                  className='rounded-md object-contain'
-                                />
+                                <ResultThumb src={product.image} title={product.title} storeName={product.storeName} />
                               </TableCell>
                               <TableCell className='text-left'>
                                 <Text>{product.title}</Text>
@@ -363,7 +385,7 @@ const PriceComparisson = ({ scrapedData, productPrice }: Props) => {
                                     onClick={() => window.open(product.url, '_blank')}
                                     aria-label={`Visitar ${product.title}`}
                                   >
-                                    Visitar
+                                    {isGoogleHostedLink ? 'Ver en Google Shopping' : 'Visitar'}
                                   </button>
                                   <div
                                     className='cursor-pointer text-gray-500 hover:text-blue-500'

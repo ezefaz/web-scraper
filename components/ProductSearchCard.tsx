@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { formatNumber, getDiscountPercentage } from '@/lib/utils';
 import { Badge } from '@tremor/react';
@@ -12,7 +13,9 @@ interface Props {
 }
 
 const ProductSearchCard = ({ product }: Props) => {
-  const imageSrc = product?.image || '/assets/images/hero-1.svg';
+  const rawImageSrc = typeof product?.image === 'string' ? product.image.trim() : '';
+  const [imageFailed, setImageFailed] = useState(false);
+  const hasImage = !!rawImageSrc && !imageFailed;
   const currentPrice = Number(product?.currentPrice) || 0;
   const originalPrice = Number(product?.originalPrice) || 0;
   const hasDiscount = originalPrice > 0 && originalPrice > currentPrice;
@@ -53,11 +56,23 @@ const ProductSearchCard = ({ product }: Props) => {
 
       <div className='overflow-hidden border border-border/70 bg-background'>
         <div className='aspect-[4/3] w-full'>
-          <img
-            src={imageSrc}
-            alt={product.title}
-            className='h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.02]'
-          />
+          {hasImage ? (
+            <img
+              src={rawImageSrc}
+              alt={product.title}
+              className='h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.02]'
+              onError={() => setImageFailed(true)}
+            />
+          ) : (
+            <div className='flex h-full w-full items-center justify-center bg-[linear-gradient(135deg,#ffffff_0%,#fafafa_100%)] p-3 text-center'>
+              <div>
+                <p className='text-[11px] uppercase tracking-[0.12em] text-muted-foreground'>Sin imagen</p>
+                <p className='mt-1 text-xs font-medium text-foreground'>
+                  {storeName || domain || sourceLabel}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
